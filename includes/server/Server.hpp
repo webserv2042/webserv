@@ -1,6 +1,6 @@
-#ifndef WEBSERV_HPP
+#ifndef SERVER_HPP
 
-# define WEBSERV_HPP
+# define SERVER_HPP
 
 #include <string.h>
 #include <iostream>
