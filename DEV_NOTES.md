@@ -41,4 +41,6 @@ Ok à partir de là ça devrai être bon nous sommes connecte.
 Le client envoie un mssg --> donc le serveur doit le receptionner --> le serveur doit rep
 au client --> le client reçoit le méssage.
 
+Construction du strict minimum pour Daniya.
+
 
