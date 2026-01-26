@@ -10,6 +10,8 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
+
 
 const int IPV4 = AF_INET;
 
@@ -22,9 +24,7 @@ class Server {
 		int					socketFD; // Stocker le socket
 		int					port;	  // Stocker le port
 		struct sockaddr_in	socketAddress; // Carte d'identité
-		int					socketAddressLenght;
-		// int					bindReturnCode;
-		// int					listenReturnCode;
+		int					socketAddressLength;
 		Server(int port);
 		void init();
 };
