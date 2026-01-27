@@ -20,11 +20,8 @@ int main (void)
 		return (1);
 	}
 
-
-
 	// Fermeture des sockets et libération des ressources
 	close(server.socketFD);
-	// close(socketFD);
 
 	return (0);
 }
