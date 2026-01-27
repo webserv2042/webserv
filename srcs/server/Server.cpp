@@ -20,7 +20,7 @@ void Server::init()
 	this->socketAddress.sin_port = htons(LISTENING_PORT); // htons = host to network short
 	this->socketAddress.sin_addr.s_addr = htonl(INADDR_ANY); // htonl = host to network long
 	this->socketAddressLength = sizeof(this->socketAddress);
-	int bindReturnCode = bind(socketFD, (struct sockaddr*) &this->socketAddress, this->socketAddressLength);
+	int bindReturnCode = bind(socketFD, reinterpret_cast<struct sockaddr*> (&this->socketAddress), this->socketAddressLength);
 	if (bindReturnCode == -1)
 		throw std::runtime_error("(SERVER) Failed to link socket");
 	int listenReturnCode = listen(socketFD, PENDING_QUEUE_MAXLENGTH);
