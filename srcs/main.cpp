@@ -7,12 +7,12 @@ int main (void)
 	try
 	{
 		server.init();
-		std::cout << "Tentative d'accept..." << std::endl;
-		int client = accept(server.socketFD, NULL, NULL);
-		if (client == -1)
-			std::cout << "Succes, cest non bloquant" << std::endl;
-		else
-			std::cout << "Fail cest bloquant" << std::endl;
+		// std::cout << "Tentative d'accept..." << std::endl;
+		// int client = accept(server.socketFD, NULL, NULL);
+		// if (client == -1)
+		// 	std::cout << "Succes, cest non bloquant" << std::endl;
+		// else
+		// 	std::cout << "Fail cest bloquant" << std::endl;
 	}
 	catch(const std::exception& e)
 	{
