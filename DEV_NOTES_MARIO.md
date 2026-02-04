@@ -180,3 +180,37 @@ Problème : la ressource demandee n'existe pas. Le code interne du serv genere u
 Au lieu d'envoyer juste un 404 le serveur verifie sa config et regarde sil a une consigne speciale pour le 404 si oui il remplace par le fichier indiqué /404_custom.html
 
 Voilà c'est bien utile de connaitre le lien entre conf.serv et requete HTPP
+
+## 7. Modification class serveur
+
+Avant de modifier la classe server je dois decouper et comprendre le fichier de configuration (.conf).
+
+server {
+    listen 8080; --> port sur lequel le serv attend des connexions (utile pour bind)
+    host 127.0.0.1; --> adresse IP à écouter
+    server_name localhost; --> Voir Host name vs server_name
+
+    client_max_body_size 10M; --> taille limite pour le corps d'une requete
+
+    error_page 404 /error_pages/404.html; --> chemin vers un fichier html personalisé à afficher si une ressource est introuvable.
+
+    root /var/www/site_principal; --> chemin absolu sur le disque dur. Si on demande (/index/html), le serv cherche dans /var/www/site_principal/index.html
+
+    index index.html; --> si l'URL demandée est un dossier le ser cherche ce fichier à linterieur
+
+    location / {
+        allow_methods GET POST; --> liste des methodes http autorisées
+        autoindex on; --> si l'utilisateur demande un dossier et qu'il n'y a pas de fameux fichier index.html il doit generer une page html listant les fichiers présents.
+    }
+
+    location /images { --> definir un chemin pour un dossier spécifique.
+        root /var/www/site_principal/images; --> toute requete qui commence par /iamges ira chercher ses ficheir dans ce dossier
+        allow_methods GET;
+    }
+}
+
+Maintenant que j'ai tout ça je peux modifier ma classe config (entre temps jai mis config dans server comme ça cest plus logique) et mettre tout ce quil faut.
+
+
+
+
