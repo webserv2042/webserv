@@ -80,7 +80,7 @@ class Config {
 		// ajout petit à petit
 		void								addServerName(const std::string& name);
 		void 								addErrorPage(int code, const std::string& path);
-		void								addAllowedMethod(const std::strinf& method);
+		void								addAllowedMethod(const std::string& method);
 		void								addLocation(const Location& location);
 
 
