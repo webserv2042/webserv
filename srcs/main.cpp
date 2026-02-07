@@ -1,4 +1,5 @@
 #include "../includes/server/Server.hpp"
+#include "../includes/config/Parser.hpp"
 
 int main (void)
 {
@@ -23,20 +24,29 @@ int main (void)
 	// // Fermeture des sockets et libération des ressources
 	// close(server.socketFD);
 
-	Config configA;
-	Config configB;
-	configA.addServerName("mario");
-	configA.setPort(5090);
-	configB.setPort(5091);
-	configB.addServerName("daniya");
-	Server siteVitrine(configA); // port 5090
-	Server siteAdmin(configB); // port 5091
-	std::cout << configA.getPort() << std::endl;
-	std::cout << configA.getServerName() << std::endl;
-	std::cout << configB.getPort() << std::endl;
-	std::cout << configB.getServerName() << std::endl;
+	// Config configA;
+	// Config configB;
+	// configA.addServerName("mario");
+	// configA.setPort(5090);
+	// configB.setPort(5091);
+	// configB.addServerName("daniya");
+	// Server siteVitrine(configA); // port 5090
+	// Server siteAdmin(configB); // port 5091
+	// std::cout << configA.getPort() << std::endl;
+	// std::cout << configA.getServerName() << std::endl;
+	// std::cout << configB.getPort() << std::endl;
+	// std::cout << configB.getServerName() << std::endl;
 
-
+	try
+	{
+		Parser					parser;
+		std::vector<ServerNode> nodes = parser.parseFile("server.conf");
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
+		return (1);
+	}
 	return (0);
 }
 
