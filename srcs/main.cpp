@@ -25,10 +25,10 @@ int main (void)
 
 	Config configA;
 	Config configB;
-	configA.setServerName("mario");
+	configA.addServerName("mario");
 	configA.setPort(5090);
 	configB.setPort(5091);
-	configB.setServerName("daniya");
+	configB.addServerName("daniya");
 	Server siteVitrine(configA); // port 5090
 	Server siteAdmin(configB); // port 5091
 	std::cout << configA.getPort() << std::endl;

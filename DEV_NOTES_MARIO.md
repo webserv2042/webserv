@@ -169,7 +169,7 @@ Probleme : le socker reçoit une ip mais si cette IP héberge  10 sites differen
 Sans ce lien le serveur est aveugle et ne sait pas pour qui est l'appel.
 
 2 - Traduction d'adresse URI vs root
-Problème : le client demande /index.html sauf que pour le serveur le fichier n'est pa à la racine donc il prend le chemin demandé par la requete HTTP /index.html et le colle devant le chemindéfini dans la config root /var/www/site
+Problème : le client demande /index.html sauf que pour le serveur le fichier n'est pas à la racine donc il prend le chemin demandé par la requete HTTP /index.html et le colle devant le chemindéfini dans la config root /var/www/site
 
 3 - La protection Content-Length vs client_max_body_size
 Problème : Un client malveillant essaye d'envoyer un fichier de 10go via une requete POST si on l'accepte RAMs saturé serveur qui plante.
@@ -211,6 +211,70 @@ server {
 
 Maintenant que j'ai tout ça je peux modifier ma classe config (entre temps jai mis config dans server comme ça cest plus logique) et mettre tout ce quil faut.
 
+
+PS : un fichier .conf sert à decrire les objets qu'on va instancier, il crée des modeles de configuration.
+
+## 8. Construction du parser
+
+Il faut bien decouper les responsabilités du projet.
+
+Webserv --> vector<Server> --> config
+
+1 - Webserv (classe)
+
+	charger le fichier de configuration
+	parser --> obtenir une liste de configs
+	créer les Server à partir des configs
+	lancer la boucle principale
+Donc Webserv ne dépend pas du format du fichier.
+
+2 - Config
+
+	contenir uniquement les donées
+	aucune logique réseau
+	aucune socket
+	aucune syscall
+Config = DTO (en gros cest que de la data)
+
+3 - Server
+	Recevoir une config
+	ouvrir un socket
+	gérer les connexions
+	router les requetes via location
+Il ne parse pas
+
+Un fichier contient N Server, chaque server contient des directives et des locations, chaque location conteint des directives.
+
+Fin.
+
+# Qu'est ce qu'une directive ???
+
+une directive = listen 8080;
+1 mot clé (listen)
+N argument
+se termine par ; --- <name> <arg1> |<arg2> ... ; --- (si une ligne ne repecte pas ça = erreur syntaxique).
+
+# liste des directives
+
+listen -> 1 arg -> server
+host -> 1 arg (string) -> server
+server_name -> N arg -> server
+
+
+
+# Qu'est ce qu'un bloc ???
+
+location /images {
+	...
+}
+
+1 mot clé (listen)
+N argument
+{
+contenu
+}				--- <name> <args> { ... } ---
+
+Le parser ne sait pas que listen = port ou root = path, ça vient après lors de létape de valdiation, au denbt juste on rempli.
 
 
 
