@@ -6,6 +6,14 @@
 // Pour ouvrir et lire un fichier
 #include <iostream>
 #include <fstream>
+#include <limits>
+
+enum	ParserState
+{
+	GLOBAL,
+	SERVER,
+	LOCATION
+};
 
 struct Directive
 {
@@ -31,7 +39,7 @@ class	Parser {
 
 	public:
 		Parser();
-		std::vector<ServerNode>	parseFile(const std::string& filename); // méthode publique pour faire le parsing
+		std::vector<ServerNode>	parseFile(const std::string& filename);
 };
-
+std::vector<std::string>	tokenize(const std::string& filename);
 #endif

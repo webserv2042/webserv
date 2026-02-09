@@ -39,7 +39,7 @@ int main (void)
 
 	try
 	{
-		Parser					parser;
+		Parser parser;
 		std::vector<ServerNode> nodes = parser.parseFile("server.conf");
 	}
 	catch(const std::exception& e)
@@ -47,6 +47,9 @@ int main (void)
 		std::cerr << e.what() << std::endl;
 		return (1);
 	}
+
+	// tokenize("server.conf");
+
 	return (0);
 }
 
