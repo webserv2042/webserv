@@ -16,6 +16,10 @@
 #include <sys/epoll.h>
 #include <stdexcept>
 #include <errno.h>
+#include <map>
+
+// class Client;
+#include "Client.hpp"
 
 const int IPV4 = AF_INET;
 
@@ -37,9 +41,13 @@ class Server {
 		void init();
 
 		//daniya
-		int					ep_fd; //instance epoll
-		void 				startEpoll();
-		void 				epollLoop();
+		int						ep_fd; //instance epoll
+		std::map<int, Client>	clientMap;
+		void 					startEpoll();
+		void 					epollLoop();
+		void					acceptClient(int newConnexionFd);
+		void 					setNonBlockingSocket(int fdSocket);
+		void					registerNewFd(int newFd, uint32_t event);
 
 };
 

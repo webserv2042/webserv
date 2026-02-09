@@ -3,7 +3,7 @@ CFLAGS  = -Wall -Wextra -Werror -std=c++98
 NAME    = webserv
 
 # Source files
-SRCS    = srcs/main.cpp srcs/server/Server.cpp
+SRCS    = srcs/main.cpp srcs/server/Server.cpp srcs/server/Client.cpp
 
 # Object files: Redirected to the obj/ directory
 OBJ_DIR = obj
