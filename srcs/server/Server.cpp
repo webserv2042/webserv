@@ -1,4 +1,6 @@
 #include "../../includes/server/Server.hpp"
+#include <errno.h>
+#include <string.h>
 
 Server::Server(int port)
 {
@@ -16,13 +18,18 @@ void Server::init()
 		throw std::runtime_error("(SERVER) Failed to get socket configuration");
 	flags = flags | O_NONBLOCK;
 	fcntl(this->socketFD, F_SETFL, flags);
+
+	//! reuse address necessary
+	int opt = 1;
+	setsockopt(this->socketFD, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
 	this->socketAddress.sin_family = IPV4;
-	this->socketAddress.sin_port = htons(LISTENING_PORT); // htons = host to network short
+	this->socketAddress.sin_port = htons(this->port); // htons = host to network short
 	this->socketAddress.sin_addr.s_addr = htonl(INADDR_ANY); // htonl = host to network long
 	this->socketAddressLength = sizeof(this->socketAddress);
 	int bindReturnCode = bind(socketFD, (struct sockaddr*) &this->socketAddress, this->socketAddressLength);
 	if (bindReturnCode == -1)
-		throw std::runtime_error("(SERVER) Failed to link socket");
+		throw std::runtime_error("(SERVER) Failed to link socket: ");
 	int listenReturnCode = listen(socketFD, PENDING_QUEUE_MAXLENGTH);
 	if (listenReturnCode == -1)
 		throw std::runtime_error("(SERVER) Failed to start listening");

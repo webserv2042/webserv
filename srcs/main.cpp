@@ -4,17 +4,19 @@
 
 int main (void)
 {
-	Server	server(LISTENING_PORT);
-
 	try
 	{
-		//SIGNAL
+		//SIGNALS
 		handle_signals();
 
 		//INIT SERVER
-		std::cout << "Initalizing server..." << std::endl;
-		server.init();
+		std::cout << "Initializing server..." << std::endl;
 
+		Server	server(8080);
+		Server	server2(8081);
+
+		server.init();
+		server2.init();
 		// std::cout << "Tentative d'accept..." << std::endl;
 		// int client = accept(server.socketFD, NULL, NULL);
 		// if (client == -1)
@@ -27,17 +29,16 @@ int main (void)
 
 		Webserv webserv;
 		webserv.setServer(server);
+		webserv.setServer(server2);
 		webserv.epollLoop();
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << std::endl;
+		std::cerr << e.what();
+		std::cerr << strerror(errno) << std::endl; //TODO add this to every error msg
+		//TODO free fds in case of error
 		return (1);
 	}
-
-	// Fermeture des sockets et libération des ressources
-	close(server.socketFD);
-	// close(socketFD);
 
 	return (0);
 }

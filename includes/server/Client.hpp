@@ -8,6 +8,7 @@
 
 typedef enum t_client_state
 {
+    REQUEST_RECEIVED,
 	READING_REQUEST,
 	PROCESSING,
 	WRITING_RESPONSE,

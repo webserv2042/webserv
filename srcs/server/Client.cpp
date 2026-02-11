@@ -2,6 +2,7 @@
 
 //CONSTRUCTOR(S)
 Client::Client() {
+    clientFd = -1;
 }
 
 Client::Client(int new_client_fd) : clientFd(new_client_fd){
@@ -16,7 +17,10 @@ Client::Client(const Client& to_copy) {
 Client& Client::operator=(const Client& to_copy) {
     if (this != &to_copy)
     {
-        //stuff to copy
+        clientFd = to_copy.clientFd;
+        clientState = to_copy.clientState;
+        readBuff = to_copy.readBuff;
+        writeBuff = to_copy.writeBuff;
     }
     return (*this);
 }

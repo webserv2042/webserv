@@ -1,6 +1,6 @@
 #include "../../includes/signals/Signals.hpp"
 
-volatile sig_atomic_t server_running = 1;
+volatile sig_atomic_t server_running = 1; //variable qui verifie que le programme n'a pas ete interrompu par un signal
 
 void    handle_sigint(int sig)
 {
