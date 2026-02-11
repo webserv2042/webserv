@@ -35,11 +35,11 @@ struct ServerNode
 
 class	Parser {
 	private:
-		void	parserServerBlock();
+		std::vector<std::string>	tokenize(const std::string& filename);
+		std::vector<ServerNode>		parserServerBlock(std::vector<std::string> tokens);
 
 	public:
 		Parser();
-		std::vector<ServerNode>	parseFile(const std::string& filename);
+		std::vector<ServerNode>		parseFile(const std::string& filename);
 };
-std::vector<std::string>	tokenize(const std::string& filename);
 #endif
