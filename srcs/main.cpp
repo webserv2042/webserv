@@ -1,4 +1,6 @@
 #include "../includes/server/Server.hpp"
+#include "../includes/signals/Signals.hpp"
+#include "../includes/webserv/Webserv.hpp"
 
 int main (void)
 {
@@ -6,7 +8,10 @@ int main (void)
 
 	try
 	{
-		//PARTIE MARIO
+		//SIGNAL
+		handle_signals();
+
+		//INIT SERVER
 		std::cout << "Initalizing server..." << std::endl;
 		server.init();
 
@@ -20,7 +25,9 @@ int main (void)
 		//PARTIE POLL
 		std::cout << "Starting Epoll..." << std::endl;
 
-		server.epollLoop();
+		Webserv webserv;
+		webserv.setServer(server);
+		webserv.epollLoop();
 	}
 	catch(const std::exception& e)
 	{
