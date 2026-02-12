@@ -250,10 +250,129 @@ std::vector<ServerNode> Parser::parserServerBlock(std::vector<std::string> token
 	return (servers);
 }
 
+void	Parser::validateArgumentCount(const Directive& d)
+{
+	size_t count = d.arguments.size();
+
+	if (d.name == "listen" && count != 1)
+		throw std::runtime_error("(CONFIG) 'listen' exptects exactly 1 argument");
+	if (d.name == "host" && count != 1)
+		throw std::runtime_error("(CONFIG) 'host' exptects exactly 1 argument");
+	if (d.name == "root" && count != 1)
+		throw std::runtime_error("(CONFIG) 'root' exptects exactly 1 argument");
+	if (d.name == "server_name" && count < 1)
+		throw std::runtime_error("(CONFIG) 'server_name' exptects at least 1 argument");
+	if (d.name == "index" && count < 1)
+		throw std::runtime_error("(CONFIG) 'index' exptects at least 1 argument");
+	if (d.name == "error_page" && count != 2)
+		throw std::runtime_error("(CONFIG) 'error_page' expects exactly 2 argument");
+	if (d.name == "client_max_body_size" && count != 1)
+		throw std::runtime_error("(CONFIG) 'client_max_body_size' exptects exactly 1 argument");
+	if (d.name == "allow_methods" && count < 1)
+		throw std::runtime_error("(CONFIG) 'allow_methods' exptects at least 1 argument");
+	if (d.name == "autoindex" && count != 1)
+		throw std::runtime_error("(CONFIG) 'autoindex' exptects exactly 1 argument");
+	if (d.name == "return" && count != 2)
+		throw std::runtime_error("(CONFIG) 'return' exptects exactly 2 argument");
+	if (d.name == "upload_path" && count != 1)
+		throw std::runtime_error("(CONFIG) 'upload_path' exptects exactly 1 argument");
+}
+
+
+bool	Parser::isDirectiveAllowedInContext(const std::string& name, Context ctx)
+{
+	if (ctx == SERVER_CTX)
+	{
+		return (name == "listen" || name == "host" || name == "server_name" || name == "root" ||
+				name == "index" || name == "error_page" || name == "client_max_body_size");
+	}
+	else
+	{
+		return (name == "root" || name == "allow_methods" || name == "autoindex" || name == "return" ||
+				name == "index" || name == "upload_path");
+	}
+}
+
+
+void	Parser::validateDirective(const Directive& d, Context ctx)
+{
+	if (!isDirectiveAllowedInContext(d.name, ctx))
+	{
+		std::string ctxName;
+		if (ctx == SERVER_CTX)
+			ctxName = "server";
+		else
+			ctxName = "location";
+		throw std::runtime_error("(CONFIG) directive '" + d.name +
+								"' is not allowed in " + ctxName + " context");
+	}
+	validateArgumentCount(d);
+	validateArgumentValues(d);
+}
+
+
+void	Parser::validateLocation(const LocationNode& location)
+{
+	if (location.path.empty())
+		throw std::runtime_error("(CONFIG) location path cannot be empty");
+	for (size_t i = 0; i < location.directives.size(); ++i) {
+		validateDirective(location.directives[i], LOCATION_CTX);
+	}
+}
+
+
+void	Parser::validateServer(const ServerNode& server)
+{
+	bool	hasListen = false;
+	size_t	hostCount = 0;
+	size_t	rootCount = 0;
+	size_t	clientSizeCount = 0;
+	size_t	indexCount = 0;
+
+	for (size_t i = 0; i < server.directives.size(); ++i) {
+		const Directive& d = server.directives[i];
+		if (d.name == "listen")
+			hasListen = true;
+		if (d.name == "host")
+			hostCount++;
+		if (d.name == "root")
+			rootCount++;
+		if (d.name == "client_max_body_size")
+			clientSizeCount++;
+		if (d.name == "index")
+			indexCount++;
+		validateDirective(d, SERVER_CTX);
+	}
+	if (!hasListen)
+		throw std::runtime_error("(CONFIG) missing 'listen' directive in server block");
+	if (hostCount > 1)
+		throw std::runtime_error("(CONFIG) 'host' can appear at most once in server block");
+	if (rootCount > 1)
+		throw std::runtime_error("(CONFIG) 'root' can appear at most once in server block");
+	if (clientSizeCount > 1)
+		throw std::runtime_error("(CONFIG) 'client_max_body_size' can appear at most once in server block");
+	if (indexCount > 1)
+		throw std::runtime_error("(CONFIG) 'index' can appear at most once in server block");
+	for (size_t i = 0; i < server.locations.size(); ++i) {
+		validateLocation(server.locations[i]);
+	}
+}
+
+
+void	Parser::validateServers(const std::vector<ServerNode>& servers)
+{
+	if (servers.empty())
+		throw std::runtime_error("(CONFIG) no server block defined");
+
+	for (size_t i = 0; i < servers.size(); ++i) {
+		validateServer(servers[i]);
+	}
+}
+
 /// @brief fonction principale qui parse le fichier de configuration
 /// @param filename nom du fichier à parser
 /// @return liste de serveurs sous forme de vector
-std::vector<ServerNode> Parser::parseFile(const std::string &filename)
+std::vector<ServerNode> Parser::parseFile(const std::string& filename)
 {
 	std::vector<ServerNode>		servers;
 	std::vector<std::string>	tokens;
@@ -262,5 +381,6 @@ std::vector<ServerNode> Parser::parseFile(const std::string &filename)
 	if (tokens.empty())
 		throw std::runtime_error("(PARSER) configuration file is empty");
 	servers = parserServerBlock(tokens);
+	validateServers(servers);
 	return (servers);
 }
