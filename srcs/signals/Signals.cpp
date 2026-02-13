@@ -1,4 +1,4 @@
-#include "../../includes/signals/Signals.hpp"
+#include "../../includes/Signals.hpp"
 
 volatile sig_atomic_t server_running = 1; //variable qui verifie que le programme n'a pas ete interrompu par un signal
 

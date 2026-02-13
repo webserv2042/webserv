@@ -28,7 +28,7 @@ Des qu'un evenement se procure, epoll_wait se reveille et nous rend les informat
 
 ## 4 - Evenements detectes
 Quand on recupere les evenements qui se sont produits sur nos fd, on retrouve 2 types de cas:
-1) les evenements arrives sur le fd d'une socket
+1) les evenements arrives sur le fd d'un socket
 -> cela signifie qu'un nouveau client essaye de se connecter au server
     ->on accepte ce client:
     -un nouveau socket est cree pour lui (la fonction accept() retourne le fd de ce socket)

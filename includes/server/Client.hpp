@@ -8,7 +8,6 @@
 
 typedef enum t_client_state
 {
-    REQUEST_RECEIVED,
 	READING_REQUEST,
 	PROCESSING,
 	WRITING_RESPONSE,
@@ -27,6 +26,8 @@ class Client {
         int         clientState;
         std::string readBuff;
         std::string writeBuff;
+
+        int         bytesSent; //nb de bytes envoyés au client
 
     private:
         /*content*/

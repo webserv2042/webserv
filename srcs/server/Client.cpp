@@ -3,6 +3,7 @@
 //CONSTRUCTOR(S)
 Client::Client() {
     clientFd = -1;
+    bytesSent = 0;
 }
 
 Client::Client(int new_client_fd) : clientFd(new_client_fd){

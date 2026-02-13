@@ -1,6 +1,6 @@
 #include "../includes/server/Server.hpp"
-#include "../includes/signals/Signals.hpp"
-#include "../includes/webserv/Webserv.hpp"
+#include "../includes/Signals.hpp"
+#include "../includes/Webserv.hpp"
 
 int main (void)
 {

@@ -4,7 +4,8 @@ NAME    = webserv
 
 # Source files
 SRCS    = srcs/main.cpp srcs/server/Server.cpp srcs/server/Client.cpp \
-		srcs/signals/Signals.cpp srcs/webserv/Webserv.cpp
+		srcs/signals/Signals.cpp srcs/webserv/Webserv.cpp \
+		srcs/webserv/epollManager.cpp 
 
 # Object files: Redirected to the obj/ directory
 OBJ_DIR = obj
