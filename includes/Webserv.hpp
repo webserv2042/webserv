@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <map>
 #include <vector>
+#include <sstream>
 
 #include "server/Client.hpp"
 #include "server/Server.hpp"
@@ -39,6 +40,7 @@ class Webserv {
     private:
 
 		//* EPOLL MANAGER
+		
 		int						ep_fd; //instance epoll
 		std::vector<Server>		servers; //liste des serveurs
 		struct epoll_event		events[MAX_EVENTS]; //tableau des evenements enregistres par epoll_wait
@@ -51,12 +53,14 @@ class Webserv {
 		void					registerNewFd(int &newFd, uint32_t event);
 		bool					isSocketFd(int &sockFD);
 		void					modifyEpollout(int &fd, int action);
+		void					closeClient(int clientFD);
 		void					finalClean();
 
 		//* REQUETE + REPONSE
+
 		void					treatRequest(int &fd);
 		int						testRead(int &clientFD); //supp + tard
-		void					sendResponse(int &fd);
+		void					sendResponse(Client &client);
     
 };
 

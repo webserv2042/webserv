@@ -4,6 +4,8 @@
 
 int main (void)
 {
+	Webserv webserv;
+
 	try
 	{
 		//SIGNALS
@@ -17,26 +19,20 @@ int main (void)
 
 		server.init();
 		server2.init();
-		// std::cout << "Tentative d'accept..." << std::endl;
-		// int client = accept(server.socketFD, NULL, NULL);
-		// if (client == -1)
-		// 	std::cout << "Succes, cest non bloquant" << std::endl;
-		// else
-		// 	std::cout << "Fail cest bloquant" << std::endl;
 
 		//PARTIE POLL
 		std::cout << "Starting Epoll..." << std::endl;
 
-		Webserv webserv;
 		webserv.setServer(server);
 		webserv.setServer(server2);
+
 		webserv.epollLoop();
 	}
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what();
-		std::cerr << strerror(errno) << std::endl; //TODO add this to every error msg
-		//TODO free fds in case of error
+		std::cerr << strerror(errno) << std::endl;
+		webserv.finalClean();
 		return (1);
 	}
 

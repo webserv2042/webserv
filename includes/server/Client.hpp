@@ -28,6 +28,9 @@ class Client {
         std::string writeBuff;
 
         int         bytesSent; //nb de bytes envoyés au client
+        int         buffSize; //taille totale du writeBuff
+
+        void        resetClient();
 
     private:
         /*content*/
