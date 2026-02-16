@@ -250,6 +250,114 @@ std::vector<ServerNode> Parser::parserServerBlock(std::vector<std::string> token
 	return (servers);
 }
 
+void	Parser::validatePort(const std::string& port)
+{
+	if (port.empty())
+		throw std::runtime_error("(CONFIG) port is empty.");
+
+	for (size_t i = 0; i < port.size(); i++) {
+		if (!isdigit(port[i]))
+			throw std::runtime_error("(CONFIG) port must contain only digit.");
+	}
+	char	*end;
+	long 	value = strtol(port.c_str(), &end, 10);
+
+	if (*end != '\0')
+		throw std::runtime_error("(CONFIG) invalid port format.");
+	if (value < 1 || value > 65535)
+		throw std::runtime_error("(CONFIG) port must be between 1 and 65535.");
+}
+
+void	Parser::validateHttpMethod(const std::vector<std::string>& httpMethods)
+{
+	if (httpMethods.empty())
+		throw std::runtime_error("(CONFIG) http methods is empty.");
+	for (std::vector<std::string>::size_type i = 0; i < httpMethods.size(); i++) {
+		if (httpMethods[i] != "GET" && httpMethods[i] != "POST" && httpMethods[i] != "DELETE")
+			throw std::runtime_error("(CONFIG) method must be GET, POST or DELETE.");
+	}
+}
+
+void	Parser::validateOnOff(const std::string& value)
+{
+	if (value.empty())
+		throw std::runtime_error("(CONFIG) autoindex is empty.");
+	if (value != "on" && value != "off")
+		throw std::runtime_error("(CONFIG) autoindex must be on or off.");
+}
+
+void	Parser::validateErrorCode(const std::string& errorCode)
+{
+	if (errorCode.empty())
+		throw std::runtime_error("(CONFIG) error code is empty.");
+	for (size_t i = 0; i < errorCode.size(); i++) {
+		if (!isdigit(errorCode[i]))
+			throw std::runtime_error("(CONFIG) error code must contain only digit.");
+	}
+	char	*end;
+	long	value = strtol(errorCode.c_str(), &end, 10);
+	if (*end != '\0')
+		throw std::runtime_error("(CONFIG) invalid error code format.");
+	if (value < 400 || value > 599)
+		throw std::runtime_error("(CONFIG) error code must be between 400 and 599");
+}
+
+void	Parser::validateRedirectCode(const std::string& code)
+{
+	if (code.empty())
+		throw std::runtime_error("(CONFIG) redirect code is empty.");
+	for (size_t i = 0; i < code.size(); i++) {
+		if (!isdigit(code[i]))
+			throw std::runtime_error("(CONFIG) redirect code must contain only digit.");
+	}
+	char	*end;
+	long	value = strtol(code.c_str(), &end, 10);
+	if (*end != '\0')
+		throw std::runtime_error("(CONFIG) invalid redirect code format.");
+	if (value != 301 && value != 302 && value != 303 && value != 307 && value != 308)
+		throw std::runtime_error("(CONFIG) redirect code must be 301, 302, 303, 307 or 308");
+}
+
+std::vector<std::string> split(const std::string& ip, char delimiter)
+{
+	std::vector<std::string>	result;
+	size_t	start = 0;
+	size_t	end = ip.find(delimiter, start);
+
+	while (end != std::string::npos)
+	{
+		result.push_back(ip.substr(start, end - start));
+		start = end + 1;
+		end = ip.find(delimiter, start);
+	}
+	result.push_back(ip.substr(start));
+	return (result);
+}
+
+void	Parser::validateIP(const std::string& ip)
+{
+	if (ip.empty())
+		throw std::runtime_error("(CONFIG) ip is empty");
+	std::vector<std::string> parts = split(ip, '.');
+	if (parts.size() != 4)
+		throw std::runtime_error("(CONFIG) ip format incorect");
+	for (size_t i = 0; i < parts.size(); i++) {
+		if (parts[i].empty())
+			throw std::runtime_error("(CONFIG) ip is invalid : one part is empty");
+		for (size_t j = 0; j < parts[i].size(); j++) {
+			if (!isdigit(parts[i][j]))
+				throw std::runtime_error("(CONFIG) ip must be only digit");
+		}
+		char	*end;
+		long	value = strtol(parts[i].c_str(), &end, 10);
+		if (*end != '\0')
+			throw std::runtime_error("(CONFIG) invalid ip format must be only digit");
+		if (value < 0 || value > 255)
+			throw std::runtime_error("(CONFIG) ip must be between 1 and 255");
+	}
+}
+
+
 void	Parser::validateArgumentCount(const Directive& d)
 {
 	size_t count = d.arguments.size();
@@ -278,6 +386,21 @@ void	Parser::validateArgumentCount(const Directive& d)
 		throw std::runtime_error("(CONFIG) 'upload_path' exptects exactly 1 argument");
 }
 
+void	Parser::validateArgumentValues(const Directive& d)
+{
+	if (d.name == "listen")
+		validatePort(d.arguments[0]);
+	if (d.name == "host")
+		validateIP(d.arguments[0]);
+	if (d.name == "error_page")
+		validateErrorCode(d.arguments[0]);
+	if (d.name == "allow_methods")
+		validateHttpMethod(d.arguments);
+	if (d.name == "autoindex")
+		validateOnOff(d.arguments[0]);
+	if (d.name == "return")
+		validateRedirectCode(d.arguments[0]);
+}
 
 bool	Parser::isDirectiveAllowedInContext(const std::string& name, Context ctx)
 {

@@ -44,6 +44,14 @@ class	Parser {
 		std::vector<std::string>	tokenize(const std::string& filename);
 		std::vector<ServerNode>		parserServerBlock(std::vector<std::string> tokens);
 
+		// utils pour valider
+		void						validatePort(const std::string& port);
+		void						validateIP(const std::string& ip);
+		void						validateErrorCode(const std::string& errorCode);
+		void						validateHttpMethod(const std::vector<std::string>& httpMethods);
+		void						validateOnOff(const std::string& value);
+		void						validateRedirectCode(const std::string& code);
+
 		// validation des arguemtns
 		bool						isDirectiveAllowedInContext(const std::string& name, Context ctx);
 		void						validateArgumentCount(const Directive& d);
