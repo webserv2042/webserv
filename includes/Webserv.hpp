@@ -15,6 +15,7 @@
 #include <map>
 #include <vector>
 #include <sstream>
+#include <ctime>
 
 #include "server/Client.hpp"
 #include "server/Server.hpp"
@@ -26,6 +27,7 @@
 #define DISCONNECTION 2
 #define ADD_EPOLLOUT 0
 #define DELETE_EPOLLOUT 1
+#define IDLE_TIMEOUT 10
 
 class Webserv {
     public:
@@ -34,13 +36,14 @@ class Webserv {
 
 		void					setServer(Server &server);
 		void 					epollLoop();
+		void					finalClean();
 
 		std::map<int, Client>	clients; //liste des clients
 
     private:
 
 		//* EPOLL MANAGER
-		
+
 		int						ep_fd; //instance epoll
 		std::vector<Server>		servers; //liste des serveurs
 		struct epoll_event		events[MAX_EVENTS]; //tableau des evenements enregistres par epoll_wait
@@ -54,7 +57,7 @@ class Webserv {
 		bool					isSocketFd(int &sockFD);
 		void					modifyEpollout(int &fd, int action);
 		void					closeClient(int clientFD);
-		void					finalClean();
+		void					checkIdleTimeout();
 
 		//* REQUETE + REPONSE
 

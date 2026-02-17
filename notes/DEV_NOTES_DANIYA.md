@@ -1,12 +1,23 @@
-# 📝 DEV NOTE : Boucle Epoll
+# 📝 DEV NOTE : Fonctionnement du serveur
 
-**Sujet :** Fonctionnement de la boucle epoll
+**INTRODUCTION** Intro
+
+---
+
+Dans cette note, je vais essayer d'expliquer comment tourne le server, a partir du lancement de la boucle epoll (le server de base etant deja ete lance avec la partie socket)
+
+Ce sujet est aborde dans les etapes suivantes: 
+1) La boucle evenementielle epoll
+2) Rendre le server non-bloquant
+3) Gestion des timeouts
+
+**PARTIE 1** La boucle evenementielle epoll
 
 ---
 
 ## 1 - Initialisation de l'instance epoll
 Une instance epoll, c'est seulement un fd retourne par epoll_create:
-ce fd represente une structure de donnees connectee au noyau de lordinateur
+ce fd represente une structure de donnees connectee au noyau de l'ordinateur
 
 Cette structure nous permet de recuperer les informations suivantes:
 1) la liste d'interet: les fd que l'on veut surveiller
@@ -37,7 +48,27 @@ Quand on recupere les evenements qui se sont produits sur nos fd, on retrouve 2 
 -> un client nous envoi une requete prete a etre lue
     -on lit la requete
     -on la traite
-    -on envoi une reponse
+    -on passe le client en mode reception de reponse
+-> un client et pret a recevoir une reponse
+    -on envoi la reponse
+    -on repasse le client en mode envoi de requetes
 
 ## 5 - Repetition de la boucle
-Une fois les requetes traitees/connections acceptees, la boucle reprend a epoll_wait et attend de nouveau
+Une fois les requetes/reponses traitees/connections acceptees, la boucle reprend a epoll_wait et attend de nouveau
+
+
+**PARTIE 3** Gestion des timeouts
+
+---
+
+## 1 - Que sont et a quoi servent les timeouts?
+Les timeouts mettent une limite de temps sur les activites d'un serveur, ex:
+un timeout de 60secondes est mit sur les activites, si un client se connecte au serveur, mais n'envoie pas de requetes pendant 60secondes, le client sera deconnecte.
+
+Cela permet au serveur de ne pas laisser un client prendre de la place et des ressources inutilement et de bloquer le serveur. 
+Cela protege aussi de certaines failles de securite, ex:
+clients qui envoient des donnees tres lentement pour maintenir une connexion artificielle
+-> le serveur est innonde de requetes, il ne peut plus repondre ou recevoir des requetes de reels clients
+
+## 2 - Les differents types de timeout implementes
+1) Timeout d'inactivité (Idle Timeout)

@@ -5,6 +5,10 @@
 #include <string.h>
 #include <iostream>
 #include <stdlib.h>
+#include <ctime>
+
+#define NO_TIMEOUT 0
+#define TIMEOUT 1
 
 typedef enum t_client_state
 {
@@ -25,10 +29,15 @@ class Client {
         int         clientFd;
         int         clientState;
         std::string readBuff;
-        std::string writeBuff;
 
+        //renvoi de reponse
+        std::string writeBuff;
         int         bytesSent; //nb de bytes envoyés au client
         int         buffSize; //taille totale du writeBuff
+
+        //timeout
+        time_t      lastActivity;
+        int         idleTimeout();
 
         void        resetClient();
 
