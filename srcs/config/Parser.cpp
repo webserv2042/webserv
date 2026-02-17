@@ -250,6 +250,8 @@ std::vector<ServerNode> Parser::parserServerBlock(std::vector<std::string> token
 	return (servers);
 }
 
+/// @brief Verifie que la chaîne représentant un port est valide (chiffres uniquement, entre 1 et 65535).
+/// @param port Chaîne représentant le numéro de port à valider
 void	Parser::validatePort(const std::string& port)
 {
 	if (port.empty())
@@ -268,6 +270,8 @@ void	Parser::validatePort(const std::string& port)
 		throw std::runtime_error("(CONFIG) port must be between 1 and 65535.");
 }
 
+/// @brief Vérifie que les méthodes HTTP sont valides (GET, POST ou DELETE uniquement).
+/// @param httpMethods Vecteur des noms de méthodes HTTP à valider
 void	Parser::validateHttpMethod(const std::vector<std::string>& httpMethods)
 {
 	if (httpMethods.empty())
@@ -278,6 +282,8 @@ void	Parser::validateHttpMethod(const std::vector<std::string>& httpMethods)
 	}
 }
 
+/// @brief Vérifie qu'une valeur on/off est valide (utilisée pour autoindex).
+/// @param value Chaîne à valider ("on" ou "off")
 void	Parser::validateOnOff(const std::string& value)
 {
 	if (value.empty())
@@ -286,6 +292,8 @@ void	Parser::validateOnOff(const std::string& value)
 		throw std::runtime_error("(CONFIG) autoindex must be on or off.");
 }
 
+/// @brief Vérifie qu'un code d'erreur HTTP est valide (entre 400 et 599).
+/// @param errorCode Chaîne représentant le code d'erreur à valider
 void	Parser::validateErrorCode(const std::string& errorCode)
 {
 	if (errorCode.empty())
@@ -302,6 +310,8 @@ void	Parser::validateErrorCode(const std::string& errorCode)
 		throw std::runtime_error("(CONFIG) error code must be between 400 and 599");
 }
 
+/// @brief Vérifie qu'un code de redirection HTTP est valide (301, 302, 303, 307 ou 308).
+/// @param code Chaîne représentant le code de redirection à valider
 void	Parser::validateRedirectCode(const std::string& code)
 {
 	if (code.empty())
@@ -318,6 +328,10 @@ void	Parser::validateRedirectCode(const std::string& code)
 		throw std::runtime_error("(CONFIG) redirect code must be 301, 302, 303, 307 or 308");
 }
 
+/// @brief Découpe une chaîne en sous-chaînes selon un délimiteur.
+/// @param ip Chaîne à découper
+/// @param delimiter Caractère délimiteur
+/// @return Vecteur des sous-chaînes extraites
 std::vector<std::string> split(const std::string& ip, char delimiter)
 {
 	std::vector<std::string>	result;
@@ -334,6 +348,8 @@ std::vector<std::string> split(const std::string& ip, char delimiter)
 	return (result);
 }
 
+/// @brief Vérifie qu'une adresse IPv4 est valide (format x.x.x.x, chaque octet entre 0 et 255).
+/// @param ip adresse IP à valider
 void	Parser::validateIP(const std::string& ip)
 {
 	if (ip.empty())
@@ -357,7 +373,8 @@ void	Parser::validateIP(const std::string& ip)
 	}
 }
 
-
+/// @brief Vérifie que le nombre d'arguments d'une directive correspond à celui attendu selon son type.
+/// @param d arguments a vérifier
 void	Parser::validateArgumentCount(const Directive& d)
 {
 	size_t count = d.arguments.size();
@@ -386,6 +403,8 @@ void	Parser::validateArgumentCount(const Directive& d)
 		throw std::runtime_error("(CONFIG) 'upload_path' exptects exactly 1 argument");
 }
 
+/// @brief Valide les valeurs des arguments d'une directive (port, IP, méthode HTTP, etc)
+/// @param d Directive dont les valeurs d'arguments sont à valider
 void	Parser::validateArgumentValues(const Directive& d)
 {
 	if (d.name == "listen")
@@ -402,6 +421,10 @@ void	Parser::validateArgumentValues(const Directive& d)
 		validateRedirectCode(d.arguments[0]);
 }
 
+/// @brief Indique si une directive est autorisée dans le contexte donné (server ou location)
+/// @param name Nom de la directive
+/// @param ctx Contexte (SERVER_CTX ou LOCATION_CTX)
+/// @return true si la directive est autorisée, false sinon
 bool	Parser::isDirectiveAllowedInContext(const std::string& name, Context ctx)
 {
 	if (ctx == SERVER_CTX)
@@ -416,7 +439,9 @@ bool	Parser::isDirectiveAllowedInContext(const std::string& name, Context ctx)
 	}
 }
 
-
+/// @brief Valide une directive complètement : contexte, nombre et valeurs des arguments
+/// @param d Directive à valider
+/// @param ctx Contexte dans lequel la directive est utilisée
 void	Parser::validateDirective(const Directive& d, Context ctx)
 {
 	if (!isDirectiveAllowedInContext(d.name, ctx))
@@ -433,7 +458,8 @@ void	Parser::validateDirective(const Directive& d, Context ctx)
 	validateArgumentValues(d);
 }
 
-
+/// @brief Valide un bloc location : chemin non vide et directives valides
+/// @param location Bloc location à valider
 void	Parser::validateLocation(const LocationNode& location)
 {
 	if (location.path.empty())
@@ -443,7 +469,8 @@ void	Parser::validateLocation(const LocationNode& location)
 	}
 }
 
-
+/// @brief Valide un bloc server : listen obligatoire, unicité de certaines directives, et locations
+/// @param server Bloc server à valider
 void	Parser::validateServer(const ServerNode& server)
 {
 	bool	hasListen = false;
@@ -481,7 +508,8 @@ void	Parser::validateServer(const ServerNode& server)
 	}
 }
 
-
+/// @brief Valide l'ensemble des blocs server (au moins un serveur défini et chaque serveur valide)
+/// @param servers Vecteur des blocs server à valider
 void	Parser::validateServers(const std::vector<ServerNode>& servers)
 {
 	if (servers.empty())
