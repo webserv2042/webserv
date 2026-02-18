@@ -83,6 +83,8 @@ class Config {
 		void								addAllowedMethod(const std::string& method);
 		void								addLocation(const Location& location);
 
+		// test afficher
+		void 								printConfig() const;
 
 
 };

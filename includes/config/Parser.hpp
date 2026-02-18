@@ -67,6 +67,6 @@ class	Parser {
 
 	public:
 		Parser();
-		std::vector<ServerNode>		parseFile(const std::string& filename);
+		std::vector<Config>			parseFile(const std::string& filename);
 };
 #endif

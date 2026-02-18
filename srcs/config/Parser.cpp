@@ -573,7 +573,7 @@ std::vector<Config> Parser::fillConfig(std::vector<ServerNode> servers)
 /// @brief fonction principale qui parse le fichier de configuration
 /// @param filename nom du fichier à parser
 /// @return liste de serveurs sous forme de vector
-std::vector<ServerNode> Parser::parseFile(const std::string& filename)
+std::vector<Config> Parser::parseFile(const std::string& filename)
 {
 	std::vector<ServerNode>		servers;
 	std::vector<std::string>	tokens;
@@ -589,5 +589,5 @@ std::vector<ServerNode> Parser::parseFile(const std::string& filename)
 	configs = fillConfig(servers);
 	if (configs.empty())
 		throw std::runtime_error("(CONFIG) configuration file is empty");
-	return (servers);
+	return (configs);
 }

@@ -13,7 +13,13 @@ int main(int argc, char **argv)
 	try
 	{
 		Parser parser;
-		std::vector<ServerNode> nodes = parser.parseFile(argv[1]);
+		std::vector<Server> servers;
+		std::vector<Config> configs = parser.parseFile(argv[1]);
+		for (size_t i = 0; i < configs.size(); i++) {
+			Server server(configs[i]);
+			configs[i].printConfig();
+			servers.push_back(server);
+		}
 	}
 	catch(const std::exception& e)
 	{
