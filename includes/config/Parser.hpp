@@ -1,6 +1,7 @@
 #ifndef PARSER_HPP
 # define PARSER_HPP
 
+#include "./Config.hpp"
 #include <string>
 #include <vector>
 // Pour ouvrir et lire un fichier
@@ -43,6 +44,7 @@ class	Parser {
 	private:
 		std::vector<std::string>	tokenize(const std::string& filename);
 		std::vector<ServerNode>		parserServerBlock(std::vector<std::string> tokens);
+		std::vector<Config>			fillConfig(std::vector<ServerNode> servers);
 
 		// utils pour valider
 		void						validatePort(const std::string& port);

@@ -514,10 +514,60 @@ void	Parser::validateServers(const std::vector<ServerNode>& servers)
 {
 	if (servers.empty())
 		throw std::runtime_error("(CONFIG) no server block defined");
-
 	for (size_t i = 0; i < servers.size(); ++i) {
 		validateServer(servers[i]);
 	}
+}
+
+/// @brief
+/// @param servers
+std::vector<Config> Parser::fillConfig(std::vector<ServerNode> servers)
+{
+	std::vector<Config>		configs;
+
+	for (size_t i = 0; i < servers.size(); i++) {
+		Config		current;
+		for (size_t j = 0; j < servers[i].directives.size(); j++) {
+			if (servers[i].directives[j].name == "listen")
+				current.setPort(std::stoi(servers[i].directives[j].arguments[0]));
+			if (servers[i].directives[j].name == "host")
+				current.setHost(servers[i].directives[j].arguments[0]);
+			if (servers[i].directives[j].name == "root")
+				current.setRoot(servers[i].directives[j].arguments[0]);
+			if (servers[i].directives[j].name == "server_name")
+				current.addServerName(servers[i].directives[j].arguments[0]);
+			if (servers[i].directives[j].name == "index")
+				current.setIndex(servers[i].directives[j].arguments[0]);
+			if (servers[i].directives[j].name == "error_page")
+				current.addErrorPage(std::stoi(servers[i].directives[j].arguments[0]), servers[i].directives[j].arguments[1]);
+			if (servers[i].directives[j].name == "client_max_body_size")
+				current.setClientMaxBodySize(std::stoi(servers[i].directives[j].arguments[0]));
+		}
+		for (size_t k = 0; k < servers[i].locations.size(); k++) {
+			Location	currentLoc;
+			currentLoc.path = servers[i].locations[k].path;
+			for (size_t l = 0; l < servers[i].locations[k].directives.size(); l++) {
+				if (servers[i].locations[k].directives[l].name == "allow_methods")
+					currentLoc.allowedMethods = servers[i].locations[k].directives[l].arguments;
+				if (servers[i].locations[k].directives[l].name == "autoindex")
+					currentLoc.autoIndex = (servers[i].locations[k].directives[l].arguments[0] == "on");
+				if (servers[i].locations[k].directives[l].name == "index")
+					currentLoc.index = servers[i].locations[k].directives[l].arguments;
+				if (servers[i].locations[k].directives[l].name == "upload_path")
+					currentLoc.uploadPath = servers[i].locations[k].directives[l].arguments[0];
+				if (servers[i].locations[k].directives[l].name == "root")
+					currentLoc.root = servers[i].locations[k].directives[l].arguments[0];
+				if (servers[i].locations[k].directives[l].name == "return")
+					currentLoc.returnRedirect = std::make_pair(
+						std::stoi(servers[i].locations[k].directives[l].arguments[0]),
+						servers[i].locations[k].directives[l].arguments[1]
+					);
+			}
+			current.addLocation(currentLoc);
+		}
+		configs.push_back(current);
+	}
+	return (configs);
 }
 
 /// @brief fonction principale qui parse le fichier de configuration
@@ -527,11 +577,17 @@ std::vector<ServerNode> Parser::parseFile(const std::string& filename)
 {
 	std::vector<ServerNode>		servers;
 	std::vector<std::string>	tokens;
+	std::vector<Config>			configs;
 
 	tokens = tokenize(filename);
 	if (tokens.empty())
 		throw std::runtime_error("(PARSER) configuration file is empty");
 	servers = parserServerBlock(tokens);
+	if (servers.empty())
+		throw std::runtime_error("(PARSER) configuration file is empty");
 	validateServers(servers);
+	configs = fillConfig(servers);
+	if (configs.empty())
+		throw std::runtime_error("(CONFIG) configuration file is empty");
 	return (servers);
 }
