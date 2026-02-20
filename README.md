@@ -19,6 +19,6 @@ For this project, the following documentation has been used:
 AI has also been used in this project, in order to get specific help and information on:
 - The basic structure of a web server
 - How HTTP requests/responses interact
-- The way functions works internally (such as epoll_create, epoll_wait, etc...)
+- The way functions works internally (such as `epoll_create`, `epoll_wait`, etc...)
 - An efficient and readable file structure
 

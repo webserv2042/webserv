@@ -1,7 +1,7 @@
 # 📝 DEV NOTE : Fonctionnement du serveur
 
+
 ## INTRODUCTION
------------------------------------------------------------------------------
 
 Dans cette note, je vais expliquer(avec mes mots) comment tourne le serveur, à partir du lancement de la boucle epoll (le server de base étant déjà été lancé avec la partie socket -> voir DEV_NOTES_MARIO.md)
 
@@ -11,7 +11,6 @@ Ce sujet est abordé dans les étapes suivantes:
 3) Gestion des timeouts
 
 ## PARTIE 1 - La boucle évènementielle epoll
------------------------------------------------------------------------------
 
 ### 1 - Initialisation de l'instance epoll
 Une instance epoll, c'est seulement un fd retourné par `epoll_create`:
@@ -56,7 +55,6 @@ Une fois les requêtes/réponses traitées/connections acceptées, la boucle rep
 
 
 ## PARTIE 2 - Rendre le serveur non-bloquant
------------------------------------------------------------------------------
 
 ### 1 - Qu'est-ce qu'un serveur non-bloquant?
 C'est un serveur qui ne bloque pas les connexions/activités des clients par celles des autres, ex:
@@ -75,8 +73,6 @@ Les fonctions de lecture(recve, read, ...) et d'écriture(send, ...) sont aussi 
 
 
 ## PARTIE 3 - Gestion des timeouts
-
------------------------------------------------------------------------------
 
 ### 1 - Que sont et a quoi servent les timeouts?
 Les timeouts mettent une limite de temps sur les activités d'un serveur, ex:
