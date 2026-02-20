@@ -12,7 +12,7 @@ int main (void)
 		handle_signals();
 
 		//INIT SERVER
-		std::cout << "Initializing server..." << std::endl;
+		std::cout << "Initializing servers..." << std::endl;
 
 		Server	server(8080);
 		Server	server2(8081);

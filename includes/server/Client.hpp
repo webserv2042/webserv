@@ -12,6 +12,7 @@
 
 typedef enum t_client_state
 {
+    CONNEXION_ACCEPTED,
 	READING_REQUEST,
 	PROCESSING,
 	WRITING_RESPONSE,
@@ -37,7 +38,10 @@ class Client {
 
         //timeout
         time_t      lastActivity;
-        int         idleTimeout();
+        // time_t      totalConnection;
+        // time_t      readTime;
+        // time_t      writeTime;
+        int         Timeout();
 
         void        resetClient();
 

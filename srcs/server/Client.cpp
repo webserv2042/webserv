@@ -7,12 +7,20 @@ Client::Client() {
     bytesSent = 0;
     buffSize = 0;
     lastActivity = time(NULL);
+    // totalConnection = time(NULL);
+    // readTime = time(NULL);
+    // writeTime = time(NULL);
+    clientState = CONNEXION_ACCEPTED;
 }
 
 Client::Client(int new_client_fd) : clientFd(new_client_fd){
     bytesSent = 0;
     buffSize = 0;
     lastActivity = time(NULL);
+    // totalConnection = time(NULL);
+    // readTime = time(NULL);
+    // writeTime = time(NULL);
+    clientState = CONNEXION_ACCEPTED;
 }
 
 //COPY CONSTRUCTOR
@@ -31,6 +39,9 @@ Client& Client::operator=(const Client& to_copy) {
         bytesSent = to_copy.bytesSent;
         buffSize = to_copy.buffSize;
         lastActivity = to_copy.lastActivity;
+        // totalConnection = to_copy.totalConnection;
+        // writeTime = to_copy.writeTime;
+        // readTime = to_copy.readTime;
     }
     return (*this);
 }
@@ -47,25 +58,32 @@ void    Client::resetClient()
 {
     buffSize = 0;
     bytesSent = 0;
-    // lastActivity = time(NULL);
     readBuff.clear();
     writeBuff.clear();
     clientState = DONE;
 }
 
 /// @brief verifie si le timeout d'un client a ete depasse
-/// @return TIMEOUT(1) si le timout est depasse, ou NO_TIMOUT s'il ne l'est pas
-int    Client::idleTimeout()
+/// @return TIMEOUT(1) si le timout est depasse, ou NO_TIMOUT(0) s'il ne l'est pas
+int    Client::Timeout()
 {
    time_t current_time = time(NULL);
 
-    // std::cout << "current time: " << current_time <<  " last activity: " << lastActivity << std::endl;
-    double seconds = difftime(current_time, lastActivity);
-    // std::cout << "client " << clientFd << ", time since last activity: " << seconds << std::endl;
-
-    if (seconds >= IDLE_TIMEOUT)
+    double lastActSec = difftime(current_time, lastActivity);
+    if (lastActSec >= IDLE_TIMEOUT)
         return TIMEOUT;
-
+    
+    // double totalSec = difftime(current_time, totalConnection);
+    // if (totalSec >= TOTAL_TIMEOUT)
+    //     return TIMEOUT;
+        
+    // if (clientState == READING_REQUEST)
+    // {
+    //     std::cout << "AAAAAAAAAAAA" << std::endl;
+    //     double readSec = difftime(current_time, readTime);
+    //     if (readSec >= READ_TIMEOUT)
+    //         return TIMEOUT;
+    // }
     return NO_TIMEOUT;
 }
 
