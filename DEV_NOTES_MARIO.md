@@ -80,4 +80,201 @@ Pour faire court ça fonctionne comme des interrupteurs (bit 1 ou 0) et nous on 
 On va pas refaire un cours sur les opérateur binaire mais globalement si tu veux ajouter une option tu utilises l'opérateur OU logique (|).
 Maintenant que j'ai la nouvelle configuration je la renvoie au système via la commande F_SETFL.
 
+--> Le code est validé et envoyé pour Daniya
+
 ---
+
+## 5. La suite
+
+Maintenant que nous avons un serveur minimal on peut commencer à regarder le fichier de configuration.
+Comme son nom l'indique il va permettre de nous donner des informations utiles à la configuration de notre serveur.
+Si vous avez bien suivi pour l'instant on configure manuellement le serveur avec :
+PORT : 5090
+socketFD :
+sockaddr_in.sin_addr : INADDR_ANY toutes les ip
+Ok maintenant je dois ajouter des informations presentes sur le fichier de configuration.
+Il y a donc maintenant :
+server_name
+client_max_body_size
+root
+Et là tu commences à comprendre qu'il y a un problème car toutes ces choses font partis d'une requëte http MAIS on a aucune idee de comment fonctionne une requete http donc allons-y.
+
+## 6. Requête hhtp : C'est quoi
+
+HTTP est un protocole texte, c'est donc lisible par un humain.
+Exemple :
+
+	GET /index.html HTTP/1.1
+	Host: www.google.com
+	User-Agent: Chrome/90.0
+	Accept: */*
+
+Une requête est toujours decoupée en 3 parties par des sauts de ligne.
+
+# A - Première ligne
+Ligne la plus importante. Elle contient 3 infos séparées par des espaces.
+Exemple : GET /index.html HTTP/1.1
+
+1. La méthode (Qu'est ce que je veux faire ?)
+GET
+Il peut y en avoir des différentes
+
+GET - recuperer
+POST - publier
+PUT - ajouter
+DELETE - supprimer
+
+2. L'URI - uniform ressource identifier (sur quel fichier je veux le faire ?)
+/index.html
+
+3. La version (quelle langue je parle ?)
+HTTP/1.1
+
+# B - Les Headers
+C'est la métadonnée (infos sur la requête).
+Format : Clé : Valeur suivi d'un retour à la ligne.
+Host: www.google.com
+Host: localhost:5090 c'est là que le serverName va servir
+User-Agent: Chrome/90.0 --> Qui est le client (ici chrome)
+Content-Length: 150 --> traduction : Après les headers il y a 150 octets de données.
+
+# C - Le Body
+Contenu utile et optionnel.
+Dans un GET, il est vide car tu demandes
+Dans un POST, il contient des données.
+
+Le piège : \r\n, en programmation réseau le saut de ligne cest pas juste \n mais
+bien \r\n (heritage des machines à ecrire).
+La séparation entre Headers et Body cest \r\n\r\n.
+
+
+## 5. La suite (bis)
+
+Voilà maintenant qu'on a vu ce qu'est une requête dans sa construction on va pouvoir continuer.
+Il y a donc maintenant :
+	server_name (string)
+Config : serveer_name localhost;
+Pourquoi car si on heberges 3 sites sur la meme IP
+client_max_body_size
+root
+JE VIENS DE ME RENDRE COMPTE QUE JE TRAVAILLE SUR LES REQUETES HTTP ALORS QUE JE DOIS FAIRE LE FICHIER DE CONFIGURATION HAHAHAH
+
+Pour la peine je vais essayer de trouver un lien entre les deux pour pas que ce travail soit inutile.
+Le serveur passe son temps à comparer ce qu'il a le droit de faire (config) et ce qu'il reçoit (HTTP).
+Les 4 moments où ça se produit :
+
+1 - Host vs server_name
+Probleme : le socker reçoit une ip mais si cette IP héberge  10 sites differents lequel on doit lancer ?
+--> Le serveur lit le header HTTP Host(ex : dicate.fr) ensuite il parcourt sa configuration pour trouver le bloc server qui possede le server_name dicate.fr
+Sans ce lien le serveur est aveugle et ne sait pas pour qui est l'appel.
+
+2 - Traduction d'adresse URI vs root
+Problème : le client demande /index.html sauf que pour le serveur le fichier n'est pas à la racine donc il prend le chemin demandé par la requete HTTP /index.html et le colle devant le chemindéfini dans la config root /var/www/site
+
+3 - La protection Content-Length vs client_max_body_size
+Problème : Un client malveillant essaye d'envoyer un fichier de 10go via une requete POST si on l'accepte RAMs saturé serveur qui plante.
+Avant de lire le contenu, le serveur regarde la taille Content-lenght (HTTP) et la compare avec la limite que j'ai autorisé via le fichier config si c'est superieur alors on rejette erreur 413.
+
+4 - Gestion d'erreurs
+Problème : la ressource demandee n'existe pas. Le code interne du serv genere un 404 not found (cf inception).
+Au lieu d'envoyer juste un 404 le serveur verifie sa config et regarde sil a une consigne speciale pour le 404 si oui il remplace par le fichier indiqué /404_custom.html
+
+Voilà c'est bien utile de connaitre le lien entre conf.serv et requete HTPP
+
+## 7. Modification class serveur
+
+Avant de modifier la classe server je dois decouper et comprendre le fichier de configuration (.conf).
+
+server {
+    listen 8080; --> port sur lequel le serv attend des connexions (utile pour bind)
+    host 127.0.0.1; --> adresse IP à écouter
+    server_name localhost; --> Voir Host name vs server_name
+
+    client_max_body_size 10M; --> taille limite pour le corps d'une requete
+
+    error_page 404 /error_pages/404.html; --> chemin vers un fichier html personalisé à afficher si une ressource est introuvable.
+
+    root /var/www/site_principal; --> chemin absolu sur le disque dur. Si on demande (/index/html), le serv cherche dans /var/www/site_principal/index.html
+
+    index index.html; --> si l'URL demandée est un dossier le ser cherche ce fichier à linterieur
+
+    location / {
+        allow_methods GET POST; --> liste des methodes http autorisées
+        autoindex on; --> si l'utilisateur demande un dossier et qu'il n'y a pas de fameux fichier index.html il doit generer une page html listant les fichiers présents.
+    }
+
+    location /images { --> definir un chemin pour un dossier spécifique.
+        root /var/www/site_principal/images; --> toute requete qui commence par /iamges ira chercher ses ficheir dans ce dossier
+        allow_methods GET;
+    }
+}
+
+Maintenant que j'ai tout ça je peux modifier ma classe config (entre temps jai mis config dans server comme ça cest plus logique) et mettre tout ce quil faut.
+
+
+PS : un fichier .conf sert à decrire les objets qu'on va instancier, il crée des modeles de configuration.
+
+## 8. Construction du parser
+
+Il faut bien decouper les responsabilités du projet.
+
+Webserv --> vector<Server> --> config
+
+1 - Webserv (classe)
+
+	charger le fichier de configuration
+	parser --> obtenir une liste de configs
+	créer les Server à partir des configs
+	lancer la boucle principale
+Donc Webserv ne dépend pas du format du fichier.
+
+2 - Config
+
+	contenir uniquement les donées
+	aucune logique réseau
+	aucune socket
+	aucune syscall
+Config = DTO (en gros cest que de la data)
+
+3 - Server
+	Recevoir une config
+	ouvrir un socket
+	gérer les connexions
+	router les requetes via location
+Il ne parse pas
+
+Un fichier contient N Server, chaque server contient des directives et des locations, chaque location conteint des directives.
+
+Fin.
+
+# Qu'est ce qu'une directive ???
+
+une directive = listen 8080;
+1 mot clé (listen)
+N argument
+se termine par ; --- <name> <arg1> |<arg2> ... ; --- (si une ligne ne repecte pas ça = erreur syntaxique).
+
+# liste des directives
+
+listen -> 1 arg -> server
+host -> 1 arg (string) -> server
+server_name -> N arg -> server
+
+
+
+# Qu'est ce qu'un bloc ???
+
+location /images {
+	...
+}
+
+1 mot clé (listen)
+N argument
+{
+contenu
+}				--- <name> <args> { ... } ---
+
+Le parser ne sait pas que listen = port ou root = path, ça vient après lors de létape de valdiation, au denbt juste on rempli.
+
+
+

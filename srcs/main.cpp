@@ -1,18 +1,25 @@
 #include "../includes/server/Server.hpp"
+#include "../includes/config/Parser.hpp"
 
-int main (void)
+int main(int argc, char **argv)
 {
-	Server	server(LISTENING_PORT);
+
+	if (argc < 2)
+	{
+		std::cerr << "Usage: " << argv[0] << " <config_file>" << std::endl;
+		return (1);
+	}
 
 	try
 	{
-		server.init();
-		// std::cout << "Tentative d'accept..." << std::endl;
-		// int client = accept(server.socketFD, NULL, NULL);
-		// if (client == -1)
-		// 	std::cout << "Succes, cest non bloquant" << std::endl;
-		// else
-		// 	std::cout << "Fail cest bloquant" << std::endl;
+		Parser parser;
+		std::vector<Server> servers;
+		std::vector<Config> configs = parser.parseFile(argv[1]);
+		for (size_t i = 0; i < configs.size(); i++) {
+			Server server(configs[i]);
+			configs[i].printConfig();
+			servers.push_back(server);
+		}
 	}
 	catch(const std::exception& e)
 	{
@@ -20,11 +27,6 @@ int main (void)
 		return (1);
 	}
 
-
-
-	// Fermeture des sockets et libération des ressources
-	close(server.socketFD);
-	// close(socketFD);
-
 	return (0);
 }
+
