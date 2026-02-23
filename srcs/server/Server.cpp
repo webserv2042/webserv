@@ -1,4 +1,6 @@
 #include "../../includes/server/Server.hpp"
+#include <errno.h>
+#include <string.h>
 
 // Server::Server(const Config& configServer) : membreRef(configServer) {};
 
@@ -11,6 +13,11 @@ void Server::init()
 	if (flags == -1)
 		throw std::runtime_error("(SERVER) Failed to get socket configuration");
 	flags = flags | O_NONBLOCK;
+
+	//! reuse address necessary
+	int opt = 1;
+	setsockopt(this->_socketFD, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
 	fcntl(this->_socketFD, F_SETFL, flags);
 	this->_socketAddress.sin_family = IPV4;
 	this->_socketAddress.sin_port = htons(_serverConfig.getPort()); // htons = host to network short
@@ -20,6 +27,7 @@ void Server::init()
 	if (bindReturnCode == -1)
 		throw std::runtime_error("(SERVER) Failed to link socket");
 	int listenReturnCode = listen(_socketFD, PENDING_QUEUE_MAXLENGTH);
+
 	if (listenReturnCode == -1)
 		throw std::runtime_error("(SERVER) Failed to start listening");
 }
