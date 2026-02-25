@@ -2,6 +2,11 @@
 
 Parser::Parser() {};
 
+static int toInt(const std::string& s)
+{
+    return (static_cast<int>(std::strtol(s.c_str(), NULL, 10)));
+}
+
 bool isDirective(const std::string& token)
 {
 	return (token == "listen" ||
@@ -529,7 +534,7 @@ std::vector<Config> Parser::fillConfig(std::vector<ServerNode> servers)
 		Config		current;
 		for (size_t j = 0; j < servers[i].directives.size(); j++) {
 			if (servers[i].directives[j].name == "listen")
-				current.setPort(std::stoi(servers[i].directives[j].arguments[0]));
+				current.setPort(toInt(servers[i].directives[j].arguments[0]));
 			if (servers[i].directives[j].name == "host")
 				current.setHost(servers[i].directives[j].arguments[0]);
 			if (servers[i].directives[j].name == "root")
@@ -539,9 +544,9 @@ std::vector<Config> Parser::fillConfig(std::vector<ServerNode> servers)
 			if (servers[i].directives[j].name == "index")
 				current.setIndex(servers[i].directives[j].arguments[0]);
 			if (servers[i].directives[j].name == "error_page")
-				current.addErrorPage(std::stoi(servers[i].directives[j].arguments[0]), servers[i].directives[j].arguments[1]);
+				current.addErrorPage(toInt(servers[i].directives[j].arguments[0]), servers[i].directives[j].arguments[1]);
 			if (servers[i].directives[j].name == "client_max_body_size")
-				current.setClientMaxBodySize(std::stoi(servers[i].directives[j].arguments[0]));
+				current.setClientMaxBodySize(toInt(servers[i].directives[j].arguments[0]));
 		}
 		for (size_t k = 0; k < servers[i].locations.size(); k++) {
 			Location	currentLoc;
@@ -559,7 +564,7 @@ std::vector<Config> Parser::fillConfig(std::vector<ServerNode> servers)
 					currentLoc.root = servers[i].locations[k].directives[l].arguments[0];
 				if (servers[i].locations[k].directives[l].name == "return")
 					currentLoc.returnRedirect = std::make_pair(
-						std::stoi(servers[i].locations[k].directives[l].arguments[0]),
+						toInt(servers[i].locations[k].directives[l].arguments[0]),
 						servers[i].locations[k].directives[l].arguments[1]
 					);
 			}

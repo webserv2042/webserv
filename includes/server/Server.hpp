@@ -4,7 +4,7 @@
 
 
 #include "../config/Config.hpp"
-#include <string.h>
+#include <string>
 #include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
@@ -14,9 +14,6 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 
-
-const int IPV4 = AF_INET;
-
 #define LISTENING_PORT 8080
 #define PENDING_QUEUE_MAXLENGTH 1
 #define BUFFER_SIZE 1024
@@ -24,7 +21,10 @@ const int IPV4 = AF_INET;
 class Server {
 	public:
 		Server(const Config& conf);
+		Server(const Server& to_copy);
+        Server& operator=(const Server& to_copy);
 		~Server();
+		
 		void init();
 
 		// getters

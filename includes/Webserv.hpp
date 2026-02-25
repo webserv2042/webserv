@@ -44,7 +44,7 @@ class Webserv {
 
 		//* FONCTIONS PRINCIPALES
 
-		void					setServer(Server &server);
+		void					setServers(std::vector<Server> &servVec);
 		void 					epollLoop();
 		void					finalClean();
 
@@ -69,7 +69,7 @@ class Webserv {
 		//* EPOLL UTILS
 
 		void 					setNonBlockingSocket(int &fdSocket);
-		void					registerNewFd(int &newFd, uint32_t event);
+		void					registerNewFd(const int &newFd, uint32_t event);
 		bool					isSocketFd(int &sockFD);
 		void					modifyEpollout(int &fd, int action);
 

@@ -4,6 +4,31 @@
 
 // Server::Server(const Config& configServer) : membreRef(configServer) {};
 
+Server::Server(const Config& conf) : _serverConfig(conf)
+{
+}
+
+//COPY CONSTRUCTOR
+Server::Server(const Server& to_copy) {
+	*this = to_copy;
+}
+
+//COPY ASSIGNMENT
+Server& Server::operator=(const Server& to_copy) {
+	if (this != &to_copy)
+	{
+		_serverConfig = to_copy._serverConfig;
+		_socketFD = to_copy._socketFD;
+		_socketAddress = to_copy._socketAddress; // Carte d'identité
+		_socketAddressLength = to_copy._socketAddressLength;
+	}
+	return (*this);
+}
+
+Server::~Server()
+{
+}
+
 void Server::init()
 {
 	this->_socketFD = socket(IPV4, SOCK_STREAM, 0);
@@ -30,15 +55,6 @@ void Server::init()
 
 	if (listenReturnCode == -1)
 		throw std::runtime_error("(SERVER) Failed to start listening");
-}
-
-Server::Server(const Config& conf) : _serverConfig(conf)
-{
-}
-
-Server::~Server()
-{
-	close(this->_socketFD);
 }
 
 int Server::getSocketAddressLength() const
