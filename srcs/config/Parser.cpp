@@ -250,8 +250,8 @@ std::vector<ServerNode> Parser::parserServerBlock(std::vector<std::string> token
 	}
 	if (state != GLOBAL)
 		 throw std::runtime_error("(PARSER) unexpected end of file: unclosed block");
-	for (size_t i = 0; i < servers.size(); ++i)
-		printServer(servers[i]);
+	// for (size_t i = 0; i < servers.size(); ++i)
+	// 	printServer(servers[i]);
 	return (servers);
 }
 

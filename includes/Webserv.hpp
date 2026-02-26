@@ -82,4 +82,7 @@ class Webserv {
     
 };
 
+//fonction temporaire pour generer une reponse http a partir d'un fichier
+std::string readFile(const std::string& filename);
+
 #endif

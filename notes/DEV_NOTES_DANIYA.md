@@ -95,3 +95,5 @@ Limite le temps que prend la lecture d'une requête client : si la requête enti
 
 4) Timeout d'écriture
 Limite le temps que prend l'envoi total de la réponse vers le client
+
+Pour l'instant, je n'ai implémenté que le timeout d'inactivité.

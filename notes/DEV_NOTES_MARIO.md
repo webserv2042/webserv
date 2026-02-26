@@ -169,7 +169,7 @@ Probleme : le socker reçoit une ip mais si cette IP héberge  10 sites differen
 Sans ce lien le serveur est aveugle et ne sait pas pour qui est l'appel.
 
 2 - Traduction d'adresse URI vs root
-Problème : le client demande /index.html sauf que pour le serveur le fichier n'est pas à la racine donc il prend le chemin demandé par la requete HTTP /index.html et le colle devant le chemindéfini dans la config root /var/www/site
+Problème : le client demande /index.html sauf que pour le serveur le fichier n'est pas à la racine donc il prend le chemin demandé par la requete HTTP /index.html et le colle devant le chemin défini dans la config root /var/www/site
 
 3 - La protection Content-Length vs client_max_body_size
 Problème : Un client malveillant essaye d'envoyer un fichier de 10go via une requete POST si on l'accepte RAMs saturé serveur qui plante.

@@ -16,6 +16,7 @@ int main(int argc, char **argv)
 
 	try
 	{
+		//PARSING
 		Parser parser;
 		std::vector<Server> servers;
 		std::vector<Config> configs = parser.parseFile(argv[1]);
@@ -29,7 +30,7 @@ int main(int argc, char **argv)
 		handle_signals();
 
 		//INIT SERVER
-		std::cout << "Initializing servers..." << std::endl;
+		std::cout << std::endl << "Initializing servers..." << std::endl;
 		webserv.setServers(servers);
 
 		//PARTIE POLL
