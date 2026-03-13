@@ -1,0 +1,30 @@
+Requête :
+
+POST /forum/message?id=42 HTTP/1.1\r\n
+
+Host: www.monsite.com\r\n
+User-Agent: Mozilla/5.0\r\n
+Content-Type: text/plain\r\n
+Content-Length: 18\r\n
+Connection: close\r\n
+\r\n
+
+Salut, ca va bien?
+
+
+Réponse :
+
+HTTP/1.1 200 OK
+Date: Wed, 04 Mar 2026 15:45:00 GMT
+Server: Webserv/1.0
+Content-Type: text/html
+Content-Length: 112
+Connection: keep-alive
+
+<html>
+<head><title>Succès</title></head>
+<body>
+    <h1>Bravo !</h1>
+    <p>Le CGI a bien travaillé.</p>
+</body>
+</html>
