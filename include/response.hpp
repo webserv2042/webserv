@@ -20,11 +20,14 @@ class Response
 		std::string     							_body; // -> tu m'injectes le corps du script
 		std::string									_uriFullPath;
 		std::string									_extension;
+		std::string									_dateHttp;
 		std::map<std::string, std::string>			_headers; // t'ajoutes les headers nécéssaires (comme content-length notamment je te laisse te renseiger)
 		static std::map<int, std::string>			_statusMessage;
 		static std::map<std::string, std::string>	_mimeType;
 		bool										_isCgiExt;
 		struct stat									_dataFile;
+		const Location								*_location;
+		bool										_closeFd;
 
 	public:
 
@@ -36,7 +39,7 @@ class Response
 		const std::vector<char>						&getResponseFinal() const;
 		void										setStatusCode(e_status_code code);
 		void										addHeaders(const std::string &key, const std::string &value);
-		void										setBody(const std::string &bodyHttp);
+		void										setBodySize(const std::string &bodyHttp);
 
 		std::string 								getUriFullPath() const;
 		std::string 								getExtension() const;

@@ -68,6 +68,7 @@ class Request
 		std::string									getBody() const;
 		const std::map<std::string, std::string>	&getAllHeaders() const;
 		std::string									getHeader(const std::string& key) const;
+		std::string									getSupportedMethod() const;
 		e_parsing_steps								getStep() const;
 		e_status_code								getErrorCode() const;
 

@@ -2,22 +2,36 @@
 #include "../include/request.hpp"
 
 
-Response::Response() : _statusCode(OK), _isCgiExt(false) {}
+Response::Response() : _statusCode(OK), _date(setHttpDate()), _isCgiExt(false), _closeFd(false) {}
 
 Response::~Response() {}
 
-// void    Response::setResponseFinal(const Request &reqClient)
-// {
-// 	std::stringstream ss;
-// 	ss << "HTTP/1.1 " << _statusCode << " " << _statusMessage[_statusCode] << "\r\n";
+void    Response::setResponseFinal(const Request &reqClient)
+{
+    try 
+    {
+        this->checkingUri(reqClient);
+        this->methodProcess(reqClient);
+        this->setHeaders();            
+    }
+    catch (const std::exception &e)
+    {
+        // this->generateErrorPage(_statusCode);
+    }
+    this->setStartLine();
+}
 
-// 	std::string	startLine = ss.str();
-// 	_responseFinal.insert(_responseFinal.end(), startLine.begin(), startLine.end());
+void	Response::setStartLine()
+{
+	std::stringstream ss;
+	ss << "HTTP/1.1 " << _statusCode << " " << _statusMessage[_statusCode] << "\r\n";
 
-// }
+	std::string	startLine = ss.str();
+	_responseFinal.insert(_responseFinal.end(), startLine.begin(), startLine.end());
+}
 
 //Fonctions pour setup les différentes partie de la réponse + ajouter le code status    
-void    Response::setBody(const std::string &bodyHttp)
+void    Response::setBodySize(const std::string &bodyHttp)
 {
 	_body = bodyHttp;
 
@@ -25,6 +39,18 @@ void    Response::setBody(const std::string &bodyHttp)
 	ss << _body.size();
 	addHeaders("content-length", ss.str());
 }
+
+void	Response::setHtppDate()
+{
+	char		buffer[50]; // stocker les données
+	time_t		time = time(0); // 
+	struct tm	*timeInfo = gmtime(&now);
+
+	stfrtime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", timeInfo);
+
+	_date = std::string(buffer);
+}
+
 
 void    Response::setStatusCode(e_status_code code)
 {
@@ -36,7 +62,6 @@ void    Response::addHeaders(const std::string &key, const std::string &value)
 	_headers[key] = value;
 }
 
-// Dans Response.hpp
 std::string Response::getUriFullPath() const
 {
 	return (_uriFullPath);
@@ -46,7 +71,6 @@ std::string Response::getExtension() const
 {
 	return (_extension);
 }
-
 
 std::string Response::getHeader(std::string key)
 {

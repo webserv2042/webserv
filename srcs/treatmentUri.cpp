@@ -3,6 +3,15 @@
 
 void    Response::checkingUri(const Request &req)
 {
+    // _location = _config.findLocation(req.getUri());
+
+    // if (_location && _location->returnRedirect.first != 0)
+    // {
+    //     _statusCode = _location->returnRedirect.first;
+    //     _locationUri = _location->returnRedirect.second;
+    //     throw std::exception();
+    // }
+
     this->fullPathUri(req);
 
     if (stat(_uriFullPath.c_str(), &_dataFile) != 0) // uri introuvable
@@ -85,10 +94,10 @@ bool    Response::isCgi()
 void    Response::contentType()
 {
     if (this->isCgi())
-        return ; // ->j'envoie à la cgi
+        return ; // ->j'envoie à la cgi qui renverra elle-mm son content-type
     
     if (_mimeType.count(_extension))
-        _headers["content-type"] = _mimeType[_extension];
+        this->addHeader("Content-Type", _mimeType[_extension]);
     else
-        _headers["content-type"] = "application/octet-stream";
+        this->addHeader("Content-Type", "application/octet-stream");
 }

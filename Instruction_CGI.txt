@@ -1,0 +1,19 @@
+ETAPE 1 : tu crées une classe CGI.
+
+ETAPE 3 : tu crées ta fonction principale du traitement de la CGI dans laquelle tu prends en paramètres
+"const Request &req,  Response &res". C'est mes deux classes, pour que tu puisses accéder aux données et remplir le tableau 
+d'environnement. Comme ça, tu n'auras pas du tout besoin de te casser la tête avec mes classes.
+
+ETAPE 2 : tu crées ton tableau d'environnement, voir le fichier ci-joint pour savoir quelle getter utiliser pour chaque champ et 
+dans quelle classe les trouver. 
+
+ETAPE 3 : tu fork blabla.
+
+ETAPE 4 : tu me mets tout le résultat dans une string. Je m'occuperai de parser la suite, ce sera plus simple sinon on va y passer 
+trop de temps.
+
+ETAPE 5 : Tu me renverras cette string. Pour le moment fais juste une variable std::string dans ta classe, on verra plus tard comment 
+je la récupère. 
+
+TRES IMPORTANT : Pour traiter le script du cgi, n'utilise pas une string mais un std::vector<char>. Pcq la string peut 
+mal interpréter certains caractères. Quand tu auras fini d'exécuter, là tu mettras tout dans une string. 

@@ -62,6 +62,11 @@ std::string	Request::getBody() const
 	return (_body);
 }
 
+size_t	Request::getContentLength() const
+{
+	return (_contentLength);
+}
+
 const std::map<std::string, std::string> &Request::getAllHeaders() const
 {
 	return (_allHeaders);
@@ -72,18 +77,19 @@ std::string Request::getHeader(const std::string& key) const
     std::string lowerKey = key;
     
     for (size_t i = 0; i < lowerKey.length(); ++i)
-    {
         lowerKey[i] = std::tolower(lowerKey[i]);
-    }
 
     std::map<std::string, std::string>::const_iterator it = _allHeaders.find(lowerKey);
 
     if (it != _allHeaders.end())
-    {
         return (it->second) ;
-    }
 
     return ("") ;
+}
+
+std::string	Request::getSupportedMethod() const
+{
+	return ("GET, POST, DELETE");
 }
 
 e_parsing_steps	Request::getStep() const

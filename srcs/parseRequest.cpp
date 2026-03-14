@@ -29,6 +29,8 @@ void    Request::parseRequest()
         if (_bytesData.size() == sizeBefore)
             break ; // on att les données
     }
+    if (_step == FINISHED)
+        _contentLength = body.size();
 }
 
 void    Request::parseLines()
@@ -133,7 +135,6 @@ void    Request::checkStartLine()
 			_errorCode = METHOD_NOT_ALLOWED;
 		else
 			_errorCode = BAD_REQUEST;
-		throw std::exception();
 	}
 
 	if (_httpVersion != target)
@@ -258,6 +259,7 @@ void    Request::parseBodyChunked()
             if (_chunkSize == 0)
             {
                 _step = TRAILERS;
+                _contentLength = _body.size();
                 return ;
             }
             _chunkStep = READ_DATA;
