@@ -30,7 +30,7 @@ void    Request::parseRequest()
             break ; // on att les données
     }
     if (_step == FINISHED)
-        _contentLength = body.size();
+        _contentLength = _body.size();
 }
 
 void    Request::parseLines()

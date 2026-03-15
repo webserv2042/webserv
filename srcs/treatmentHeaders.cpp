@@ -1,5 +1,6 @@
 #include "../include/response.hpp"
 #include "../include/request.hpp"
+#include "../include/config.hpp"
 
 void    Response::setHeaders(const Request &req)
 {
@@ -14,6 +15,9 @@ void    Response::setHeaders(const Request &req)
 	if (_statusCode == METHOD_NOT_ALLOWED)
 		this->addHeaders("Allow", req.getSupportedMethod());
 
+	if (_statusCode >= 300 && _statusCode < 400)
+		this->addHeaders("Location", _locationUri);
+		
 	if (req.getHeader("connection") == "close")
 	{
 		this->addHeaders("Connection", "close");
@@ -25,22 +29,3 @@ void    Response::setHeaders(const Request &req)
 		_closeFd = false; // a voir si nécéssaire de le garder
 	}
 }
-
-// const Location* Config::findLocation(std::string uri) const
-// {
-// 	const Location*	searchLoc = NULL;
-// 	size_t			maxLen = 0;
-
-// 	for (size_t i = 0; i < _locations.size(); ++i)
-// 	{
-// 		if (uri.compare(0, _locations[i].path.length(), _locations[i].path) == 0)
-// 		{
-// 			if (_locations[i].path.length() >= maxLen)
-// 			{
-// 				maxLen = _locations[i].path.length();
-// 				searchLoc = &_locations[i];
-// 			}
-// 		}
-// 	}
-// 	return (searchLoc);
-// }

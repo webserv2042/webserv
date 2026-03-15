@@ -7,9 +7,13 @@
 #include <iostream>
 #include <sstream>
 #include <sys/stat.h>
+#include <vector>
+#include <dirent.h>
 
 #include "errors.hpp"
 
+class Config;
+struct Location;
 class Request;
 
 class Response
@@ -17,21 +21,23 @@ class Response
 	private:
 		e_status_code								_statusCode; // -> tu set l'état du status pour que je sache si tout est ok ou si je dois écrire une erreur dans ma réponse
 		std::vector<char>							_responseFinal; // -> ça c'est pour moi la version finale
-		std::string     							_body; // -> tu m'injectes le corps du script
+		std::vector<char>     						_body; // -> tu m'injectes le corps du script
 		std::string									_uriFullPath;
 		std::string									_extension;
 		std::string									_dateHttp;
+		std::string									_locationUri;
 		std::map<std::string, std::string>			_headers; // t'ajoutes les headers nécéssaires (comme content-length notamment je te laisse te renseiger)
 		static std::map<int, std::string>			_statusMessage;
 		static std::map<std::string, std::string>	_mimeType;
 		bool										_isCgiExt;
+		const Config								&_config;
 		struct stat									_dataFile;
-		const Location								*_location;
+		const Location								*_structLocation;
 		bool										_closeFd;
 
 	public:
 
-		Response();
+		Response(const Config &configServer);
 		~Response();
 
 		// static std::map<int, std::string>			initMessageStatus();

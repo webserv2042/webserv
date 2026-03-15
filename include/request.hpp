@@ -71,6 +71,7 @@ class Request
 		std::string									getSupportedMethod() const;
 		e_parsing_steps								getStep() const;
 		e_status_code								getErrorCode() const;
+		size_t										getContentLength() const;
 
 		//******************** PARTIE 2 : Parsing **************************//
 		void										parseRequest();

@@ -1,8 +1,9 @@
 #include "../include/response.hpp"
 #include "../include/request.hpp"
+#include "../include/config.hpp"
 
 
-Response::Response() : _statusCode(OK), _date(setHttpDate()), _isCgiExt(false), _closeFd(false) {}
+Response::Response(const Config &configServer) : _statusCode(OK), _date(setHttpDate()), _isCgiExt(false), _config(configServer), _closeFd(false) {}
 
 Response::~Response() {}
 
@@ -17,9 +18,30 @@ void    Response::setResponseFinal(const Request &reqClient)
     catch (const std::exception &e)
     {
         // this->generateErrorPage(_statusCode);
+		this->setHeaders();
     }
-    this->setStartLine();
+	this->createResponse();
 }
+
+void	Response::createResponse()
+{
+	this->startLine();
+
+	std::map<std::string, std::string>::iterator it;
+	for (it = _headers.begin(); it != _headers.end(); ++it)
+	{
+		std::string line = it->first + ": " + it->second + "\r\n";
+		_responseFinal.insert(_responseFinal.end(), line.begin(), line.end());
+	}
+
+	std::string	lineEmpty = "\r\n";
+	_responseFinal.insert(_responseFinal.end(), lineEmpty.begin(), lineEmpty.end());
+
+	if (!_body.empty())
+		_responseFinal.insert(_responseFinal.end(), _body.begin(), _body.end());
+}
+
+//*************************************************************************************************//
 
 void	Response::setStartLine()
 {
