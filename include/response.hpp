@@ -12,9 +12,10 @@
 
 #include "errors.hpp"
 
-class Config;
-struct Location;
-class Request;
+class	Config;
+struct	Location;
+class	Request;
+class	Cgi;
 
 class Response
 {
@@ -33,6 +34,7 @@ class Response
 		const Config								&_config;
 		struct stat									_dataFile;
 		const Location								*_structLocation;
+		std::string									_pathExecCgi;
 		bool										_closeFd;
 
 	public:
@@ -63,7 +65,10 @@ class Response
 		void										checkingUri(const Request &req);
 		void										checkingPerm();
 		void										searchFile();
-		
+
+		void    									parseCgi(const std::vector<char> &cgi);
+        void    									parseHeadersCgi(const std::string &line);
+
 };
 
 #endif

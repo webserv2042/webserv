@@ -1,6 +1,6 @@
 #include "../include/response.hpp"
 #include "../include/request.hpp"
-#include "../include/config.hpp	"
+#include "../include/config.hpp"
 
 void    Response::checkingUri(const Request &req)
 {
@@ -120,8 +120,17 @@ void    Response::setExtension()
 
 bool    Response::isCgi()
 {
-	if (_extension == "php" || _extension == "py" || _extension == "sh")
+	if (!_structLocation)
+		return (false);
+	
+	std::map<std::string, std::string>::iterator it = _structLocation->cgi.find("." + _extension);
+
+	if (it != _structLocation->cgi.end())
+	{
+		_pathExecCgi = it->second;
 		return (true);
+	}
+
 	return (false);
 }
 

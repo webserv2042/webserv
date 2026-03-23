@@ -28,7 +28,7 @@ struct Location {
 	std::vector<std::string>		allowedMethods;
 	std::pair<int, std::string>		returnRedirect;
 	std::string						uploadPath;
-	// std::map<std::string, std::string>	cgi;
+	std::map<std::string, std::string>	cgi;
 	Location() : autoIndex(false) {}
 };
 

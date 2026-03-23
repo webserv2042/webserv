@@ -12,13 +12,22 @@ void    Response::setResponseFinal(const Request &reqClient)
     try 
     {
         this->checkingUri(reqClient);
-        this->methodProcess(reqClient);
-        this->setHeaders();            
+		if (isCgi())
+		{
+			CGI 				cgiExec(_uriFullPath, _pathExecCgi);
+			std::vector<char>	cgiOutput = cgiExec(reqClient, *this);
+			this->parseCgi(cgiOutput);
+			this->createResponse();
+			return ;
+		}
+		else
+        	this->methodProcess(reqClient);
+        this->setHeaders(reqClient);            
     }
     catch (const std::exception &e)
     {
         // this->generateErrorPage(_statusCode);
-		this->setHeaders();
+		this->setHeaders(reqClient);
     }
 	this->createResponse();
 }
@@ -81,6 +90,8 @@ void    Response::setStatusCode(e_status_code code)
 
 void    Response::addHeaders(const std::string &key, const std::string &value)
 {
+	for (size_t i = 0; i < key.length(); ++i)
+        key[i] = std::tolower(static_cast<unsigned char>(key[i]));
 	_headers[key] = value;
 }
 
