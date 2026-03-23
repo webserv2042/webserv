@@ -1,6 +1,6 @@
 #include "../include/response.hpp"
 #include "../include/request.hpp"
-#include "../include/config.hpp"
+#include "../include/Config.hpp"
 
 void    Response::checkingUri(const Request &req)
 {
@@ -8,7 +8,7 @@ void    Response::checkingUri(const Request &req)
 
 	if (_structLocation && _structLocation->returnRedirect.first != 0)
 	{
-		_statusCode = _strucLocation->returnRedirect.first;
+		_statusCode = static_cast<e_status_code>(_structLocation->returnRedirect.first);
 		_locationUri = _structLocation->returnRedirect.second;
 		// throw std::exception(); // generer page d'erreur
 		return ;
@@ -123,7 +123,7 @@ bool    Response::isCgi()
 	if (!_structLocation)
 		return (false);
 	
-	std::map<std::string, std::string>::iterator it = _structLocation->cgi.find("." + _extension);
+	std::map<std::string, std::string>::const_iterator it = _structLocation->cgi.find("." + _extension);
 
 	if (it != _structLocation->cgi.end())
 	{
@@ -141,7 +141,7 @@ void    Response::contentType()
 		// fonction cgi
 		return ; // ->j'envoie à la cgi qui renverra elle-mm son content-type
 	}
-	if (_location && _location->autoIndex == true && !_body.empty())
+	if (_structLocation && _structLocation->autoIndex == true && !_body.empty())
 	{
         this->addHeaders("Content-Type", "text/html");
         return; 

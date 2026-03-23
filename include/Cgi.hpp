@@ -1,9 +1,11 @@
 #ifndef CGI_HPP
 # define CGI_HPP
 
-#include "../server/Request.hpp"
-#include "../server/response.hpp"
+#include "request.hpp"
+#include "response.hpp"
 #include <vector>
+#include <cstring>
+#include <sys/wait.h>	
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

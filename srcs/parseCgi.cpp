@@ -5,7 +5,7 @@ void    Response::parseCgi(const std::vector<char> &cgi)
 {
 	const std::string 	delimCRLF = "\r\n\r\n";
 
-	std::vector<char>::iterator it = search(cgi.begin(), cgi.end(), delimCRLF.begin(), delimCRLF.end());
+	std::vector<char>::const_iterator it = search(cgi.begin(), cgi.end(), delimCRLF.begin(), delimCRLF.end());
 
 	if (it != cgi.end())
 	{
@@ -50,4 +50,15 @@ void    Response::parseHeadersCgi(const std::string &line)
     {
         this->addHeaders(key, value);
     }
+}
+
+void    Response::trim(std::string &line)
+{
+    size_t  start = line.find_first_not_of(" \t\r\n"); // je cherche avant la string
+    size_t  end = line.find_last_not_of(" \t\r\n"); // on cherche après la string
+
+    if (start == std::string::npos)
+        line.clear();
+    else
+        line = line.substr(start, end - start + 1);
 }

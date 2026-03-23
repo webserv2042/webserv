@@ -1,6 +1,6 @@
 #include "../include/response.hpp"
 #include "../include/request.hpp"
-#include "../include/config.hpp"
+#include "../include/Config.hpp"
 
 void    Response::setHeaders(const Request &req)
 {
@@ -8,7 +8,7 @@ void    Response::setHeaders(const Request &req)
 
 	ss << _body.size();
 
-	this->addHeaders("Date", _date);
+	this->addHeaders("Date", _dateHttp);
 	this->addHeaders("Server", "werserv/1.1");
 	this->addHeaders("Content-Length", ss.str());
 

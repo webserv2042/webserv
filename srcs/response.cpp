@@ -1,9 +1,13 @@
 #include "../include/response.hpp"
 #include "../include/request.hpp"
-#include "../include/config.hpp"
+#include "../include/Config.hpp"
+#include "../include/Cgi.hpp"
 
 
-Response::Response(const Config &configServer) : _statusCode(OK), _date(setHttpDate()), _isCgiExt(false), _config(configServer), _closeFd(false) {}
+Response::Response(const Config &configServer) : _statusCode(OK), _isCgiExt(false), _config(configServer), _closeFd(false)
+{
+	this->setHttpDate();
+}
 
 Response::~Response() {}
 
@@ -15,7 +19,7 @@ void    Response::setResponseFinal(const Request &reqClient)
 		if (isCgi())
 		{
 			CGI 				cgiExec(_uriFullPath, _pathExecCgi);
-			std::vector<char>	cgiOutput = cgiExec(reqClient, *this);
+			std::vector<char>	cgiOutput = cgiExec.cgi(reqClient, *this);
 			this->parseCgi(cgiOutput);
 			this->createResponse();
 			return ;
@@ -34,7 +38,7 @@ void    Response::setResponseFinal(const Request &reqClient)
 
 void	Response::createResponse()
 {
-	this->startLine();
+	this->setStartLine();
 
 	std::map<std::string, std::string>::iterator it;
 	for (it = _headers.begin(); it != _headers.end(); ++it)
@@ -64,7 +68,7 @@ void	Response::setStartLine()
 //Fonctions pour setup les différentes partie de la réponse + ajouter le code status    
 void    Response::setBodySize(const std::string &bodyHttp)
 {
-	_body = bodyHttp;
+	_body.assign(bodyHttp.begin(), bodyHttp.end());
 
 	std::stringstream ss;
 	ss << _body.size();
@@ -74,12 +78,12 @@ void    Response::setBodySize(const std::string &bodyHttp)
 void	Response::setHtppDate()
 {
 	char		buffer[50]; // stocker les données
-	time_t		time = time(0); // 
+	time_t		now = time(0); // 
 	struct tm	*timeInfo = gmtime(&now);
 
-	stfrtime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", timeInfo);
+	strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", timeInfo);
 
-	_date = std::string(buffer);
+	_dateHttp = std::string(buffer);
 }
 
 
@@ -90,9 +94,12 @@ void    Response::setStatusCode(e_status_code code)
 
 void    Response::addHeaders(const std::string &key, const std::string &value)
 {
-	for (size_t i = 0; i < key.length(); ++i)
-        key[i] = std::tolower(static_cast<unsigned char>(key[i]));
-	_headers[key] = value;
+	std::string lowerKey = key;
+
+	for (size_t i = 0; i < lowerKey.length(); ++i)
+    	lowerKey[i] = std::tolower(static_cast<unsigned char>(lowerKey[i]));
+
+	_headers[lowerKey] = value;
 }
 
 std::string Response::getUriFullPath() const

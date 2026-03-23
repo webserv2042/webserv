@@ -15,7 +15,7 @@
 class	Config;
 struct	Location;
 class	Request;
-class	Cgi;
+class	CGI;
 
 class Response
 {
@@ -48,6 +48,7 @@ class Response
 		void										setStatusCode(e_status_code code);
 		void										addHeaders(const std::string &key, const std::string &value);
 		void										setBodySize(const std::string &bodyHttp);
+		void    									setHtppDate();
 
 		std::string 								getUriFullPath() const;
 		std::string 								getExtension() const;
@@ -66,8 +67,16 @@ class Response
 		void										checkingPerm();
 		void										searchFile();
 
+		void										trim(std::string &line);
 		void    									parseCgi(const std::vector<char> &cgi);
         void    									parseHeadersCgi(const std::string &line);
+
+        void    									createResponse();
+        void    									setStartLine();
+        void    									setHeaders(const Request &req); // Attention : avec l'argument Request
+        void   			 							setHttpDate(); // Correction de l'orthographe (pas HtppDate)
+        void    									methodProcess(const Request &req);
+        void   	 									doAutoIndex();
 
 };
 

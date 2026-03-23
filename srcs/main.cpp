@@ -74,10 +74,10 @@
 
 #include <iostream>
 #include <vector>
-#include "include/Config.hpp"
-#include "include/request.hpp"
-#include "include/response.hpp"
-#include "include/Cgi.hpp"
+#include "../include/Config.hpp"
+#include "../include/request.hpp"
+#include "../include/response.hpp"
+#include "../include/Cgi.hpp"
 
 int main() {
     std::cout << "--- DÉBUT DES TESTS WEBSERV ---" << std::endl;

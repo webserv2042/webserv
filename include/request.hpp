@@ -45,6 +45,7 @@ class Request
 		std::map<std::string, std::string>			_allHeaders;
 		std::string         						_method;
 		std::string         						_uri;
+		std::string									_queryString;
 		std::string         						_httpVersion;
 		std::string         						_body;
 		size_t										_contentLength;
@@ -72,6 +73,7 @@ class Request
 		e_parsing_steps								getStep() const;
 		e_status_code								getErrorCode() const;
 		size_t										getContentLength() const;
+		std::string									getQueryString() const;
 
 		//******************** PARTIE 2 : Parsing **************************//
 		void										parseRequest();

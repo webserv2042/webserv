@@ -66,6 +66,8 @@ class Config {
 		const std::map<int, std::string>&	getErrorPage() const;
 		const std::vector<std::string>&		getAllowedMethods() const;
 		const std::vector<Location>&		getLocations() const;
+		const Location*						findLocation(std::string uri) const;
+
 
 		// ----- setters -----
 		// par le parser

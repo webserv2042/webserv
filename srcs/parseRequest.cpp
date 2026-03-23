@@ -95,6 +95,15 @@ void    Request::parseStartLine(const std::string &line)
     }
     _uri = line.substr((firstSpace + 1), secondSpace - (firstSpace + 1)); // extraction de l'uri
 
+    size_t queryPos = _uri.find('?');
+    if (queryPos != std::string::npos)
+    {
+        _queryString = _uri.substr(queryPos + 1); // Ce qui est après le ?
+        _uri = _uri.substr(0, queryPos);          // Ce qui est avant le ?
+    }
+    else
+        _queryString = ""; // Important de vider si pas de ?
+
 	size_t  thirdSpace = line.find(' ', secondSpace + 1);
     if (thirdSpace != std::string::npos)
     {

@@ -7,6 +7,7 @@ Request::Request() :
     _step(START_LINE),
     _chunkStep(SEARCH_SIZE),
     _errorCode(OK)
+	// _queryString("")
 	{}
 
 Request::~Request() {}
@@ -100,6 +101,11 @@ e_parsing_steps	Request::getStep() const
 e_status_code	Request::getErrorCode() const
 {
 	return (_errorCode);
+}
+
+std::string	Request::getQueryString() const
+{
+	return (_queryString);
 }
 
 //============================================================================================================================//
