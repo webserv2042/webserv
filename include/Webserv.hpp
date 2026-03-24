@@ -18,8 +18,8 @@
 #include <sstream>
 #include <ctime>
 
-#include "server/Client.hpp"
-#include "server/Server.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 
 
 #define MAX_EVENTS 3 //nombre d'evenements enregistres a la fois par epoll_wait

@@ -1,8 +1,9 @@
 #ifndef CGI_HPP
 # define CGI_HPP
 
-#include "request.hpp"
-#include "response.hpp"
+#include "Request.hpp"
+#include "Response.hpp"
+
 #include <vector>
 #include <cstring>
 #include <sys/wait.h>	

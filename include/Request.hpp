@@ -9,8 +9,8 @@
 #include <map>
 #include <sstream>
 
-#include "utils.hpp"
-#include "errors.hpp"
+#include "Utils.hpp"
+#include "Errors.hpp"
 
 #define MAX_BYTES	8000 // recommandé dans la RFC 9112 d'imposer cette limite
 #define LIMIT_BODY	20971520 // 20 Mo pour le body

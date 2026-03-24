@@ -1,4 +1,4 @@
-#include "../include/Cgi.hpp"
+#include "../srcs/include/Cgi.hpp"
 
 CGI::CGI() : _clientFd(-1) {
 }
@@ -55,6 +55,7 @@ void	CGI::execCgi(const Request &req) {
 	if (pipe(pipeIn) == -1) {
 		throw std::runtime_error("(CGI) : Error while creating pipe");
 	}
+
 	if (pipe(pipeOut) == -1) {
 		close(pipeIn[0]);
 		close(pipeIn[1]);
@@ -109,6 +110,10 @@ void	CGI::execCgi(const Request &req) {
 		int status;
 		waitpid(forkPid, &status, 0);
 		close(pipeOut[0]);
+
+		// if (_output.empty()) {
+        //     throw std::runtime_error("500"); 
+        // }
 	}
 }
 

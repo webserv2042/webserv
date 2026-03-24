@@ -124,3 +124,53 @@
 
 //     return 0;
 // }
+
+#include "../include/Client.hpp"
+#include "../include/Request.hpp"
+#include "../include/Response.hpp"
+#include "../include/Config.hpp"
+#include <iostream>
+
+int main() {
+    // 1. SIMULER LA CONFIG (Le GPS)
+    Config mockConfig;
+    mockConfig.setPort(8080);
+    mockConfig.setRoot("./www");
+
+    // 2. SIMULER LE CLIENT (Le Conteneur)
+    // On crée un client manuellement comme si epoll venait d'accepter
+    Client testClient(42, &mockConfig); 
+
+    // 3. SIMULER L'ARRIVÉE DE DONNÉES (Le Réseau)
+    // On crée une requête HTTP brute sous forme de string
+    std::string rawRequest = "GET /index.html HTTP/1.1\r\nHost: localhost\r\nCookie: user=admin\r\n\r\n";
+    
+    std::cout << "--- ETAPE 1 : RECEPTION ---" << std::endl;
+    // On injecte les données comme le ferait recv()
+    testClient.getRequest().feeding(rawRequest.c_str(), rawRequest.size());
+
+    // 4. TESTER TA LOGIQUE DE FUSION
+    if (testClient.getRequest().isFinished()) {
+        std::cout << "[OK] Requete detectee comme finie." << std::endl;
+
+        // On lance ta Response avec la config du client
+        Response res(testClient.getConfig());
+        res.setResponseFinal(testClient.getRequest());
+
+        // On recupere les resultats
+        testClient._keepAlive = !res.getCloseFd();
+        std::vector<char> fullRes = res.getResponseFinal();
+        testClient.writeBuff.assign(fullRes.begin(), fullRes.end());
+        
+        std::cout << "--- ETAPE 2 : VERIFICATION ---" << std::endl;
+        std::cout << "Taille de la reponse generee : " << testClient.writeBuff.size() << " octets." << std::endl;
+        std::cout << "Keep-Alive memorise : " << (testClient._keepAlive ? "OUI" : "NON") << std::endl;
+        
+        // Verifier les cookies
+        std::cout << "Cookies recus dans Request : " << testClient.getRequest().getCookies() << std::endl;
+    } else {
+        std::cout << "[FAIL] La requete n'est pas consideree comme finie." << std::endl;
+    }
+
+    return 0;
+}

@@ -1,5 +1,5 @@
-#include "../include/response.hpp"
-#include "../include/request.hpp"
+#include "../srcs/include/Response.hpp"
+#include "../srcs/include/Request.hpp"
 
 void    Response::parseCgi(const std::vector<char> &cgi)
 {
@@ -54,14 +54,3 @@ void    Response::parseHeadersCgi(const std::string &line)
 	else
 		this->addHeaders(key, value);
 }
-
-// void   trim(std::string &line)
-// {
-// 	size_t  start = line.find_first_not_of(" \t\r\n"); // je cherche avant la string
-// 	size_t  end = line.find_last_not_of(" \t\r\n"); // on cherche après la string
-
-// 	if (start == std::string::npos)
-// 		line.clear();
-// 	else
-// 		line = line.substr(start, end - start + 1);
-// }

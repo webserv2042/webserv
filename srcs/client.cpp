@@ -1,16 +1,17 @@
-#include "../include/client.hpp"
+#include "../include/Client.hpp"
 
-Client::Client(int fd) :
-					_fd(fd),
-					_lastActivity(time(NULL))
-					// _bytesSent(0)
-					{}
+Client::Client(int fd, const Config *config) :
+						clientFd(fd),
+						serverConfig(config)
+					{
+						this->_lastActivity = time(NULL);
+					}
 
 Client::~Client() {}
 
 int			Client::getFd() const
 {
-	return (_fd);
+	return (clientFd);
 }
 
 Request&    Client::getRequest()

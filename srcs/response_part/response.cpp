@@ -1,5 +1,5 @@
-#include "../include/response.hpp"
-#include "../include/request.hpp"
+#include "../srcs/include/Response.hpp"
+#include "../srcs/include/Request.hpp"
 #include "../include/Config.hpp"
 #include "../include/Cgi.hpp"
 
@@ -37,6 +37,7 @@ void    Response::setResponseFinal(const Request &reqClient)
 			CGI 				cgiExec(_uriFullPath, _pathExecCgi);
 			std::vector<char>	cgiOutput = cgiExec.cgi(reqClient, *this);
 			this->parseCgi(cgiOutput);
+			// this->setHeaders(reqClient);
 			this->createResponse();
 			return ;
 		}
@@ -150,6 +151,11 @@ std::string	Response::getExt() const
 e_status_code	Response::getStatusCode() const
 {
 	return (_statusCode);
+}
+
+bool		Response::getCloseFd() const
+{
+	return (_closeFd);
 }
 
 const std::vector<char> & Response::getResponseFinal() const

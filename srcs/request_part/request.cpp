@@ -1,4 +1,4 @@
-#include "../include/request.hpp"
+#include "../srcs/include/Request.hpp"
 
 Request::Request() :
 	_bytesData(),
@@ -40,6 +40,11 @@ void Request::reset()
     _errorCode = OK;
 }
 
+bool		Request::isFinished() const
+{
+	return (_step == FINISHED);
+}
+
 void		Request::feeding(const char *buffer, size_t sizeOfBytes)
 {
 	_bytesData.insert(_bytesData.end(), buffer, buffer + sizeOfBytes);
@@ -54,11 +59,6 @@ void		Request::feeding(const char *buffer, size_t sizeOfBytes)
 		}
 }
 
-bool		Request::isFinished() const
-{
-	return (_step == FINISHED);
-}
-
 void	Request::setMethod(const std::string &method)
 {
 	if (method == "GET")
@@ -69,6 +69,11 @@ void	Request::setMethod(const std::string &method)
 		_methodEnum = DELETE;
 	else
 		_methodEnum = NOT_ALLOWED; // renvoyer une erreur directement ? _errorCode ? 
+}
+
+std::vector<char>	Request::getRequest() const
+{
+	return (_bytesData);
 }
 
 std::string Request::getMethod() const
@@ -140,31 +145,37 @@ std::string	Request::getQueryString() const
 // Fonction qui lit les octets reçus de la boucle epoll et vérifie ce qu'elle va envoyer a la partie réception de la requête
 // premier filtrage !
 
-// int		Webserv::readRequest(int fd)
-// {
-// 	char    buffer[4096];
-// 	ssize_t bytesReceived;
+int		Webserv::readRequest(int fd)
+{
+	char    buffer[4096];
+	size_t bytesReceived;
 
-// 	bytesReceived = recv(fd, buffer, sizeof(buffer), 0);
+	bytesReceived = recv(fd, buffer, sizeof(buffer), 0);
 
-// 	if (bytesReceived > 0)
-// 	{
-// 		_client[fd].updateActivity();
-// 		_client[fd].getRequest().feeding(buffer, (size_t)bytesReceived); // on récup le client du fd nommé, on copie les octets reçus du buffer vers sa requête
-// 		if (_client[fd].getRequest().isFinished())
-// 		{
-// 			std::cout << "Requête terminée du fd " << fd << " !" << std::endl;
-// 		}
-// 	}
-// 	else if (bytesReceived == 0)
-// 	{
-// 		std::cout << "Client fermé avec succès !" << std::endl;
-// 		return DISCONNECTION; // -> implémentation à revoir
-// 	}
-// 	else
-// 	{
-// 		std::cout << "Erreur, client fermé." << std::endl;
-// 		return DISCONNECTION;
-// 	}
-// 	// regrouper les deux if ? à voir selon cas d'erreur et fonction de fermeture, si une seule ou deux distinctes (closeError et closeSuccess)
-// }
+	if (bytesReceived > 0)
+	{
+		_client[fd].updateActivity();
+		_client[fd].getRequest().feeding(buffer, (size_t)bytesReceived); // on récup le client du fd nommé, on copie les octets reçus du buffer vers sa requête
+		if (_client[fd].getRequest().isFinished())
+		{
+			std::cout << "Requête terminée du fd " << fd << " !" << std::endl;
+
+			const Config		&config = _client[fd].getConfig();
+			Response			res(config);
+
+			res.setResponseFinal(_client[fd].getRequest());
+			_client[fd]._keepAlive = !res.getCloseFd();
+
+			std:vector<char>	responseToSend = res.getResponseFinal();
+
+			_client[fd].writeBuff.assign(responseToSend.begin(), responseToSend.end());
+            _client[fd].buffSize = _client[fd].writeBuff.size();
+            _client[fd].bytesSent = 0;
+
+			_client[fd].clientState = WRITING_RESPONSE;
+            modifyEpollout(fd, ADD_EPOLLOUT);
+		}
+	}
+	else
+		closeClient(fd);
+}

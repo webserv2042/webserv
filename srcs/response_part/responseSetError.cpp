@@ -1,5 +1,6 @@
-#include "../include/response.hpp"
-#include "../include/errors.hpp"
+#include "../srcs/include/Response.hpp"
+#include "../srcs/include/Errors.hpp"
+
 
 std::map<e_status_code, std::string> Response::_statusMessage = initMessageStatus();
 

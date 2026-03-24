@@ -10,8 +10,8 @@
 #include <vector>
 #include <dirent.h>
 
-#include "utils.hpp"
-#include "errors.hpp"
+#include "Utils.hpp"
+#include "Errors.hpp"
 
 #define PATH_ERROR_PAGES "errors_pages/"
 
@@ -23,21 +23,24 @@ class	CGI;
 class Response
 {
 	private:
-		e_status_code								_statusCode; // -> tu set l'état du status pour que je sache si tout est ok ou si je dois écrire une erreur dans ma réponse
-		std::vector<char>							_responseFinal; // -> ça c'est pour moi la version finale
-		std::vector<char>     						_body; // -> tu m'injectes le corps du script
+		e_status_code								_statusCode; 
+		std::vector<char>							_responseFinal;
+		std::vector<char>     						_body;
+	
 		std::string									_uriFullPath;
 		std::string									_extension;
 		std::string									_dateHttp;
 		std::string									_locationUri;
-		std::map<std::string, std::string>			_headers; // t'ajoutes les headers nécéssaires (comme content-length notamment je te laisse te renseiger)
-		static std::map<e_status_code, std::string>	_statusMessage;
+
+		std::map<std::string, std::string>			_headers;
 		static std::map<std::string, std::string>	_mimeType;
+	
 		bool										_isCgiExt;
+		std::string									_pathExecCgi;
+	
 		const Config								&_config;
 		struct stat									_dataFile;
 		const Location								*_structLocation;
-		std::string									_pathExecCgi;
 		bool										_isAutoIndex;
 		bool										_closeFd;
 
@@ -59,6 +62,7 @@ class Response
 		std::string 								getHeader(std::string key);
 		std::string									getExt() const;
 		e_status_code								getStatusCode() const;
+		bool										getCloseFd() const;
 		
 		static void									initMimeType();
 		static void									isNotMimeFile();
