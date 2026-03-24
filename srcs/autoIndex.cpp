@@ -3,6 +3,8 @@
 
 void    Response::doAutoIndex(const Request &req)
 {
+	_isAutoIndex = true;
+
 	DIR				*directory = NULL; // pour ouvrir le dossier
 	struct dirent	*fileRead = NULL; // chaque fichier lu
 	struct stat		dataFile;
@@ -10,10 +12,8 @@ void    Response::doAutoIndex(const Request &req)
 
 	directory = opendir(_uriFullPath.c_str());
 	if (!directory)
-	{
-		_statusCode = FORBIDDEN;
-		throw std::exception();
-	}
+		this->fail(FORBIDDEN);
+	
 	std::stringstream ss;
 
 	ss << "<html><head><title>Index of " + uri + "</title></head>";
@@ -42,6 +42,7 @@ void    Response::doAutoIndex(const Request &req)
 	closedir(directory);
 	ss << "</ul><hr></body></html>";
 
-	_body = ss.str();
+	std::string html = ss.str();
+	_body.assign(html.begin(), html.end());
 	_statusCode = OK;
 }

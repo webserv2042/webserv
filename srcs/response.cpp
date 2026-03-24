@@ -3,9 +3,18 @@
 #include "../include/Config.hpp"
 #include "../include/Cgi.hpp"
 
-
-Response::Response(const Config &configServer) : _statusCode(OK), _isCgiExt(false), _config(configServer), _closeFd(false)
+Response::Response(const Config &configServer) :
+	_statusCode(OK),
+    _isCgiExt(false),
+    _config(configServer),
+	_structLocation(NULL),
+    _isAutoIndex(false),
+	_closeFd(false)
 {
+	_responseFinal.clear();
+    _body.clear();
+    _headers.clear();
+
 	this->setHttpDate();
 }
 
@@ -13,6 +22,13 @@ Response::~Response() {}
 
 void    Response::setResponseFinal(const Request &reqClient)
 {
+	if (_statusCode >= 300 && _statusCode < 400)
+	{
+        this->setHeaders(reqClient);
+        this->createResponse();
+        return ;
+    }
+
     try 
     {
         this->checkingUri(reqClient);
@@ -28,9 +44,10 @@ void    Response::setResponseFinal(const Request &reqClient)
         	this->methodProcess(reqClient);
         this->setHeaders(reqClient);            
     }
+
     catch (const std::exception &e)
     {
-        // this->generateErrorPage(_statusCode);
+        this->generateErrorPage(_statusCode);
 		this->setHeaders(reqClient);
     }
 	this->createResponse();
@@ -38,6 +55,7 @@ void    Response::setResponseFinal(const Request &reqClient)
 
 void	Response::createResponse()
 {
+	_responseFinal.clear();
 	this->setStartLine();
 
 	std::map<std::string, std::string>::iterator it;
@@ -75,7 +93,7 @@ void    Response::setBodySize(const std::string &bodyHttp)
 	addHeaders("content-length", ss.str());
 }
 
-void	Response::setHtppDate()
+void	Response::setHttpDate()
 {
 	char		buffer[50]; // stocker les données
 	time_t		now = time(0); // 
@@ -86,6 +104,10 @@ void	Response::setHtppDate()
 	_dateHttp = std::string(buffer);
 }
 
+void	Response::setLocationUri(const std::string &path)
+{
+	_locationUri = path;
+}
 
 void    Response::setStatusCode(e_status_code code)
 {
@@ -96,8 +118,7 @@ void    Response::addHeaders(const std::string &key, const std::string &value)
 {
 	std::string lowerKey = key;
 
-	for (size_t i = 0; i < lowerKey.length(); ++i)
-    	lowerKey[i] = std::tolower(static_cast<unsigned char>(lowerKey[i]));
+	lowerKey = toLower(lowerKey);
 
 	_headers[lowerKey] = value;
 }
@@ -114,7 +135,11 @@ std::string Response::getExtension() const
 
 std::string Response::getHeader(std::string key)
 {
-	return (_headers[key]);
+    std::map<std::string, std::string>::iterator it = _headers.find(toLower(key));
+
+    if (it != _headers.end())
+        return it->second;
+    return "";
 }
 
 std::string	Response::getExt() const
@@ -125,4 +150,9 @@ std::string	Response::getExt() const
 e_status_code	Response::getStatusCode() const
 {
 	return (_statusCode);
+}
+
+const std::vector<char> & Response::getResponseFinal() const
+{
+	return (_responseFinal);
 }

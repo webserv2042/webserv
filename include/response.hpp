@@ -10,7 +10,10 @@
 #include <vector>
 #include <dirent.h>
 
+#include "utils.hpp"
 #include "errors.hpp"
+
+#define PATH_ERROR_PAGES "errors_pages/"
 
 class	Config;
 struct	Location;
@@ -28,13 +31,14 @@ class Response
 		std::string									_dateHttp;
 		std::string									_locationUri;
 		std::map<std::string, std::string>			_headers; // t'ajoutes les headers nécéssaires (comme content-length notamment je te laisse te renseiger)
-		static std::map<int, std::string>			_statusMessage;
+		static std::map<e_status_code, std::string>	_statusMessage;
 		static std::map<std::string, std::string>	_mimeType;
 		bool										_isCgiExt;
 		const Config								&_config;
 		struct stat									_dataFile;
 		const Location								*_structLocation;
 		std::string									_pathExecCgi;
+		bool										_isAutoIndex;
 		bool										_closeFd;
 
 	public:
@@ -42,13 +46,13 @@ class Response
 		Response(const Config &configServer);
 		~Response();
 
-		// static std::map<int, std::string>			initMessageStatus();
 		void										setResponseFinal(const Request &reqClient);
 		const std::vector<char>						&getResponseFinal() const;
 		void										setStatusCode(e_status_code code);
 		void										addHeaders(const std::string &key, const std::string &value);
 		void										setBodySize(const std::string &bodyHttp);
-		void    									setHtppDate();
+		void    									setHttpDate();
+		void										setLocationUri(const std::string &path);
 
 		std::string 								getUriFullPath() const;
 		std::string 								getExtension() const;
@@ -65,18 +69,33 @@ class Response
 		void										contentType();
 		void										checkingUri(const Request &req);
 		void										checkingPerm();
-		void										searchFile();
+		void										searchFile(const Request &req);
 
-		void										trim(std::string &line);
+		// void										trim(std::string &line);
 		void    									parseCgi(const std::vector<char> &cgi);
         void    									parseHeadersCgi(const std::string &line);
 
+		// method
+
+		void										doGet();
+		void										doPost(const Request &req);
+		void										doDelete();
+
+
         void    									createResponse();
         void    									setStartLine();
-        void    									setHeaders(const Request &req); // Attention : avec l'argument Request
-        void   			 							setHttpDate(); // Correction de l'orthographe (pas HtppDate)
+        void    									setHeaders(const Request &req);
         void    									methodProcess(const Request &req);
-        void   	 									doAutoIndex();
+        void   	 									doAutoIndex(const Request &req);
+		static std::map<e_status_code, std::string>	initMessageStatus();
+		void										generateErrorPage(e_status_code code);
+		bool										checkFile(const std::string &path);
+		std::string									readFile(const std::string &path);
+
+		void										fail(e_status_code code);
+
+
+
 
 };
 

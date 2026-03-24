@@ -10,23 +10,18 @@ void    Response::checkingUri(const Request &req)
 	{
 		_statusCode = static_cast<e_status_code>(_structLocation->returnRedirect.first);
 		_locationUri = _structLocation->returnRedirect.second;
-		// throw std::exception(); // generer page d'erreur
-		return ;
+		this->fail(_statusCode);
 	}
 
 	this->fullPathUri(req);
 
 	if (stat(_uriFullPath.c_str(), &_dataFile) != 0) // uri introuvable
-	{
-		_statusCode = NOT_FOUND;
-		throw std::exception(); // a modifier pour generer page d'erreur
-		return ;
-	}
+		this->fail(NOT_FOUND);
 	
 	if (S_ISREG(_dataFile.st_mode)) // un fichier ?
 		this->checkingPerm();
 	else if(S_ISDIR(_dataFile.st_mode)) // un dossier ?
-		this->searchFile();
+		this->searchFile(req);
 
 	this->contentType();
 }
@@ -53,15 +48,12 @@ const Location* Config::findLocation(std::string uri) const
 void    Response::checkingPerm()
 {
 	if (!(_dataFile.st_mode & S_IRUSR)) // autorisation de l'user de lire ?
-	{
-		_statusCode = FORBIDDEN;
-		throw std::exception();
-	}
+		this->fail(FORBIDDEN);
 	
 	_statusCode = OK;
 }
 
-void    Response::searchFile()
+void    Response::searchFile(const Request &req)
 {
 	std::string fileOnDirectory = _uriFullPath;
 
@@ -69,19 +61,16 @@ void    Response::searchFile()
 		fileOnDirectory += "/";
 	fileOnDirectory += "index.html";
 
-	if (stat(fileOnDirectory.c_str(), &_dataFile) == 0) // fichier trouvé (prq dataFile et que contient elle)
+	if (stat(fileOnDirectory.c_str(), &_dataFile) == 0)
 	{
 		_uriFullPath = fileOnDirectory;
 		this->checkingPerm();
 		this->setExtension();
 	}
 	else if (_structLocation && _structLocation->autoIndex == true)
-		this->doAutoIndex();
+		this->doAutoIndex(req);
 	else
-	{
-		_statusCode = NOT_FOUND;
-		throw std::exception();
-	}
+		this->fail(NOT_FOUND);
 }
 
 void    Response::fullPathUri(const Request &req)
@@ -137,17 +126,18 @@ bool    Response::isCgi()
 void    Response::contentType()
 {
 	if (this->isCgi())
-	{
-		// fonction cgi
 		return ; // ->j'envoie à la cgi qui renverra elle-mm son content-type
-	}
-	if (_structLocation && _structLocation->autoIndex == true && !_body.empty())
-	{
+
+	if (_isAutoIndex)
+    {
         this->addHeaders("Content-Type", "text/html");
-        return; 
+        return ;
     }
-	if (_mimeType.count(_extension))
-		this->addHeaders("Content-Type", _mimeType[_extension]);
+
+	std::map<std::string, std::string>::iterator it = _mimeType.find(_extension);
+
+	if (it != _mimeType.end())
+		this->addHeaders("Content-Type", it->second);
 	else
 		this->addHeaders("Content-Type", "application/octet-stream");
 }

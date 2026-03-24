@@ -9,6 +9,7 @@
 #include <map>
 #include <sstream>
 
+#include "utils.hpp"
 #include "errors.hpp"
 
 #define MAX_BYTES	8000 // recommandé dans la RFC 9112 d'imposer cette limite
@@ -48,6 +49,7 @@ class Request
 		std::string									_queryString;
 		std::string         						_httpVersion;
 		std::string         						_body;
+		std::string									_cookies;
 		size_t										_contentLength;
 		size_t										_chunkSize;
 		e_request_method							_methodEnum;
@@ -61,8 +63,10 @@ class Request
 
 		//******************** PARTIE 1 : Réception du client ******************//
 		void                						feeding(const char *buffer, size_t sizeOfBytesRead);
+
 		bool                						isFinished() const;
 		void										setMethod(const std::string &method);
+
 		std::string         						getMethod() const;
 		std::string         						getUri() const;
 		std::string         						getHttpVersion() const;
@@ -74,6 +78,7 @@ class Request
 		e_status_code								getErrorCode() const;
 		size_t										getContentLength() const;
 		std::string									getQueryString() const;
+		std::string									getCookies() const;
 
 		//******************** PARTIE 2 : Parsing **************************//
 		void										parseRequest();
@@ -84,7 +89,9 @@ class Request
 		void										parseBodyContent();
 		void										parseBodyChunked();
 		void										parseTrailers();
-		void										trim(std::string &line);
+		// void										trim(std::string &line);
+		void										reset();
+		void										fail(e_status_code code);
 
 		//Erreurs parsing
 		bool										errorMaxBytes();

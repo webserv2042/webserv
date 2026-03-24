@@ -5,20 +5,14 @@ void    Response::methodProcess(const Request &req)
 {
     std::string method = req.getMethod();
 
-    try
-    {
-        if (method == "GET")
-            this->doGet();
-        else if (method == "POST")
-            this->doPost(req);
-        else if (method == "DELETE")
-            this->doDelete();
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n'; // ->generer page d'erreur
-    }
-
+    if (method == "GET")
+        this->doGet();
+    else if (method == "POST")
+        this->doPost(req);
+    else if (method == "DELETE")
+        this->doDelete();
+    else
+        this->fail(NOT_IMPLEMENTED);
 }
 
 void    Response::doGet()
@@ -28,7 +22,7 @@ void    Response::doGet()
     if (!file.is_open())
     {
         _statusCode = INTERNAL_SERVER_ERROR;
-        return ;
+            this->fail(INTERNAL_SERVER_ERROR);    
     }
 
     _body.resize(_dataFile.st_size); // on alloue la mémoire + on remplit le body
@@ -55,13 +49,16 @@ void    Response::doPost(const Request &req)
     std::ofstream  file(_uriFullPath.c_str(), std::ios::binary);
 
     if (!file.is_open())
-    {
-        _statusCode = INTERNAL_SERVER_ERROR;
-        return ;
-    }
+        this->fail(INTERNAL_SERVER_ERROR);
 
     if (!req.getBody().empty())
-        file.write(req.getBody().c_str(), req.getContentLength());
+        file.write(req.getBody().c_str(), req.getBody().size());
+    if (file.fail()) 
+    {
+        file.close();
+        std::remove(_uriFullPath.c_str());
+        this->fail(INTERNAL_SERVER_ERROR);
+    }
 
     file.close();
     _statusCode = CREATED;
@@ -73,24 +70,20 @@ void    Response::doPost(const Request &req)
 void    Response::doDelete()
 {
     if (S_ISDIR(_dataFile.st_mode)) // je refuse la suppression de dossiers car nginx refuse 
-    {
-        _statusCode = FORBIDDEN;
-        throw std::exception();
-    }
+        this->fail(FORBIDDEN);
 
     if (std::remove(_uriFullPath.c_str()) == 0)
     {
         _statusCode = NO_CONTENT;
-        _body.clear(); // ATTENTION EN CAS DE DOUBLE FREE VOIR ICI !!!!
+        _body.clear();
     }
     else
     {
         if (errno == EACCES || errno == EPERM)
-            _statusCode = FORBIDDEN;
+            this->fail(FORBIDDEN);
         else if (errno == ENOENT)
-            _statusCode = NOT_FOUND;
+            this->fail(NOT_FOUND);
         else
-            _statusCode = INTERNAL_SERVER_ERROR;
-        throw std::exception();
+            this->fail(INTERNAL_SERVER_ERROR);
     }
 }

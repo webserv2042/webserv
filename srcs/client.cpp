@@ -1,8 +1,10 @@
-#include "client.hpp"
+#include "../include/client.hpp"
 
-Client::Client() {}
-
-Client::Client(int fd) : _fd(fd), _lastActivity(time(NULL)) {}
+Client::Client(int fd) :
+					_fd(fd),
+					_lastActivity(time(NULL))
+					// _bytesSent(0)
+					{}
 
 Client::~Client() {}
 

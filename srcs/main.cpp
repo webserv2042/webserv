@@ -72,55 +72,55 @@
 //     return 0;
 // }
 
-#include <iostream>
-#include <vector>
-#include "../include/Config.hpp"
-#include "../include/request.hpp"
-#include "../include/response.hpp"
-#include "../include/Cgi.hpp"
+// #include <iostream>
+// #include <vector>
+// #include "../include/Config.hpp"
+// #include "../include/request.hpp"
+// #include "../include/response.hpp"
+// #include "../include/Cgi.hpp"
 
-int main() {
-    std::cout << "--- DÉBUT DES TESTS WEBSERV ---" << std::endl;
+// int main() {
+//     std::cout << "--- DÉBUT DES TESTS WEBSERV ---" << std::endl;
 
-    // 1. SIMULATION DU PARSING (Config)
-    Config config;
-    config.setRoot("www");
+//     // 1. SIMULATION DU PARSING (Config)
+//     Config config;
+//     config.setRoot("www");
     
-    Location cgiLoc;
-    cgiLoc.path = "/cgi-bin";
-    cgiLoc.root = "www/cgi-bin";
-    cgiLoc.cgi[".py"] = "/usr/bin/python3"; // On simule ce que le parser a lu
-    config.addLocation(cgiLoc);
+//     Location cgiLoc;
+//     cgiLoc.path = "/cgi-bin";
+//     cgiLoc.root = "www/cgi-bin";
+//     cgiLoc.cgi[".py"] = "/usr/bin/python3"; // On simule ce que le parser a lu
+//     config.addLocation(cgiLoc);
 
-    std::cout << "[OK] Configuration initialisée (CGI .py configuré)" << std::endl;
+//     std::cout << "[OK] Configuration initialisée (CGI .py configuré)" << std::endl;
 
-    // 2. SIMULATION D'UNE REQUÊTE CLIENT (Request)
-    Request req;
-    // On simule l'arrivée d'octets sur la socket
-    std::string rawRequest = 
-        "GET /cgi-bin/hello.py HTTP/1.1\r\n"
-        "Host: localhost\r\n"
-        "Content-Type: text/plain\r\n"
-        "Connection: keep-alive\r\n\r\n";
+//     // 2. SIMULATION D'UNE REQUÊTE CLIENT (Request)
+//     Request req;
+//     // On simule l'arrivée d'octets sur la socket
+//     std::string rawRequest = 
+//         "GET /cgi-bin/hello.py HTTP/1.1\r\n"
+//         "Host: localhost\r\n"
+//         "Content-Type: text/plain\r\n"
+//         "Connection: keep-alive\r\n\r\n";
     
-    req.feeding(rawRequest.c_str(), rawRequest.size());
-    req.parseRequest();
+//     req.feeding(rawRequest.c_str(), rawRequest.size());
+//     req.parseRequest();
 
-    std::cout << "[OK] Requête parsée : " << req.getMethod() << " " << req.getUri() << std::endl;
+//     std::cout << "[OK] Requête parsée : " << req.getMethod() << " " << req.getUri() << std::endl;
 
-    // 3. GÉNÉRATION DE LA RÉPONSE (Response + CGI)
-    Response res(config);
+//     // 3. GÉNÉRATION DE LA RÉPONSE (Response + CGI)
+//     Response res(config);
     
-    std::cout << "[INFO] Lancement de setResponseFinal..." << std::endl;
-    res.setResponseFinal(req);
+//     std::cout << "[INFO] Lancement de setResponseFinal..." << std::endl;
+//     res.setResponseFinal(req);
 
-    // 4. AFFICHAGE DU RÉSULTAT FINAL
-    std::vector<char> result = res.getResponseFinal();
-    std::string finalStr(result.begin(), result.end());
+//     // 4. AFFICHAGE DU RÉSULTAT FINAL
+//     std::vector<char> result = res.getResponseFinal();
+//     std::string finalStr(result.begin(), result.end());
 
-    std::cout << "\n--- RÉPONSE HTTP GÉNÉRÉE ---" << std::endl;
-    std::cout << finalStr << std::endl;
-    std::cout << "--- FIN DU TEST ---" << std::endl;
+//     std::cout << "\n--- RÉPONSE HTTP GÉNÉRÉE ---" << std::endl;
+//     std::cout << finalStr << std::endl;
+//     std::cout << "--- FIN DU TEST ---" << std::endl;
 
-    return 0;
-}
+//     return 0;
+// }

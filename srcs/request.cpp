@@ -1,16 +1,44 @@
 #include "../include/request.hpp"
 
 Request::Request() :
+	_bytesData(),
+	_allHeaders(),
+	_method(""),
+	_uri(""),
+	_queryString(""),
+	_httpVersion(""),
+	_body(""),
+	_cookies(""),
 	_contentLength(0),
-    _chunkSize(0),
+	_chunkSize(0),
 	_methodEnum(DEFAULT),
-    _step(START_LINE),
-    _chunkStep(SEARCH_SIZE),
-    _errorCode(OK)
-	// _queryString("")
-	{}
+	_step(START_LINE),
+	_chunkStep(SEARCH_SIZE),
+	_errorCode(OK)
+{
+	_bytesData.clear();
+    _allHeaders.clear();
+}
 
 Request::~Request() {}
+
+void Request::reset()
+{
+    _bytesData.clear();
+    _allHeaders.clear();
+    _method = "";
+    _uri = "";
+    _queryString = "";
+    _httpVersion = "";
+    _body = "";
+    _cookies = "";
+    _contentLength = 0;
+    _chunkSize = 0;
+    _methodEnum = DEFAULT;
+    _step = START_LINE;
+    _chunkStep = SEARCH_SIZE;
+    _errorCode = OK;
+}
 
 void		Request::feeding(const char *buffer, size_t sizeOfBytes)
 {
@@ -76,9 +104,8 @@ const std::map<std::string, std::string> &Request::getAllHeaders() const
 std::string Request::getHeader(const std::string& key) const
 {
     std::string lowerKey = key;
-    
-    for (size_t i = 0; i < lowerKey.length(); ++i)
-        lowerKey[i] = std::tolower(lowerKey[i]);
+
+    lowerKey = toLower(lowerKey);
 
     std::map<std::string, std::string>::const_iterator it = _allHeaders.find(lowerKey);
 
