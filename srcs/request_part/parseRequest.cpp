@@ -6,10 +6,7 @@ void    Request::parseRequest()
 	{
 		size_t sizeBefore = _bytesData.size();
 		if ((_step == START_LINE || _step == HEADERS) && _bytesData.size() > MAX_BYTES)
-		{
 			this->errorMaxBytes();
-			return ;
-		}
 		
 		switch (_step)
 		{
@@ -43,8 +40,8 @@ void    Request::parseLines()
 
 		if (it == _bytesData.end()) // le delim n'est pas trouvé, on vérif que la taille limite ne soit pas atteinte
 		{
-			this->errorMaxBytes();
-			return ;
+			if (_bytesData.size()> MAX_BYTES)
+				this->fail((_step == START_LINE) ? URI_TOO_LONG : REQUEST_HEADER_FIELDS_TOO_LARGE);
 		}
 
 		std::string line(_bytesData.begin(), it);
@@ -67,6 +64,7 @@ void    Request::parseLines()
 				_step = BODY;
 				return ;
 			}
+			
 			if (line.find(':') != std::string::npos) // réglage d'un bug, pas de qst ça marche c tout
 				this->parseHeaders(line);
 			else
@@ -88,15 +86,8 @@ void    Request::parseStartLine(const std::string &line)
 		this->fail(BAD_REQUEST);
 	
 	_uri = line.substr((firstSpace + 1), secondSpace - (firstSpace + 1)); // extraction de l'uri
-
-	size_t queryPos = _uri.find('?');
-	if (queryPos != std::string::npos)
-	{
-		_queryString = _uri.substr(queryPos + 1); // Ce qui est après le ?
-		_uri = _uri.substr(0, queryPos);          // Ce qui est avant le ?
-	}
-	else
-		_queryString = ""; // Important de vider si pas de ?
+	std::string decodedUri = decodeUri(_uri);
+	_uri = parseUri(decodedUri);
 
 	size_t  thirdSpace = line.find(' ', secondSpace + 1);
 	if (thirdSpace != std::string::npos)
@@ -105,6 +96,86 @@ void    Request::parseStartLine(const std::string &line)
 	_httpVersion = line.substr(secondSpace + 1); // extraction de la version http
 
 	this->checkStartLine();
+}
+
+std::string Request::decodeUri(const std::string &uri)
+{
+    std::string decoded;
+
+    for (size_t i = 0; i < uri.size(); ++i)
+    {
+        if (uri[i] == '%' && i + 2 < uri.size()
+            && std::isxdigit(uri[i+1]) && std::isxdigit(uri[i+2])) // verif que c'est dans la base hexa 
+        {
+            int value;
+            std::sscanf(uri.c_str() + i + 1, "%2x", &value);
+            decoded += static_cast<char>(value);
+            i += 2;
+        }
+		else if (uri[i] == '+') // dans les query string c un espace
+			decoded += ' ';
+        else
+            decoded += uri[i];
+    }
+
+    return (decoded);
+}
+
+std::string	Request::parseUri(std::string uri)
+{
+
+	size_t queryPos = uri.find('?');
+    std::string path;
+
+	if (queryPos != std::string::npos)
+	{
+        _queryString = uri.substr(queryPos + 1); // après le ? 
+        path = uri.substr(0, queryPos); // avant le ?
+    }
+	else
+	{
+        _queryString = "";
+        path = uri;
+    }
+
+	size_t pos;
+    while ((pos = path.find("//")) != std::string::npos)
+    {
+		path.erase(pos, 1);
+	}
+	
+	std::vector<std::string>	allPath;
+	std::stringstream			ss(path);
+	std::string					onePath;
+
+	while(std::getline(ss, onePath, '/'))
+	{
+		if (onePath == "" || onePath == ".")
+			continue ;
+		if (onePath == "..")
+		{
+			if (!allPath.empty())
+				allPath.pop_back(); // on supprime le dernier élement
+			else
+				return ("/");
+		}
+		else
+			allPath.push_back(onePath);
+	}
+
+	std::string cleanPath = "/";
+	
+	for (size_t i = 0; i < allPath.size(); ++i)
+	{
+		cleanPath += allPath[i];
+		if (i < allPath.size() - 1)
+			cleanPath += "/";
+	}
+
+	if (path.size() > 1 && path[path.size() - 1] == '/' && cleanPath[cleanPath.size() - 1] != '/')
+        cleanPath += "/";
+	
+	return (cleanPath);
 }
 
 void    Request::checkStartLine()
@@ -142,6 +213,14 @@ void    Request::checkStartLine()
 void    Request::parseHeaders(const std::string &line)
 {
 	size_t      delim = line.find(':');
+
+	if (line.size() > 4096)
+        this->fail(REQUEST_HEADER_FIELDS_TOO_LARGE);	
+    
+    if (_allHeaders.size() > 100)
+    {
+		this->fail(REQUEST_HEADER_FIELDS_TOO_LARGE);
+	}
 
 	if (delim == std::string::npos || (delim > 0 && (line[delim - 1] == ' ' || line[delim - 1] == '\t')))
 		this->fail(BAD_REQUEST);
@@ -195,10 +274,12 @@ void    Request::parseBodyContent()
 	}
 	if (_allHeaders.count("content-length"))
 	{
-		if (_contentLength == 0)
+		if (!_isContentLength)
 		{
 			long valueForContent = std::atol(_allHeaders["content-length"].c_str()); // on initialise content-length
+        
 			_contentLength = static_cast<size_t>(valueForContent);
+			_isContentLength = true;
 
 			if (_contentLength == 0)
 			{

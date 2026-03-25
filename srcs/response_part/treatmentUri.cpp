@@ -15,6 +15,7 @@ void    Response::checkingUri(const Request &req)
 
 	this->fullPathUri(req);
 
+	std::cout << "Tentative d'ouverture de : [" << _uriFullPath << "]\n";
 	if (stat(_uriFullPath.c_str(), &_dataFile) != 0) // uri introuvable
 		this->fail(NOT_FOUND);
 	
@@ -22,6 +23,7 @@ void    Response::checkingUri(const Request &req)
 		this->checkingPerm();
 	else if(S_ISDIR(_dataFile.st_mode)) // un dossier ?
 		this->searchFile(req);
+	std::cout << "après search: Tentative d'ouverture de : [" << _uriFullPath << "]\n";
 
 	this->contentType();
 }
@@ -73,25 +75,26 @@ void    Response::searchFile(const Request &req)
 		this->fail(NOT_FOUND);
 }
 
-void    Response::fullPathUri(const Request &req)
+void Response::fullPathUri(const Request &req)
 {
-	std::string root;
-	std::string uri = req.getUri();
-	// std::string uri = "/index.html";
+    std::string root;
+    std::string uri = req.getUri();
 
-	if (_structLocation && !_structLocation->root.empty())
-		root = _structLocation->root;
-	else if (!_config.getRoot().empty())
-		root = _config.getRoot();
-	else
-		root = "www";
+    if (_structLocation && !_structLocation->root.empty())
+        root = _structLocation->root;
+    else if (!_config.getRoot().empty())
+        root = _config.getRoot();
+    else
+        root = "www";
 
-	if (!root.empty() && root[root.size() - 1] == '/' && !uri.empty() && uri[0] == '/')
-		_uriFullPath = root + uri.substr(1);
-	else
-		_uriFullPath = root + uri;
+    if (!root.empty() && root[root.size() - 1] == '/')
+        root.erase(root.size() - 1);
 
-	this->setExtension();
+    if (!uri.empty() && uri[0] != '/')
+        uri = "/" + uri;
+
+    _uriFullPath = root + uri;
+    this->setExtension();
 }
 
 void    Response::setExtension()

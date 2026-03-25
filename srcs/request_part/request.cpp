@@ -10,6 +10,7 @@ Request::Request() :
 	_body(""),
 	_cookies(""),
 	_contentLength(0),
+	_isContentLength(false),
 	_chunkSize(0),
 	_methodEnum(DEFAULT),
 	_step(START_LINE),
