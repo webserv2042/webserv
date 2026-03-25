@@ -1,53 +1,55 @@
 #ifndef CLIENT_HPP
-
 # define CLIENT_HPP
 
-#include <string.h>
-#include <iostream>
-#include <stdlib.h>
+#include "Request.hpp"
+#include "Config.hpp"
+#include <vector>
 #include <ctime>
 
+#define IDLE_TIMEOUT 60 //timeout d'un client sans aucune activité
 #define NO_TIMEOUT 0
 #define TIMEOUT 1
 
-typedef enum t_client_state
+typedef enum e_client_state
 {
     CONNEXION_ACCEPTED,
-	READING_REQUEST,
-	PROCESSING,
-	WRITING_RESPONSE,
-	DONE
+    READING_REQUEST,
+    WRITING_RESPONSE,
+    DONE
 }	t_client_state;
 
-class Client {
+class Config;
+class Request;
+
+class Client
+{
     public:
         Client();
-        Client(int new_client_fd);
+        Client(int fd, const Config* config);
         Client(const Client& to_copy);
         Client& operator=(const Client& to_copy);
         ~Client();
 
-        int         clientFd;
-        int         clientState;
-        std::string readBuff;
+        int                 clientFd;
+        int                 clientState;
 
-        //renvoi de reponse
-        std::string writeBuff;
-        int         bytesSent; //nb de bytes envoyés au client
-        int         buffSize; //taille totale du writeBuff
+        std::vector<char>   writeBuff;
+        size_t              bytesSent;
+        size_t              buffSize;
 
-        //timeout
-        time_t      lastActivity;
-        // time_t      totalConnection;
-        // time_t      readTime;
-        // time_t      writeTime;
-        int         Timeout();
+        time_t              _lastActivity;
 
-        void        resetClient();
+        Request             _request;
+        const Config* 		_serverConfig;
+        bool                _keepAlive;
 
-    private:
-        /*content*/
-    
+        int                 timeout();
+        void                updateActivity();
+        time_t              getLastActivity() const;
+        Request&            getRequest();
+        const Config&       getConfig() const;
+        int                 getFd() const;
+        void                resetClient();
 };
 
 #endif

@@ -1,4 +1,4 @@
-#include "../../includes/config/Config.hpp"
+#include "../include/Config.hpp"
 
 Config::Config()
 {
@@ -142,6 +142,13 @@ void Config::printConfig() const
     for (size_t i = 0; i < _locations.size(); i++) {
         std::cout << "  [" << i << "] path: " << _locations[i].path << std::endl;
         std::cout << "      root: " << _locations[i].root << std::endl;
+		if (!_locations[i].cgi.empty()) {
+            std::cout << "      CGI:" << std::endl;
+            for (std::map<std::string, std::string>::const_iterator it = _locations[i].cgi.begin();
+            	it != _locations[i].cgi.end(); ++it) {
+                std::cout << "        " << it->first << " -> " << it->second << std::endl;
+            }
+        }
     }
     std::cout << std::endl;
 }

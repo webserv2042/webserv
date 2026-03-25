@@ -1,4 +1,5 @@
 #include "../../includes/server/Server.hpp"
+#include "../../includes/config/Config.hpp"
 #include <errno.h>
 #include <string.h>
 
@@ -65,6 +66,11 @@ int Server::getSocketAddressLength() const
 int Server::getSocketFD() const
 {
 	return (_socketFD);
+}
+
+const Config& Server::getConfig() const
+{
+    return (_serverConfig);
 }
 
 struct sockaddr_in Server::getSocketAdress() const

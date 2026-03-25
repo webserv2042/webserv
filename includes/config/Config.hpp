@@ -28,7 +28,7 @@ struct Location {
 	std::vector<std::string>		allowedMethods;
 	std::pair<int, std::string>		returnRedirect;
 	std::string						uploadPath;
-	// std::map<std::string, std::string>	cgi;
+	std::map<std::string, std::string>	cgi;
 	Location() : autoIndex(false) {}
 };
 
@@ -66,6 +66,8 @@ class Config {
 		const std::map<int, std::string>&	getErrorPage() const;
 		const std::vector<std::string>&		getAllowedMethods() const;
 		const std::vector<Location>&		getLocations() const;
+		const Location*						findLocation(std::string uri) const;
+
 
 		// ----- setters -----
 		// par le parser

@@ -78,78 +78,100 @@ void    Webserv::setServers(std::vector<Server> &servVec)
 /// @param fd fd du client
 void	Webserv::treatRequest(int &fd)
 {
-	std::cout << "\033[34mREADING REQUEST...\033[0m" << std::endl;
-	int readReturn = testRead(fd);
-	if (readReturn == DISCONNECTION)
-		return;
+	char    buffer[4096];
+	ssize_t bytesReceived;
 
-	clients[fd].lastActivity = time(NULL);
+	bytesReceived = recv(fd, buffer, sizeof(buffer), 0);
 
-	if (clients[fd].clientState == PROCESSING)
-		modifyEpollout(fd, ADD_EPOLLOUT);
-}
-
-/// @brief fonction pour tester de lire a partir du fd client (a supp + tard)
-/// @param clientFD fd du client
-int	Webserv::testRead(int &clientFD)
-{
-	clients[clientFD].clientState = READING_REQUEST;
-	char buffer[2000];
-
-	int bytesRead = read(clientFD, buffer, sizeof(buffer));
-	if (bytesRead == ERROR || bytesRead == 0) //deconnexion client
+	if (bytesReceived > 0)
 	{
-		closeClient(clientFD);
-		return DISCONNECTION;
+		clients[fd].updateActivity();
+		clients[fd].getRequest().feeding(buffer, (size_t)bytesReceived); // on récup le client du fd nommé, on copie les octets reçus du buffer vers sa requête
+		if (clients[fd].getRequest().isFinished())
+		{
+			std::cout << "Requête terminée du fd " << fd << " !" << std::endl;
+
+			const Config		&config = clients[fd].getConfig();
+			Response			res(config);
+
+			res.setResponseFinal(clients[fd].getRequest());
+			clients[fd]._keepAlive = !res.getCloseFd();
+
+			std::vector<char>	responseToSend = res.getResponseFinal();
+
+			clients[fd].writeBuff.assign(responseToSend.begin(), responseToSend.end());
+            clients[fd].buffSize = clients[fd].writeBuff.size();
+            clients[fd].bytesSent = 0;
+
+			clients[fd].clientState = WRITING_RESPONSE;
+            modifyEpollout(fd, ADD_EPOLLOUT);
+		}
 	}
-
-	std::cout << std::endl << "Content:" << std::endl;
-	buffer[bytesRead] = '\0';
-	std::cout << buffer << std::endl;
-	memset(buffer, 0, 2000);
-
-	//rempli la reponse temporairement
-	// clients[clientFD].writeBuff = "test response: hi!\n";
-	// clients[clientFD].buffSize = clients[clientFD].writeBuff.size();
-
-
-	//test avec bcp de data
-	// std::string bigBody(5 * 1024 * 1024, 'A'); // 5 MB of 'A'
-	// std::string str;
-	// std::stringstream ss;
-	// ss << bigBody.size();
-	// ss >> str;
-	// clients[clientFD].writeBuff =
-    // "HTTP/1.1 200 OK\r\n"
-    // "Content-Length: " + str + "\r\n"
-    // "Content-Type: text/plain\r\n"
-    // "Connection: close\r\n"
-    // "\r\n" +
-    // bigBody + "\n--END--\n";
-	// clients[clientFD].buffSize = clients[clientFD].writeBuff.size();
-
-	//test avec une vraie reponse http
-	std::string body = readFile("./www/index.html");
-
-	std::string str;
-	std::stringstream ss;
-	ss << body.size();
-	ss >> str;
-
-	clients[clientFD].writeBuff =
-	"HTTP/1.1 200 OK\r\n"
-    "Date: Wed, 25 Feb 2026 16:14:00 GMT\r\n"
-    "Content-Type: text/html; charset=UTF-8\r\n"
-    "Content-Length: " + str + "\r\n"
-    "Connection: close\r\n"
-    "\r\n" +
-	body;
-
-	clients[clientFD].buffSize = clients[clientFD].writeBuff.size();
-	
-	clients[clientFD].clientState = PROCESSING;
-	return 0;
+	else
+		closeClient(fd);
 }
+
+// /// @brief fonction pour tester de lire a partir du fd client (a supp + tard)
+// /// @param clientFD fd du client
+// int	Webserv::testRead(int &clientFD)
+// {
+// 	clients[clientFD].clientState = READING_REQUEST;
+// 	char buffer[2000];
+
+// 	int bytesRead = read(clientFD, buffer, sizeof(buffer));
+// 	if (bytesRead == ERROR || bytesRead == 0) //deconnexion client
+// 	{
+// 		closeClient(clientFD);
+// 		return DISCONNECTION;
+// 	}
+
+// 	std::cout << std::endl << "Content:" << std::endl;
+// 	buffer[bytesRead] = '\0';
+// 	std::cout << buffer << std::endl;
+// 	memset(buffer, 0, 2000);
+
+// 	//rempli la reponse temporairement
+// 	// clients[clientFD].writeBuff = "test response: hi!\n";
+// 	// clients[clientFD].buffSize = clients[clientFD].writeBuff.size();
+
+
+// 	//test avec bcp de data
+// 	// std::string bigBody(5 * 1024 * 1024, 'A'); // 5 MB of 'A'
+// 	// std::string str;
+// 	// std::stringstream ss;
+// 	// ss << bigBody.size();
+// 	// ss >> str;
+// 	// clients[clientFD].writeBuff =
+//     // "HTTP/1.1 200 OK\r\n"
+//     // "Content-Length: " + str + "\r\n"
+//     // "Content-Type: text/plain\r\n"
+//     // "Connection: close\r\n"
+//     // "\r\n" +
+//     // bigBody + "\n--END--\n";
+// 	// clients[clientFD].buffSize = clients[clientFD].writeBuff.size();
+
+// 	//test avec une vraie reponse http
+// 	std::string body = readFile("./www/index.html");
+
+// 	std::string str;
+// 	std::stringstream ss;
+// 	ss << body.size();
+// 	ss >> str;
+
+// 	clients[clientFD].writeBuff =
+// 	"HTTP/1.1 200 OK\r\n"
+//     "Date: Wed, 25 Feb 2026 16:14:00 GMT\r\n"
+//     "Content-Type: text/html; charset=UTF-8\r\n"
+//     "Content-Length: " + str + "\r\n"
+//     "Connection: close\r\n"
+//     "\r\n" +
+// 	body;
+
+// 	clients[clientFD].buffSize = clients[clientFD].writeBuff.size();
+	
+// 	clients[clientFD].clientState = PROCESSING;
+// 	return 0;
+// }
 
 /// @brief fonction qui renvoi une reponse au client en non-bloquant(=potentiellement en plusieurs fois)
 /// @param client le client a qui on veut renvoyer la reponse
@@ -182,11 +204,20 @@ void	Webserv::sendResponse(Client &client)
 	}
 
 	if (client.bytesSent == client.buffSize) // tous les bytes envoyes? ->client retourne en EPOLLIN, sinon retourne ds la boucle d'envoi
-	{
-		client.resetClient();
-		modifyEpollout(client.clientFd, DELETE_EPOLLOUT);
-	}
-	client.lastActivity = time(NULL);
+    {
+        if (client._keepAlive == false) // si ma réponse a dit de fermer selon header Connection
+        {
+            std::cout << "Closing connection as requested by Response headers." << std::endl;
+            closeClient(client.clientFd);
+        }
+        else // sinon on reste ouvert
+        {
+            client.resetClient();
+            modifyEpollout(client.clientFd, DELETE_EPOLLOUT);
+            client.clientState = READING_REQUEST;
+        }
+    }
+    client._lastActivity = time(NULL);
 }
 
 /// @brief ferme et supprime les donnees necessaires a la fin de la boucle ->

@@ -2,8 +2,7 @@
 
 # define SERVER_HPP
 
-
-#include "../config/Config.hpp"
+#include "Config.hpp"
 #include <string>
 #include <iostream>
 #include <stdlib.h>
@@ -31,6 +30,7 @@ class Server {
 		int						getSocketFD() const;
 		struct sockaddr_in		getSocketAdress() const;
 		int						getSocketAddressLength() const;
+		const Config&			getConfig() const;
 
 		// setters
 		void					setSocketFD(int value);
@@ -45,4 +45,5 @@ class Server {
 };
 
 #endif
+
 

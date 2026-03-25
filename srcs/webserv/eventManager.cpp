@@ -47,7 +47,18 @@ void    Webserv::acceptClient(int &newConnexionFd)
 	setNonBlockingSocket(client_fd);
 	registerNewFd(client_fd, EPOLLIN);
 
-	Client newClient(client_fd);
+	// AJOUT DE SHEINEZ POUR AJOUTER LA CONFIG A LA CREATION DE CHAQUE CLIENT
+	const Config* foundConfig = NULL;
+    for (size_t i = 0; i < servers.size(); i++)
+	{
+        if (servers[i].getSocketFD() == newConnexionFd)
+		{
+            foundConfig = &(servers[i].getConfig());
+            break;
+        }
+	}
+
+	Client newClient(client_fd,foundConfig);
     clients[client_fd] = newClient; //do a proper copy!!!!
 }
 
@@ -89,7 +100,7 @@ void    Webserv::checkIdleTimeout()
 
 	while (it != clients.end())
 	{
-		if (it->second.Timeout() == TIMEOUT)
+		if (it->second.timeout() == TIMEOUT)
 			it = closeClient(it);
 		else
 			++it;

@@ -1,4 +1,4 @@
-#include"../../includes/config/Parser.hpp"
+#include"../include/Parser.hpp"
 
 Parser::Parser() {};
 
@@ -19,7 +19,8 @@ bool isDirective(const std::string& token)
 			token == "allow_methods" ||
 			token == "autoindex" ||
 			token == "return" ||
-			token == "upload_path");
+			token == "upload_path" ||
+			token == "cgi");
 }
 
 bool isStructuralKeyword(const std::string& token)
@@ -406,6 +407,8 @@ void	Parser::validateArgumentCount(const Directive& d)
 		throw std::runtime_error("(CONFIG) 'return' exptects exactly 2 argument");
 	if (d.name == "upload_path" && count != 1)
 		throw std::runtime_error("(CONFIG) 'upload_path' exptects exactly 1 argument");
+	if (d.name == "cgi" && count != 2)
+		throw std::runtime_error("(CONFIG) 'cgi' expects exactly 2 arguments");
 }
 
 /// @brief Valide les valeurs des arguments d'une directive (port, IP, méthode HTTP, etc)
@@ -440,7 +443,7 @@ bool	Parser::isDirectiveAllowedInContext(const std::string& name, Context ctx)
 	else
 	{
 		return (name == "root" || name == "allow_methods" || name == "autoindex" || name == "return" ||
-				name == "index" || name == "upload_path");
+				name == "index" || name == "upload_path" || name == "cgi");
 	}
 }
 
@@ -524,7 +527,7 @@ void	Parser::validateServers(const std::vector<ServerNode>& servers)
 	}
 }
 
-/// @brief
+/// @brief rempli le vecteur Config
 /// @param servers
 std::vector<Config> Parser::fillConfig(std::vector<ServerNode> servers)
 {
@@ -565,8 +568,10 @@ std::vector<Config> Parser::fillConfig(std::vector<ServerNode> servers)
 				if (servers[i].locations[k].directives[l].name == "return")
 					currentLoc.returnRedirect = std::make_pair(
 						toInt(servers[i].locations[k].directives[l].arguments[0]),
-						servers[i].locations[k].directives[l].arguments[1]
-					);
+						servers[i].locations[k].directives[l].arguments[1]);
+				if (servers[i].locations[k].directives[l].name == "cgi")
+						currentLoc.cgi[servers[i].locations[k].directives[l].arguments[0]] =
+						servers[i].locations[k].directives[l].arguments[1];
 			}
 			current.addLocation(currentLoc);
 		}
