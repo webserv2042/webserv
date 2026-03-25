@@ -1,6 +1,6 @@
-#include "../../include/Response.hpp"
-#include "../../include/Request.hpp"
-#include "../../include/Config.hpp"
+#include "../../includes/http/Response.hpp"
+#include "../../includes/http/Request.hpp"
+#include "../../includes/config/Config.hpp"
 
 void    Response::checkingUri(const Request &req)
 {

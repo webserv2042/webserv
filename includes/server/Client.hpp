@@ -1,8 +1,8 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-#include "Request.hpp"
-#include "Config.hpp"
+#include "../http/Request.hpp"
+#include "../config/Config.hpp"
 #include <vector>
 #include <ctime>
 

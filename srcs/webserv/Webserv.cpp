@@ -1,6 +1,7 @@
 #include "../../includes/Webserv.hpp"
 #include "../../includes/server/Client.hpp"
 #include "../../includes/Signals.hpp"
+#include "../../includes/http/Response.hpp"
 
 //CONSTRUCTOR(S)
 Webserv::Webserv() {

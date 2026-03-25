@@ -1,7 +1,7 @@
-#include "../../include/Response.hpp"
-#include "../../include/Request.hpp"
-#include "../../include/Config.hpp"
-#include "../../include/Cgi.hpp"
+#include "../../includes/http/Response.hpp"
+#include "../../includes/http/Request.hpp"
+#include "../../includes/config/Config.hpp"
+#include "../../includes/http/Cgi.hpp"
 
 Response::Response(const Config &configServer) :
 	_statusCode(OK),

@@ -2,7 +2,7 @@
 
 # define SERVER_HPP
 
-#include "Config.hpp"
+#include "../config/Config.hpp"
 #include <string>
 #include <iostream>
 #include <stdlib.h>

@@ -1,4 +1,4 @@
-#include "../../include/Cgi.hpp"
+#include "../../includes/http/Cgi.hpp"
 
 CGI::CGI() : _clientFd(-1) {
 }

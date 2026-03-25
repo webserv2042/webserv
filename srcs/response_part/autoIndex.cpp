@@ -1,5 +1,5 @@
-#include "../../include/Response.hpp"
-#include "../../include/Request.hpp"
+#include "../../includes/http/Response.hpp"
+#include "../../includes/http/Request.hpp"
 
 void    Response::doAutoIndex(const Request &req)
 {

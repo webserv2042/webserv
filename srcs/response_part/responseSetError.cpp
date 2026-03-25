@@ -1,5 +1,5 @@
-#include "../../include/Response.hpp"
-#include "../../include/Request.hpp"
+#include "../../includes/http/Response.hpp"
+#include "../../includes/http/Request.hpp"
 
 std::map<e_status_code, std::string> Response::_statusMessage = initMessageStatus();
 

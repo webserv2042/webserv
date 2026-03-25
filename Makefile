@@ -3,7 +3,14 @@ CFLAGS = -Wall -Wextra -Werror -std=c++98
 
 SRCS = 	srcs/main.cpp srcs/server/Server.cpp srcs/config/Config.cpp srcs/config/Parser.cpp \
 		srcs/server/Client.cpp srcs/signals/Signals.cpp srcs/webserv/Webserv.cpp \
-		srcs/webserv/epollUtils.cpp srcs/webserv/eventManager.cpp 
+		srcs/webserv/epollUtils.cpp srcs/webserv/eventManager.cpp \
+		srcs/request_part/request.cpp srcs/request_part/parseRequest.cpp \
+		srcs/request_part/errorsParsing.cpp srcs/request_part/utils.cpp \
+		srcs/response_part/response.cpp srcs/response_part/responseSetError.cpp \
+		srcs/response_part/treatmentHeaders.cpp srcs/response_part/treatmentMethod.cpp \
+		srcs/response_part/treatmentUri.cpp srcs/response_part/autoIndex.cpp \
+		srcs/response_part/mimeTypes.cpp \
+		srcs/cgi_part/Cgi.cpp srcs/cgi_part/parseCgi.cpp
 
 # OBJS = $(SRCS:.cpp=.o)
 NAME = webserv
