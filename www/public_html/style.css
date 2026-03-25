@@ -1,0 +1,349 @@
+/* ── Reset & base ── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    height: 100vh;
+    display: flex;
+    align-items: stretch;
+    background: #ffffff;
+    color: #1a2e5a;
+}
+
+
+/* CONTAINER TO ALIGN ALL CONTENT ***********************************************************/
+
+.container {
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+
+/*************************************************************************************************/
+/************************************** REQUEST FORM ************************************************/
+/*************************************************************************************************/
+
+/* ── Page background ── */
+.page-wrapper {
+    width: 100%; /* Add this */
+    min-height: 100vh;
+    background-color: #faf9f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 16px;
+}
+
+/* ── Card ── */
+.form-card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    padding: 48px 56px 52px;
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+/* ── Icon circle ── */
+.form-icon {
+    width: 80px;
+    height: 80px;
+    background-color: #c8dff0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+/* ── Title ── */
+.form-card h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 36px;
+    text-align: center;
+}
+
+/* ── Form full width ── */
+.form-card form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ── Field groups ── */
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.field-group label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111;
+}
+
+/* ── Shared input/select styles ── */
+.field-group input[type="date"],
+.field-group select {
+    width: 100%;
+    padding: 15px 20px;
+    background-color: #e8ecf0;
+    border: none;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    color: #555;
+    font-family: inherit;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.field-group input[type="date"]:focus,
+.field-group select:focus {
+    background-color: #dde2e8;
+}
+
+/* ── Select chevron ── */
+.field-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    padding-right: 44px;
+}
+
+/* ── File input ── */
+.file-input-wrapper {
+    position: relative;
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.file-input-wrapper input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+
+.file-placeholder {
+    display: block;
+    width: 100%;
+    padding: 15px 20px;
+    background-color: #e8ecf0;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    color: #999;
+    font-family: inherit;
+    pointer-events: none;
+    transition: background-color 0.2s;
+}
+
+.file-input-wrapper:hover .file-placeholder {
+    background-color: #dde2e8;
+}
+
+/* ── Submit button ── */
+button[type="submit"] {
+    width: 100%;
+    padding: 18px;
+    background-color: #3d546e;
+    color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+button[type="submit"]:hover {
+    background-color: #2e4059;
+}
+
+button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+    .form-card {
+        padding: 36px 24px 40px;
+    }
+}
+
+/*************************************************************************************************/
+/************************************** LOGIN PAGE ***********************************************/
+/*************************************************************************************************/
+
+
+/* ── Two-panel wrapper ── */
+.login-content {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* ── Left panel ── */
+.login-text {
+    flex: 0 0 50%;
+    background-color: #dce6f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 40px;
+}
+
+.login-text p {
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: #1a2e5a;
+    margin-bottom: 10px;
+    letter-spacing: 0.01em;
+}
+
+.login-text h1 {
+    font-size: 2.9rem;
+    font-weight: 700;
+    color: #1a2e5a;
+    margin-bottom: 20px;
+    letter-spacing: -0.01em;
+}
+
+.divider {
+    width: 80px;
+    height: 3px;
+    background-color: #1a2e5a;
+    border-radius: 2px;
+}
+
+/* ── Right panel ── */
+.login-form {
+    flex: 1;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 40px;
+}
+
+.login-form h2 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #1a2e5a;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+/* ── Form ── */
+form {
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.input-group {
+    position: relative;
+    border-left: 4px solid #1a2e5a;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 16px 20px;
+    background-color: #e8edf2;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    color: #1a2e5a;
+    font-family: inherit;
+    transition: background-color 0.2s ease;
+}
+
+.input-group input::placeholder {
+    color: #7a8faa;
+}
+
+.input-group input:focus {
+    background-color: #d8e2ed;
+}
+
+/* ── Submit button ── */
+button[type="submit"] {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #1a2e5a;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 0.03em;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #243f7a;
+}
+
+button[type="submit"]:active {
+    transform: scale(0.98);
+}
+
+/* ── Error message ── */
+.error-msg {
+    color: #c0392b;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* ── Responsive: stack vertically on small screens ── */
+@media (max-width: 700px) {
+    .login-content {
+        flex-direction: column;
+    }
+
+    .login-text {
+        flex: 0 0 auto;
+        padding: 50px 30px 40px;
+    }
+
+    .login-text h1 {
+        font-size: 1.8rem;
+    }
+
+    .login-form {
+        padding: 40px 24px 60px;
+    }
+
+    form {
+        max-width: 100%;
+    }
+}

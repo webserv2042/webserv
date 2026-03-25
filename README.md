@@ -15,6 +15,7 @@ To launch the program, you must execute it with the configuration file as argume
 For this project, the following documentation has been used:
 - for all the epoll functions: https://man7.org/linux/man-pages/man7
 - for the standard functions of C++98: https://www.geeksforgeeks.org
+- for the standard functions of PHP: https://www.php.net/manual, https://www.w3schools.com/php
 
 AI has also been used in this project, in order to get specific help and information on:
 - The basic structure of a web server

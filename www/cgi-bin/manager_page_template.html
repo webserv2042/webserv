@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Page</title>
+    <link rel="stylesheet" href="../public_html/dashboard_pages.css">
+</head>
+<body>
+    <script>
+        async function confirmDeletion(fileName, elementId) {
+
+        // try {
+        //     const response = await fetch('/uploads/' + fileName, {
+        //         method: 'DELETE' // This sends the literal DELETE method
+        //     });
+
+        //     if (response.ok) {
+        //         // Successfully deleted! Remove the element from the UI
+        //         document.getElementById(elementId).remove();
+        //         alert("File deleted successfully.");
+        //     } else {
+        //         alert("Error: " + response.status + " - " + response.statusText);
+        //     }
+        // }
+        // catch (error) {
+        //     console.error("Network error:", error);
+        //     }
+        document.getElementById(elementId).remove();
+        }
+
+        async function acceptRequest(rowId) {
+            // send a POST request to 'update_request.py'
+            const response = await fetch("update_request.py", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id=${rowId}&status=accepted`
+            });
+
+            if (response.ok) 
+                location.reload();
+            else
+                alert("Error updating status");
+        }
+
+        async function denyRequest(rowId) {
+            // send a POST request to 'update_request.py'
+            const response = await fetch("update_request.py", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id=${rowId}&status=denied`
+            });
+
+            if (response.ok) 
+                location.reload();
+            else
+                alert("Error updating status");
+        }
+
+    </script>
+
+     <div class="dashboard-wrapper">
+
+        <h1 class="welcome-title">Welcome back, [manager name]</h1>
+
+        <div class="dashboard-grid">
+
+            <!-- Left: Pending Requests -->
+            <div class="card card-pending">
+                <p class="card-title">Pending Requests</p>
+                <div class="pending-list-manager">
+                    {{REQUESTS}}
+                </div>
+            </div>
+
+            <!-- Right column -->
+            <div class="right-column">
+
+                <!-- All Employees card -->
+                <div class="card card-employees">
+                    <p class="card-title">All Employees</p> 
+
+                    <div class="employee-list">
+                        <a href="profiles/profile.html" class="employee-row">
+                            <span class="employee-name">Mme Bizbiz ZibZib</span>
+                            <div class="profile-avatar-list">
+                                <img src="../../uploads/Norminette.jpg" alt="Profile photo">
+                            </div>
+                        </a>
+                        <hr class="employee-divider">
+                        <a href="profiles/profile.html" class="employee-row">
+                            <span class="employee-name">Mme Bizbiz ZibZib</span>
+                            <div class="profile-avatar-list">
+                                <img src="../../uploads/Norminette.jpg" alt="Profile photo">
+                            </div>
+                        </a>
+                        <hr class="employee-divider">
+                    </div>
+
+                </div>
+
+                <!-- Total vacation card -->
+                <div class="card card-vacation">
+                    <p class="card-title">Total Vacation Time</p>
+                    <div class="vacation-list">
+                        {{VACATION_TIME}}
+
+                        <div class="vacation-row">
+                            <div class="profile-avatar-list">
+                                <img src="../../uploads/Norminette.jpg" alt="Profile photo">
+                            </div>
+                            <span class="vacation-count">30/35</span>
+                            <div class="vacation-bar-track">
+                                <div class="vacation-bar-fill" style="width: 86%;"></div>
+                            </div>
+                        </div>
+                        <hr class="vacation-divider">
+
+                        <div class="vacation-row">
+                            <div class="profile-avatar-list">
+                                <img src="../../uploads/Norminette.jpg" alt="Profile photo">
+                            </div>
+                            <span class="vacation-count">8/35</span>
+                            <div class="vacation-bar-track">
+                                <div class="vacation-bar-fill" style="width: 22%;"></div>
+                            </div>
+                        </div>
+                        <hr class="vacation-divider">
+
+                        <div class="vacation-row">
+                            <div class="profile-avatar-list">
+                                <img src="../../uploads/Norminette.jpg" alt="Profile photo">
+                            </div>
+                            <span class="vacation-count">13/35</span>
+                            <div class="vacation-bar-track">
+                                <div class="vacation-bar-fill" style="width: 37%;"></div>
+                            </div>
+                        </div>
+                        <hr class="vacation-divider">
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Time-off Requests</title>
+	<link rel="stylesheet" href="../public_html/style.css">
+</head>
+<body>
+
+    <div class="page-wrapper">
+        <div class="form-card">
+
+            <div class="form-icon">
+                <!-- Beach/vacation calendar emoji as icon -->
+                <span>🏖️</span>
+            </div>
+
+            <h2>Submit a Time-off Request</h2>
+
+            <form action="request_form.py" method="POST" enctype="multipart/form-data">
+
+                <div class="field-group">
+                    <label for="motive">Motive</label>
+                    <select name="motive" id="motive" required>
+                        <option value="" disabled selected>Motive</option>
+                        <option value="sick">Sick Leave</option>
+                        <option value="vacation">Vacation</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label for="start-date">Start Date</label>
+                    <input type="date" name="start-date" id="start-date" required>
+                </div>
+
+                <div class="field-group">
+                    <label for="end-date">End Date</label>
+                    <input type="date" name="end-date" id="end-date" required>
+                </div>
+
+                <div class="field-group">
+                    <label for="file_upload">Upload Supporting Documents</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" name="file_upload" id="file_upload" accept=".pdf">
+                        <span class="file-placeholder">Choose file</span>
+                    </div>
+                </div>
+
+                <button type="submit">Submit</button>
+
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('file_upload').addEventListener('change', function () {
+        const placeholder = this.closest('.file-input-wrapper').querySelector('.file-placeholder');
+        if (this.files.length > 0) {
+            placeholder.textContent = this.files[0].name;
+            placeholder.style.color = '#555';
+        } else {
+            placeholder.textContent = 'Choose file';
+            placeholder.style.color = '#999';
+        }
+        });
+    </script>
+</body>
+</html>

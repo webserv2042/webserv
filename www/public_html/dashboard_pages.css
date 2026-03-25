@@ -1,0 +1,551 @@
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/*************************************************************************************************/
+/************************************** EMPLOYEE PAGE ********************************************/
+/*************************************************************************************************/
+
+/* ── Dashboard page ── */
+.dashboard-wrapper {
+    min-height: 100vh;
+    background-color: #FDFBF8;
+    padding: 48px 100px 60px;
+    box-sizing: border-box;
+}
+
+.welcome-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #111;
+    margin-bottom: 130px;
+
+    text-shadow: 2px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Two-column grid ── */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 700px 1fr;
+    gap: 150px;
+    align-items: start;
+}
+
+/* ── Shared card base ── */
+.card {
+    background-color: #ffffff;
+    border-radius: 20px;
+    border: 3.5px solid;
+    padding: 28px 32px;
+}
+
+.card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 0;
+}
+
+/* ── Profile card (teal border, tall) ── */
+.card-profile {
+    border-color: #3de8c8;
+    min-height: 580px;
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
+}
+
+/* ── Avatar circle ── */
+.profile-avatar-emp {
+    flex-shrink: 0;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.profile-avatar-emp img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ── Sections ── */
+.profile-section-emp {
+    margin-bottom: 0px;
+}
+
+.profile-section-emp h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #3de8c8;
+    margin-bottom: 12px;
+}
+
+.profile-section-emp p {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: #222;
+    text-align: justify;
+}
+
+/* ── Header row ── */
+.profile-header-emp {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    /* margin-bottom: 28px; */
+}
+
+/* ── Right column ── */
+.right-column {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 70px;
+}
+
+/* ── Make a Request card (red/coral border) ── */
+.card-request {
+    border-color: #f05f5f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 600px;
+    width: 100%;
+    gap: 20px;
+    padding: 28px 32px 32px;
+}
+
+.card-request .card-title {
+    align-self: center;
+}
+
+.arrow-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f05f5f;
+    color: #ffffff;
+    border-radius: 50px;
+    width: 55%;
+    padding: 16px;
+    text-decoration: none;
+    transition: background-color 0.2s, transform 0.15s;
+}
+
+.arrow-button:hover {
+    background-color: #d94a4a;
+    transform: scale(1.03);
+}
+
+/* ── Requests History card (yellow/amber border) ── */
+.card-history {
+    border-color: #f5b942;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 600px;
+    width: 100%;
+}
+
+.request-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 8px;
+}
+
+.request {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 8px;
+    gap: 16px;
+}
+
+.request-motive {
+    font-size: 1rem;
+    color: #111;
+    flex: 0 0 160px;
+}
+
+.request-dates {
+    font-size: 1rem;
+    color: #111;
+    flex: 1;
+    text-align: center;
+}
+
+.request-status {
+    font-size: 1rem;
+    color: #111;
+    flex: 0 0 100px;
+    text-align: right;
+}
+
+/* Status color classes — apply these in your backend/template */
+.status-pending  { color: #111; }
+.status-denied   { color: #e03c3c; }
+.status-accepted { color: #2eaa5e; }
+
+.request-divider {
+    border: none;
+    border-top: 1.5px solid #ddd;
+    margin: 0 8px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+    .dashboard-wrapper {
+        padding: 32px 20px 48px;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card-profile {
+        min-height: 260px;
+    }
+
+    .arrow-button {
+        width: 80%;
+    }
+}
+
+
+/*************************************************************************************************/
+/************************************** MANAGER PAGE ********************************************/
+/*************************************************************************************************/
+
+/* Pending Requests */
+.card-pending {
+    border-color: #3de8c8;
+    min-height: 580px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pending-list-manager {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 8px;
+}
+
+/* ── Each request block ── */
+.request-manager {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 8px;
+}
+
+.request-info-manager {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.request-name-manager,
+.request-motive-manager,
+.request-dates-manager {
+    font-size: 1rem;
+    color: #111;
+}
+
+.request-proof-manager {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    white-space: nowrap;
+}
+
+.request-proof-manager:hover {
+    color: #4dd9e0;
+}
+
+/* ── Accept / Deny buttons ── */
+.request-actions-manager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding-left: 4px;
+}
+
+.btn-accept,
+.btn-deny {
+    padding: 10px 28px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ffffff;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn-accept {
+    background-color: #2ecc71;
+}
+
+.btn-deny {
+    background-color: #f06b6b;
+}
+
+.btn-accept:hover,
+.btn-deny:hover {
+    opacity: 0.88;
+}
+
+.btn-accept:active,
+.btn-deny:active {
+    transform: scale(0.97);
+}
+
+.request-divider-manager {
+    border: none;
+    border-top: 1.5px solid #ddd;
+    margin: 0 8px;
+}
+
+/* employees profiles */
+.card-employees {
+    border-color: #FF69F0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 600px;
+    min-height: 180px;
+    gap: 20px;
+    padding: 28px 32px 32px;
+}
+
+.profile-avatar-list {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.profile-avatar-list img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.employee-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.employee-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 8px;
+    text-decoration: none;
+    transition: background-color 0.15s;
+    border-radius: 8px;
+}
+
+.employee-row:hover {
+    background-color: #fff0fd;
+}
+
+.employee-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111;
+}
+
+.employee-divider {
+    border: none;
+    border-top: 1.5px solid #ddd;
+    margin: 0 8px;
+}
+
+/* Total vacation time */
+.card-vacation {
+    border-color: #FF5757;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 600px;
+}
+
+.vacation-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-top: 8px;
+}
+
+/* ── Each employee row ── */
+.vacation-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 8px;
+}
+
+.vacation-avatar {
+    flex-shrink: 0;
+}
+
+.vacation-count {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111;
+    white-space: nowrap;
+    flex: 0 0 56px;
+}
+
+/* ── Progress bar ── */
+.vacation-bar-track {
+    flex: 1;
+    height: 28px;
+    background-color: #d9d9d9;
+    border-radius: 50px;
+    overflow: hidden;
+}
+
+.vacation-bar-fill {
+    height: 100%;
+    background-color: #FF5757;
+    border-radius: 50px;
+    transition: width 0.4s ease;
+}
+
+.vacation-divider {
+    border: none;
+    border-top: 1.5px solid #ddd;
+    margin: 0 8px;
+}
+
+/*************************************************************************************************/
+/************************************** PROFILE PAGES ********************************************/
+/*************************************************************************************************/
+
+/* ── Profile page ── */
+.profile-wrapper {
+    min-height: 100vh;
+    background-color: #f5f2ec;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 60px 24px 80px;
+    box-sizing: border-box;
+}
+
+/* ── Card ── */
+.profile-card {
+    background-color: #ffffff;
+    border: 3.5px solid #1a2e5a;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 680px;
+    padding: 44px 52px 56px;
+    box-sizing: border-box;
+}
+
+/* ── Header row ── */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    margin-bottom: 28px;
+}
+
+/* ── Avatar circle ── */
+.profile-avatar {
+    flex-shrink: 0;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid #1a2e5a;
+    overflow: hidden;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ── Name & role ── */
+.profile-identity h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #111;
+    line-height: 1.15;
+    margin-bottom: 4px;
+}
+
+.profile-role {
+    font-size: 1rem;
+    font-style: italic;
+    font-weight: 600;
+    color: #666;
+}
+
+/* ── Divider ── */
+.profile-divider {
+    border: none;
+    border-top: 1.5px solid #ccc;
+    margin: 0 0 32px 0;
+}
+
+/* ── Sections ── */
+.profile-section {
+    margin-bottom: 28px;
+}
+
+.profile-section:last-child {
+    margin-bottom: 0;
+}
+
+.profile-section h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1a2e5a;
+    margin-bottom: 12px;
+}
+
+.profile-section p {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: #222;
+    text-align: justify;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+    .profile-card {
+        padding: 28px 20px 36px;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .profile-identity h1 {
+        font-size: 1.5rem;
+    }
+}
