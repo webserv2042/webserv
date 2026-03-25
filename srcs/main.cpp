@@ -124,53 +124,114 @@
 
 //     return 0;
 // }
-
-#include "../include/Client.hpp"
-#include "../include/Request.hpp"
-#include "../include/Response.hpp"
-#include "../include/Config.hpp"
 #include <iostream>
+#include <map>
+#include <vector>
+#include <unistd.h>
+#include "../include/Client.hpp"
+#include "../include/Config.hpp"
+#include "../include/Webserv.hpp"
+
+// On simule la fonction de Webserv pour le test
+void simulated_checkIdleTimeout(std::map<int, Client>& clients) {
+    std::map<int, Client>::iterator it = clients.begin();
+    while (it != clients.end()) {
+        if (it->second.timeout() == TIMEOUT) {
+            std::cout << "\033[31m   [TIMEOUT] Expulsion du FD " << it->first << "\033[0m" << std::endl;
+            clients.erase(it++); 
+        } else {
+            ++it;
+        }
+    }
+}
 
 int main() {
-    // 1. SIMULER LA CONFIG (Le GPS)
     Config mockConfig;
-    mockConfig.setPort(8080);
-    mockConfig.setRoot("./www");
+    std::map<int, Client> clients;
 
-    // 2. SIMULER LE CLIENT (Le Conteneur)
-    // On crée un client manuellement comme si epoll venait d'accepter
-    Client testClient(42, &mockConfig); 
+    std::cout << "\033[95m========================================\033[0m" << std::endl;
+    std::cout << "\033[95m       TEST DE FLUX : TIMEOUT LOOP      \033[0m" << std::endl;
+    std::cout << "\033[95m========================================\033[0m" << std::endl;
 
-    // 3. SIMULER L'ARRIVÉE DE DONNÉES (Le Réseau)
-    // On crée une requête HTTP brute sous forme de string
-    std::string rawRequest = "GET /index.html HTTP/1.1\r\nHost: localhost\r\nCookie: user=admin\r\n\r\n";
+    // 1. Création de clients avec des âges différents
+    std::cout << "[1] Initialisation des clients..." << std::endl;
     
-    std::cout << "--- ETAPE 1 : RECEPTION ---" << std::endl;
-    // On injecte les données comme le ferait recv()
-    testClient.getRequest().feeding(rawRequest.c_str(), rawRequest.size());
+    clients.insert(std::make_pair(1, Client(1, &mockConfig))); // Client tout neuf
+    clients.insert(std::make_pair(2, Client(2, &mockConfig))); // Client qui va expirer
+    clients.insert(std::make_pair(3, Client(3, &mockConfig))); // Client qui va expirer vite
 
-    // 4. TESTER TA LOGIQUE DE FUSION
-    if (testClient.getRequest().isFinished()) {
-        std::cout << "[OK] Requete detectee comme finie." << std::endl;
+    // On trafique leur _lastActivity pour simuler le passé
+    clients.at(2)._lastActivity -= 58; // Proche de la limite (60s)
+    clients.at(3)._lastActivity -= 59; // Très proche de la limite
+    
+    std::cout << "   -> FD 1 : Actif (0s d'inactivité)" << std::endl;
+    std::cout << "   -> FD 2 : Inactif (58s d'inactivité)" << std::endl;
+    std::cout << "   -> FD 3 : Inactif (59s d'inactivité)" << std::endl;
 
-        // On lance ta Response avec la config du client
-        Response res(testClient.getConfig());
-        res.setResponseFinal(testClient.getRequest());
-
-        // On recupere les resultats
-        testClient._keepAlive = !res.getCloseFd();
-        std::vector<char> fullRes = res.getResponseFinal();
-        testClient.writeBuff.assign(fullRes.begin(), fullRes.end());
+    // 2. Simulation de la boucle Epoll (On simule 5 tours de boucle)
+    std::cout << "\n[2] Démarrage de la boucle de surveillance..." << std::endl;
+    
+    for (int sec = 0; sec < 5; ++sec) {
+        std::cout << "\n--- Tour de boucle : T + " << sec << "s ---" << std::endl;
         
-        std::cout << "--- ETAPE 2 : VERIFICATION ---" << std::endl;
-        std::cout << "Taille de la reponse generee : " << testClient.writeBuff.size() << " octets." << std::endl;
-        std::cout << "Keep-Alive memorise : " << (testClient._keepAlive ? "OUI" : "NON") << std::endl;
+        // On simule le passage du temps réel sur TOUS les clients
+        // (Dans la vraie vie, c'est le temps système qui avance)
+        std::map<int, Client>::iterator it;
+        for (it = clients.begin(); it != clients.end(); ++it)
+            it->second._lastActivity -= 1; 
+
+        // Appel de ta fonction de nettoyage
+        simulated_checkIdleTimeout(clients);
+
+        if (clients.find(1) != clients.end())
+            std::cout << "   (FD 1 est toujours là...)" << std::endl;
         
-        // Verifier les cookies
-        std::cout << "Cookies recus dans Request : " << testClient.getRequest().getCookies() << std::endl;
+        usleep(100000); // Petite pause pour la lisibilité (0.1s)
+    }
+
+    std::cout << "\n\033[95m========================================\033[0m" << std::endl;
+    if (clients.size() == 1 && clients.count(1)) {
+        std::cout << "\033[32m[SUCCÈS] Le ménage a été fait au bon moment !\033[0m" << std::endl;
     } else {
-        std::cout << "[FAIL] La requete n'est pas consideree comme finie." << std::endl;
+        std::cout << "\033[31m[ERREUR] La logique de nettoyage a échoué.\033[0m" << std::endl;
     }
 
     return 0;
 }
+// int main() {
+//     // 1. SIMULER LA CONFIG (Le GPS)
+//     Config mockConfig;
+//     mockConfig.setPort(8080);
+//     mockConfig.setRoot("./www");
+
+//     // 2. SIMULER LE CLIENT (Le Conteneur)
+//     // On crée un client manuellement comme si epoll venait d'accepter
+//     Client testClient(42, &mockConfig); 
+
+//     // 3. SIMULER L'ARRIVÉE DE DONNÉES (Le Réseau)
+//     // On crée une requête HTTP brute sous forme de string
+//     std::string rawRequest = "GET /index.html HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n";
+
+//     std::cout << "--- ETAPE 1 : RECEPTION ---" << std::endl;
+//     // On injecte les données comme le ferait recv()
+//     testClient.getRequest().feeding(rawRequest.c_str(), rawRequest.size());
+
+//     // 4. TESTER TA LOGIQUE DE FUSION
+//     if (testClient.getRequest().isFinished()) {
+//         std::cout << "[OK] Requete detectee comme finie." << std::endl;
+
+//         // On lance ta Response avec la config du client
+//         Response res(testClient.getConfig());
+//         res.setResponseFinal(testClient.getRequest());
+
+//         // On recupere les resultats
+//         testClient._keepAlive = !res.getCloseFd();
+//         std::vector<char> fullRes = res.getResponseFinal();
+//         testClient.writeBuff.assign(fullRes.begin(), fullRes.end());
+        
+//         std::cout << "--- ETAPE 2 : VERIFICATION ---" << std::endl;
+//         std::cout << "Taille de la reponse generee : " << testClient.writeBuff.size() << " octets." << std::endl;
+//         std::cout << "Keep-Alive memorise : " << (testClient._keepAlive ? "OUI" : "NON") << std::endl;
+//     }
+//     return 0;
+// }

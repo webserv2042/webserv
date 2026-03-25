@@ -67,6 +67,7 @@ class Request
 		bool                						isFinished() const;
 		void										setMethod(const std::string &method);
 
+		std::vector<char>							getRequest() const;
 		std::string         						getMethod() const;
 		std::string         						getUri() const;
 		std::string         						getHttpVersion() const;

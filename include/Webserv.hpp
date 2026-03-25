@@ -32,7 +32,9 @@
 #define DELETE_EPOLLOUT 1
 
 //TIMEOUT
-#define IDLE_TIMEOUT 60 //timeout d'un client sans aucune activité
+// #define IDLE_TIMEOUT 60 //timeout d'un client sans aucune activité
+// #define NO_TIMEOUT 0
+// #define TIMEOUT 1
 // #define TOTAL_TIMEOUT 300 //timeout de la connection totale d'un client
 // #define READ_TIMEOUT 10 //timeout de reception de requete
 // #define WRITE_TIMEOUT 600 //timeout d'envoi de reponse
@@ -45,39 +47,41 @@ class Webserv {
 
 		//* FONCTIONS PRINCIPALES
 
-		void					setServers(std::vector<Server> &servVec);
-		void 					epollLoop();
-		void					finalClean();
+		void								setServers(std::vector<Server> &servVec);
+		void 								epollLoop();
+		void								finalClean();
 
-		std::map<int, Client>	_client; //liste des clients
+		std::map<int, Client>				clients; //liste des clients
 
     private:
 
 		//* EVENT MANAGER
 
-		int						ep_fd; //instance epoll
-		std::vector<Server>		servers; //liste des serveurs
-		struct epoll_event		events[MAX_EVENTS]; //tableau des evenements enregistres par epoll_wait
-		int						ready_fds; //nombre de fd ayant recus des evenements
+		int									ep_fd; //instance epoll
+		std::vector<Server>					servers; //liste des serveurs
+		struct epoll_event					events[MAX_EVENTS]; //tableau des evenements enregistres par epoll_wait
+		int									ready_fds; //nombre de fd ayant recus des evenements
 
-		void 					startEpoll();
-		int						waitForEvents();
-		void					acceptClient(int &newConnexionFd);
-		void					closeClient(int clientFD);
-		std::map<int, Client>::iterator    closeClient(std::map<int, Client>::iterator it);
-		void					checkIdleTimeout();
+		void 								startEpoll();
+		int									waitForEvents();
+		void								acceptClient(int &newConnexionFd);
+		void								closeClient(int clientFD);
+		std::map<int, Client>::iterator		closeClient(std::map<int, Client>::iterator it);
+		void								checkIdleTimeout();
 
 		//* EPOLL UTILS
 
-		void 					setNonBlockingSocket(int &fdSocket);
-		void					registerNewFd(const int &newFd, uint32_t event);
-		bool					isSocketFd(int &sockFD);
-		void					modifyEpollout(int &fd, int action);
+		void 								setNonBlockingSocket(int &fdSocket);
+		void								registerNewFd(const int &newFd, uint32_t event);
+		bool								isSocketFd(int &sockFD);
+		void								modifyEpollout(int &fd, int action);
 
 
 		//* REQUETE + REPONSE
 
-        void                    readRequest(int fd);
+    	void 			                  	treatRequest(int &fd);
+		void								sendResponse(Client &client);
+
 };
 
 //fonction temporaire pour generer une reponse http a partir d'un fichier

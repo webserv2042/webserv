@@ -11,7 +11,6 @@ void    trim(std::string &line)
 		line = line.substr(start, end - start + 1);
 }
 
-
 std::string toLower(std::string str)
 {
     for (size_t i = 0; i < str.length(); ++i)

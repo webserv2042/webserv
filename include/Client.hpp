@@ -2,9 +2,13 @@
 # define CLIENT_HPP
 
 #include "Request.hpp"
-#include "Config.hpp" // Pour le pointeur vers la config
+#include "Config.hpp"
 #include <vector>
 #include <ctime>
+
+#define IDLE_TIMEOUT 60 //timeout d'un client sans aucune activité
+#define NO_TIMEOUT 0
+#define TIMEOUT 1
 
 typedef enum e_client_state
 {
@@ -26,21 +30,22 @@ class Client
         Client& operator=(const Client& to_copy);
         ~Client();
 
-        // --- Données Réseau (Partie collègue) ---
         int                 clientFd;
-        int                 clientState;     // Utilise l'enum ci-dessus
-        std::vector<char>   writeBuff;       // La réponse finale à envoyer
-        size_t              bytesSent;       // Combien d'octets on a déjà envoyé
-        size_t              buffSize;        // Taille totale du message à envoyer
-        time_t              _lastActivity;    // Pour le timeout
+        int                 clientState;
 
-        // --- Données Métier (Ta partie) ---
-        Request             _request;        // TON objet Request avec son _bytesData
-        const Config* 		_serverConfig;    // Pointeur vers la config du serveur
-        bool                _keepAlive;       // <--- LA VOILÀ !
+        std::vector<char>   writeBuff;
+        size_t              bytesSent;
+        size_t              buffSize;
 
-        // --- Méthodes ---
+        time_t              _lastActivity;
+
+        Request             _request;
+        const Config* 		_serverConfig;
+        bool                _keepAlive;
+
+        int                 timeout();
         void                updateActivity();
+        time_t              getLastActivity() const;
         Request&            getRequest();
         const Config&       getConfig() const;
         int                 getFd() const;

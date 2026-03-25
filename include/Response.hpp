@@ -33,6 +33,7 @@ class Response
 		std::string									_locationUri;
 
 		std::map<std::string, std::string>			_headers;
+		static std::map<e_status_code, std::string> _statusMessage;
 		static std::map<std::string, std::string>	_mimeType;
 	
 		bool										_isCgiExt;

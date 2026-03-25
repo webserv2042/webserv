@@ -1,5 +1,5 @@
-#include "../srcs/include/Response.hpp"
-#include "../srcs/include/Request.hpp"
+#include "../../include/Response.hpp"
+#include "../../include/Request.hpp"
 
 void    Response::parseCgi(const std::vector<char> &cgi)
 {

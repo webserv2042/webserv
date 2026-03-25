@@ -1,5 +1,5 @@
-#include "../srcs/include/Response.hpp"
-#include "../srcs/include/Request.hpp"
+#include "../../include/Response.hpp"
+#include "../../include/Request.hpp"
 
 std::map<std::string, std::string>	Response::_mimeType;
 

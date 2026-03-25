@@ -1,6 +1,6 @@
-#include "../srcs/include/Response.hpp"
-#include "../srcs/include/Request.hpp"
-#include "../srcs/include/Config.hpp"
+#include "../../include/Response.hpp"
+#include "../../include/Request.hpp"
+#include "../../include/Config.hpp"
 
 void    Response::setHeaders(const Request &req)
 {
@@ -26,7 +26,7 @@ void    Response::setHeaders(const Request &req)
 	else
 	{
 		this->addHeaders("Connection", "keep-alive");
-		_closeFd = false; // a voir si nécéssaire de le garder
+		_closeFd = false;
 	}
 }
 

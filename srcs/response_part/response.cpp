@@ -1,7 +1,7 @@
-#include "../srcs/include/Response.hpp"
-#include "../srcs/include/Request.hpp"
-#include "../include/Config.hpp"
-#include "../include/Cgi.hpp"
+#include "../../include/Response.hpp"
+#include "../../include/Request.hpp"
+#include "../../include/Config.hpp"
+#include "../../include/Cgi.hpp"
 
 Response::Response(const Config &configServer) :
 	_statusCode(OK),
@@ -72,8 +72,6 @@ void	Response::createResponse()
 	if (!_body.empty())
 		_responseFinal.insert(_responseFinal.end(), _body.begin(), _body.end());
 }
-
-//*************************************************************************************************//
 
 void	Response::setStartLine()
 {

@@ -1,4 +1,4 @@
-#include "../srcs/include/Request.hpp"
+#include "../../include/Request.hpp"
 
 Request::Request() :
 	_bytesData(),
@@ -138,44 +138,4 @@ e_status_code	Request::getErrorCode() const
 std::string	Request::getQueryString() const
 {
 	return (_queryString);
-}
-
-//============================================================================================================================//
-//(a mettre dans fonction liée à la class webserv)
-// Fonction qui lit les octets reçus de la boucle epoll et vérifie ce qu'elle va envoyer a la partie réception de la requête
-// premier filtrage !
-
-int		Webserv::readRequest(int fd)
-{
-	char    buffer[4096];
-	size_t bytesReceived;
-
-	bytesReceived = recv(fd, buffer, sizeof(buffer), 0);
-
-	if (bytesReceived > 0)
-	{
-		_client[fd].updateActivity();
-		_client[fd].getRequest().feeding(buffer, (size_t)bytesReceived); // on récup le client du fd nommé, on copie les octets reçus du buffer vers sa requête
-		if (_client[fd].getRequest().isFinished())
-		{
-			std::cout << "Requête terminée du fd " << fd << " !" << std::endl;
-
-			const Config		&config = _client[fd].getConfig();
-			Response			res(config);
-
-			res.setResponseFinal(_client[fd].getRequest());
-			_client[fd]._keepAlive = !res.getCloseFd();
-
-			std:vector<char>	responseToSend = res.getResponseFinal();
-
-			_client[fd].writeBuff.assign(responseToSend.begin(), responseToSend.end());
-            _client[fd].buffSize = _client[fd].writeBuff.size();
-            _client[fd].bytesSent = 0;
-
-			_client[fd].clientState = WRITING_RESPONSE;
-            modifyEpollout(fd, ADD_EPOLLOUT);
-		}
-	}
-	else
-		closeClient(fd);
 }
