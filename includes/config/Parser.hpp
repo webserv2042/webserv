@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <limits>
+#include <unistd.h>
 
 enum	ParserState
 {
