@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Page</title>
+    <link rel="stylesheet" href="../public_html/dashboard_pages.css">
+</head>
+<body>
+
+    <div class="dashboard-wrapper">
+
+        <h1 class="welcome-title">Welcome back, [employee name]</h1>
+
+        <div class="dashboard-grid">
+
+            <!-- Left: Profile card -->
+            <div class="card card-profile">
+                <!-- <p class="card-title">Profile</p> -->
+
+                <!-- Header -->
+                <div class="profile-header-emp">
+                    <div class="profile-avatar-emp">
+                        <img src="../../uploads/Norminette.jpg" alt="Profile photo">
+                    </div>
+                    <div class="profile-identity">
+                        <h1>Name Surname</h1>
+                        <p class="profile-role">Project Manager</p>
+                    </div>
+                </div>
+
+                <hr class="profile-divider">
+
+                <!-- Sections -->
+                <div class="profile-section-emp">
+                    <h2>Profile</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                    exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+                    dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+                    mollit anim id est laborum.</p>
+                </div>
+
+                <div class="profile-section-emp">
+                    <h2>Title</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                    exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+                    dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+                    mollit anim id est laborum.</p>
+                </div>
+
+                <div class="profile-section-emp">
+                    <h2>Title</h2>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                    exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+                    dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+                    mollit anim id est laborum.</p>
+                </div>
+            </div>
+
+            <!-- Right column -->
+            <div class="right-column">
+
+                <!-- Make a Request card -->
+                <div class="card card-request">
+                    <p class="card-title">Make a Request</p>
+                    <a href="request_form.py" class="arrow-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- Requests History card -->
+                <div class="card card-history">
+                    <p class="card-title">Requests History</p>
+                    <div class="request-list">
+                        {{REQUESTS}}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,379 @@
+/* ── Variables & Reset ── */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --navy: #1a3a5c;
+    --teal: #2a9db5;
+    --teal-light: #e8f6f9;
+    --teal-border: #4dbdd4;
+    --bg: #f5f5f0;
+    --white: #ffffff;
+    --text-dark: #1a3a5c;
+    --text-body: #444;
+    --text-muted: #888;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #FFFFFF;
+    color: var(--text-dark);
+}
+
+/* ── Container ── */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* ── HERO BANNER ── */
+
+.hero-banner .container {
+    display: flex;
+    justify-content: flex-start; /* Pushes the banner-content to the left of the container */
+    width: 100%;                 /* Ensures it takes up the available space */
+}
+
+.hero-banner {
+    background-image: url('../uploads/hero-banner-image.jpg'); /* replace with your photo */
+    background-size: cover;
+    background-position: center top;
+    position: relative;
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /*added*/
+    padding-bottom: 24px;
+}
+
+.hero-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(10,30,60,0.55) 0%, rgba(10,30,60,0.15) 100%);
+}
+
+.banner-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--white);
+    padding: 32px 0 8px;
+    text-align: left;       /* Ensures text lines up on the left */
+    align-items: flex-start;
+}
+
+.banner-content .brand-logo svg {
+    color: var(--white);
+    margin-bottom: 4px;
+}
+
+.banner-content h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+}
+
+.banner-content p {
+    font-size: 1rem;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+/* ── DESCRIPTION ── */
+.description {
+    display: flex;
+    align-items: flex-start;
+    gap: 48px;
+    padding: 90px 0 100px;
+}
+
+.description-text {
+    flex: 1;
+}
+
+.description-intro {
+    font-size: 1.2rem;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--navy);
+    margin-bottom: 12px;
+}
+
+.description-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--navy);
+    line-height: 1.25;
+    margin-bottom: 20px;
+}
+
+.description-body {
+    font-size: 1.2rem;
+    line-height: 1.75;
+    color: var(--text-body);
+}
+
+.description-image {
+    flex: 0 0 500px;
+    max-width: 500px;
+}
+
+.description-image img {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    display: block;
+}
+
+/* ── SERVICES SECTION ── */
+.services {
+    background-color: #FDFBF8;
+    padding: 90px 0 100px;
+}
+
+.services-content {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+}
+
+/* ── Wrapper for the whole sidebar ── */
+.login-wrapper {
+    flex: 0 0 280px; /* Adjust width as needed */
+    display: flex;
+    flex-direction: column;
+    gap: 40px; /* Space between title and card */
+}
+
+/* ── Title above the card ── */
+.brand-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #4a6280; /* Muted navy/grey from your screenshot */
+    line-height: 1.1;
+    padding-left: 20px;
+}
+
+/* ── The Card ── */
+.login {
+    background-color: #eff8ff; /* Very light blue background */
+    border-radius: 25px;       /* Softer, larger corners */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 350px;         /* Taller card like the image */
+}
+
+/* ── Top blue bar ── */
+.login .top-bar {
+    width: 100%;
+    height: 40px;             /* Height of the dark blue strip */
+    background-color: #5b82b5; 
+}
+
+/* ── Login Text ── */
+.login-label {
+    font-size: 2.6rem;          /* Very large as seen in screenshot */
+    font-weight: 700;
+    color: #4a6280;
+    padding: 60px 30px 0;     /* Large top gap */
+}
+
+/* ── Arrow Button at bottom ── */
+.login-button {
+    margin-top: auto;         /* Pushes button to bottom */
+    padding: 90px 30px 50px;     /* Large bottom gap */
+}
+
+.login-button a svg {
+    width: 90px;              /* Making the arrow icon large */
+    height: 90px;
+    color: #5b82b5;
+    transition: transform 0.2s ease;
+}
+
+.login-button a:hover svg {
+    transform: scale(1.05);
+}
+
+/* ── Boxes grid ── */
+.boxes {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.box {
+    background-color: var(--teal-light);
+    border: 2px solid var(--teal-border);
+    border-radius: 14px;
+    padding: 30px 18px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 24px;
+    min-height: 232px;
+    max-width: 300px;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+
+
+.box-plus {
+    font-size: 1.5rem;
+    font-weight: 300;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--teal-border);
+    background-color: var(--teal-light);
+    color: var(--teal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.box p {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.3;
+    align-self: flex-start;
+}
+
+/* --- BOX 2: Soft Blue/Navy --- */
+.box:nth-child(4),
+.box:nth-child(5),
+.box:nth-child(6) {
+    background-color: #eaf2fb; /* Matches your login sidebar */
+    border-color: #5b82b5;
+}
+.box:nth-child(4) .box-plus,
+.box:nth-child(5) .box-plus,
+.box:nth-child(6) .box-plus {
+    background-color: #eaf2fb;
+    border-color: #5b82b5;
+    color: #5b82b5;
+}
+
+/* ── FOOTER ── */
+.footer {
+    background-color: #F1EFEC;
+    padding: 90px 0 32px;
+    margin-top: 0;
+}
+
+.footer .container {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--navy);
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.footer-brand svg {
+    color: var(--teal);
+    flex-shrink: 0;
+}
+
+.copyrights p {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+
+.footer-info {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+}
+
+.footer-info a {
+    font-size: 0.9rem;
+    color: var(--navy);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    transition: color 0.2s;
+}
+
+.footer-info a:hover {
+    color: var(--teal);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+    .description {
+        flex-direction: column;
+        gap: 28px;
+        padding: 32px 0 40px;
+    }
+
+    .description-image {
+        flex: unset;
+        max-width: 100%;
+    }
+
+    .description-title {
+        font-size: 1.35rem;
+    }
+
+    .services-content {
+        flex-direction: column;
+    }
+
+    .login {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .login-divider {
+        display: none;
+    }
+
+    .boxes {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .banner-content h1 {
+        font-size: 1.8rem;
+    }
+
+    .footer .container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .boxes {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .box {
+        min-height: 110px;
+    }
+}
