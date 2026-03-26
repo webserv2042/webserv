@@ -40,8 +40,14 @@ void    Response::parseHeadersCgi(const std::string &line)
 	trim(value);
 
 	key = toLower(key);
+
+	if (key == "location")
+    {
+        this->_locationUri = value;
+        this->_statusCode = FOUND;
+    }
 	
-	if (key == "status")
+	else if (key == "status")
    	{
 		char* endPtr;
 		long code = std::strtol(value.c_str(), &endPtr, 10);
@@ -51,6 +57,10 @@ void    Response::parseHeadersCgi(const std::string &line)
 		else
 			this->_statusCode = INTERNAL_SERVER_ERROR;
 	}
+	else if (key == "content-type")
+    {
+        this->addHeaders("Content-Type", value);
+    }
 	else
 		this->addHeaders(key, value);
 }

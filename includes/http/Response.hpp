@@ -62,6 +62,7 @@ class Response
 		std::string 								getExtension() const;
 		std::string 								getHeader(std::string key);
 		std::string									getExt() const;
+		std::string									getRootLocation() const;
 		e_status_code								getStatusCode() const;
 		bool										getCloseFd() const;
 		
@@ -98,9 +99,6 @@ class Response
 		std::string									readFile(const std::string &path);
 
 		void										fail(e_status_code code);
-
-
-
 
 };
 

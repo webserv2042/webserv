@@ -22,8 +22,6 @@ void    Response::checkingUri(const Request &req)
 		this->checkingPerm();
 	else if(S_ISDIR(_dataFile.st_mode)) // un dossier ?
 		this->searchFile(req);
-
-	this->contentType();
 }
 
 const Location* Config::findLocation(std::string uri) const
@@ -77,10 +75,13 @@ void    Response::fullPathUri(const Request &req)
 {
 	std::string root;
 	std::string uri = req.getUri();
-	// std::string uri = "/index.html";
 
 	if (_structLocation && !_structLocation->root.empty())
+	{
 		root = _structLocation->root;
+		if (!_structLocation->path.empty() && _structLocation->path != "/" && uri.compare(0, _structLocation->path.size(), _structLocation->path) == 0)
+				uri = uri.substr(_structLocation->path.size());
+    }
 	else if (!_config.getRoot().empty())
 		root = _config.getRoot();
 	else
@@ -121,23 +122,4 @@ bool    Response::isCgi()
 	}
 
 	return (false);
-}
-
-void    Response::contentType()
-{
-	if (this->isCgi())
-		return ; // ->j'envoie à la cgi qui renverra elle-mm son content-type
-
-	if (_isAutoIndex)
-    {
-        this->addHeaders("Content-Type", "text/html");
-        return ;
-    }
-
-	std::map<std::string, std::string>::iterator it = _mimeType.find(_extension);
-
-	if (it != _mimeType.end())
-		this->addHeaders("Content-Type", it->second);
-	else
-		this->addHeaders("Content-Type", "application/octet-stream");
 }

@@ -34,6 +34,11 @@ void CGI::buildEnvp(const Request &req, const Response &rep) {
 	_envp.push_back("PATH_TRANSLATED=" + rep.getUriFullPath());
 	_envp.push_back("SCRIPT_NAME=" + req.getUri());
 	_envp.push_back("SERVER_PROTOCOL=" + req.getHttpVersion());
+	_envp.push_back("REDIRECT_STATUS=200");
+	_envp.push_back("DOCUMENT_ROOT=" + rep.getRootLocation());
+	_envp.push_back("SCRIPT_FILENAME=" + rep.getUriFullPath());
+	_envp.push_back("HTTP_HOST=" + req.getHeader("Host"));
+
 	struct sockaddr_in addr;
 	socklen_t len = sizeof(addr);
 	std::string remoteAddr = "";
@@ -109,6 +114,9 @@ void	CGI::execCgi(const Request &req) {
 		}
 		int status;
 		waitpid(forkPid, &status, 0);
+		std::string debug(_output.begin(), _output.end());
+		std::cerr << "CGI RAW OUTPUT: [" << debug << "]" << std::endl;
+		std::cerr << "CGI OUTPUT SIZE: " << _output.size() << std::endl;
 		close(pipeOut[0]);
 
 		// if (_output.empty()) {

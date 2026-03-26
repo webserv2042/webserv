@@ -37,7 +37,7 @@ void    Response::setResponseFinal(const Request &reqClient)
 			CGI 				cgiExec(_uriFullPath, _pathExecCgi);
 			std::vector<char>	cgiOutput = cgiExec.cgi(reqClient, *this);
 			this->parseCgi(cgiOutput);
-			// this->setHeaders(reqClient);
+			this->setHeaders(reqClient);
 			this->createResponse();
 			return ;
 		}
@@ -51,6 +51,7 @@ void    Response::setResponseFinal(const Request &reqClient)
         this->generateErrorPage(_statusCode);
 		this->setHeaders(reqClient);
     }
+	
 	this->createResponse();
 }
 
@@ -139,6 +140,11 @@ std::string Response::getHeader(std::string key)
     if (it != _headers.end())
         return it->second;
     return "";
+}
+
+std::string Response::getRootLocation() const
+{
+    return (_structLocation ? _structLocation->root : "");
 }
 
 std::string	Response::getExt() const
