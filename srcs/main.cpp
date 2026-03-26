@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 		std::vector<Config> configs = parser.parseFile(argv[1]);
 		for (size_t i = 0; i < configs.size(); i++) {
 			Server server(configs[i]);
-			// configs[i].printConfig();
+			configs[i].printConfig();
 			servers.push_back(server);
 		}
 	

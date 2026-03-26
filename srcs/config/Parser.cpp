@@ -564,7 +564,22 @@ std::vector<Config> Parser::fillConfig(std::vector<ServerNode> servers)
 				if (servers[i].locations[k].directives[l].name == "upload_path")
 					currentLoc.uploadPath = servers[i].locations[k].directives[l].arguments[0];
 				if (servers[i].locations[k].directives[l].name == "root")
-					currentLoc.root = servers[i].locations[k].directives[l].arguments[0];
+				{
+					std::string val = servers[i].locations[k].directives[l].arguments[0];
+					if (!val.empty() && val[0] != '/')
+					{
+						char cwd[4096];
+						std::string relative = val;
+						if (val.size() >= 2 && val[0] == '.' && val[1] == '/')
+							relative = val.substr(2);
+						if (getcwd(cwd, sizeof(cwd)))
+							currentLoc.root = std::string(cwd) + "/" + relative;
+						else
+							currentLoc.root = val;
+					}
+					else
+						currentLoc.root = val;
+				}
 				if (servers[i].locations[k].directives[l].name == "return")
 					currentLoc.returnRedirect = std::make_pair(
 						toInt(servers[i].locations[k].directives[l].arguments[0]),

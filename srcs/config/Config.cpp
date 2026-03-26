@@ -87,7 +87,19 @@ void Config::setHost(const std::string& value)
 
 void Config::setRoot(const std::string& value)
 {
-	_root = value;
+	if (!value.empty() && value[0] != '/')
+	{
+		char cwd[4096];
+		std::string relative = value;
+		if (value.size() >= 2 && value[0] == '.' && value[1] == '/')
+			relative = value.substr(2);
+		if (getcwd(cwd, sizeof(cwd)))
+			_root = std::string(cwd) + "/" + relative;
+		else
+			_root = value;
+	}
+	else
+		_root = value;
 }
 
 void Config::setIndex(const std::string& value)
