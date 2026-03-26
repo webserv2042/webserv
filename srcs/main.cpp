@@ -2,6 +2,7 @@
 #include "../includes/config/Parser.hpp"
 #include "../includes/Signals.hpp"
 #include "../includes/Webserv.hpp"
+#include "../includes/http/Response.hpp"
 
 
 int main(int argc, char **argv)
@@ -16,6 +17,7 @@ int main(int argc, char **argv)
 
 	try
 	{
+		Response::initMimeType();
 		//PARSING
 		Parser parser;
 		std::vector<Server> servers;

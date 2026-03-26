@@ -56,8 +56,8 @@ void    Webserv::epollLoop()
 				else if (events[i].events == EPOLLOUT)
 					sendResponse(clients[fd]);
 			}
-			std::cout << "--------------------------" << std::endl;
 		}
+		// std::cout << "--------------------------" << std::endl;
 	}
 
 	std::cout << "Server stopped." << std::endl;
@@ -79,6 +79,7 @@ void    Webserv::setServers(std::vector<Server> &servVec)
 /// @param fd fd du client
 void	Webserv::treatRequest(int &fd)
 {
+	std::cout << "\033[38;5;211m-----------request------------\033[0m" << std::endl;
 	char    buffer[4096];
 	ssize_t bytesReceived;
 
@@ -91,6 +92,9 @@ void	Webserv::treatRequest(int &fd)
 		if (clients[fd].getRequest().isFinished())
 		{
 			std::cout << "Requête terminée du fd " << fd << " !" << std::endl;
+			//print request here
+
+			std::cout << "\033[38;5;211m-----------request------------\033[0m" << std::endl;
 
 			const Config		&config = clients[fd].getConfig();
 			Response			res(config);
@@ -178,7 +182,11 @@ void	Webserv::treatRequest(int &fd)
 /// @param client le client a qui on veut renvoyer la reponse
 void	Webserv::sendResponse(Client &client)
 {
-	std::cout << "\033[34mSENDING RESPONSE...\033[0m" << std::endl;
+	// std::cout << "\033[34mSENDING RESPONSE...\033[0m" << std::endl;
+	std::cout << "\033[38;5;117m-----------response------------\033[0m" << std::endl;
+	std::string s(client.writeBuff.begin(), client.writeBuff.end());
+	std::cout << s << std::endl;
+	std::cout << "\033[38;5;117m-----------response------------\033[0m" << std::endl;
 	client.clientState = WRITING_RESPONSE;
 
 	//Calcule le nombre de bytes restants a envoyer
