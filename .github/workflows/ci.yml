@@ -1,0 +1,28 @@
+name: Webserv CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Compile
+      run: make all
+
+    - name: Setup test environment
+      run: |
+        mkdir -p srcs/www/upload
+        touch srcs/www/noperm
+        chmod 000 srcs/www/noperm
+
+    - name: Make scripts executable
+      run: chmod +x tests/test_http.sh
+
+    - name: Run HTTP tests
+      run: bash tests/test_http.sh
