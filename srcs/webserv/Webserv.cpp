@@ -2,6 +2,7 @@
 #include "../../includes/server/Client.hpp"
 #include "../../includes/Signals.hpp"
 #include "../../includes/http/Response.hpp"
+#include <cstdio>
 
 //CONSTRUCTOR(S)
 Webserv::Webserv() {
@@ -32,10 +33,14 @@ void    Webserv::epollLoop()
 		//connection(s) trouvee(s) -> parcourir les events
 		for (int i = 0; i < ready_fds; i++)
 		{
+			// std::cout << "\033[31mFOUND CONNECTION\033[0m" << std::endl;
 			int fd = events[i].data.fd;
 
 			if (isSocketFd(fd) == true) //nouvelle connexion sur une socket -> accepter
+			{
+				std::cout << "\033[31mINSIDE SOCKET\033[0m" << std::endl;
 				acceptClient(fd);
+			}
 
 			else //requete/reponse client -> lire/ecrire
 			{
@@ -49,12 +54,23 @@ void    Webserv::epollLoop()
 				}
 
 				//lire la requete, la parser, preparer la reponse etc...
-				else if (events[i].events == EPOLLIN)
+				if (events[i].events & EPOLLIN)
 					treatRequest(fd);
 
 				//renvoyer la reponse
-				else if (events[i].events == EPOLLOUT)
+				if (events[i].events & EPOLLOUT)
 					sendResponse(clients[fd]);
+				else
+				{
+					std::cout << "\033[31mLAST ELSE :\033[0m" << std::endl;
+					if (events[i].events & EPOLLIN)  printf("EPOLLIN ");
+					if (events[i].events & EPOLLOUT) printf("EPOLLOUT ");
+					if (events[i].events & EPOLLRDHUP) printf("EPOLLRDHUP "); // Déconnexion client
+					if (events[i].events & EPOLLPRI) printf("EPOLLPRI ");
+					if (events[i].events & EPOLLERR) printf("EPOLLERR ");
+					if (events[i].events & EPOLLHUP) printf("EPOLLHUP ");
+   					printf("(Raw: %u)\n", events[i].events);
+				}
 			}
 		}
 		// std::cout << "--------------------------" << std::endl;
@@ -94,7 +110,7 @@ void	Webserv::treatRequest(int &fd)
 			std::cout << "Requête terminée du fd " << fd << " !" << std::endl;
 			//print request here
 
-			std::cout << "\033[38;5;211m-----------request------------\033[0m" << std::endl;
+			std::cout << "\033[38;5;211m-----------request-end--------\033[0m" << std::endl;
 
 			const Config		&config = clients[fd].getConfig();
 			Response			res(config);
@@ -110,6 +126,7 @@ void	Webserv::treatRequest(int &fd)
 
 			clients[fd].clientState = WRITING_RESPONSE;
             modifyEpollout(fd, ADD_EPOLLOUT);
+			// std::cout << "\033[38;5;211m-----------sortie de treat request--------\033[0m" << std::endl;
 		}
 	}
 	else
@@ -182,7 +199,6 @@ void	Webserv::treatRequest(int &fd)
 /// @param client le client a qui on veut renvoyer la reponse
 void	Webserv::sendResponse(Client &client)
 {
-	// std::cout << "\033[34mSENDING RESPONSE...\033[0m" << std::endl;
 	std::cout << "\033[38;5;117m-----------response------------\033[0m" << std::endl;
 	std::string s(client.writeBuff.begin(), client.writeBuff.end());
 	std::cout << s << std::endl;
