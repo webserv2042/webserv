@@ -378,7 +378,8 @@ void    Request::parseTrailers() // headers probables après le body
 	}
 }
 
-void Request::printRequest() const {
+void Request::printRequest() const
+{
     std::cout << "\033[1;36m--- REQUEST RECEIVED ---\033[0m" << std::endl;
     
     // 1. Start-Line
@@ -394,14 +395,14 @@ void Request::printRequest() const {
     std::cout << "\r\n";
 
     // 4. Body (on affiche un aperçu si c'est du texte)
-    if (!_body.empty()) {
-        if (_body.size() > 500) {
-            std::string snippet(_body.begin(), _body.begin() + 500);
-            std::cout << snippet << "\n[... Body truncated, total size: " << _body.size() << " bytes ...]" << std::endl;
-        } else {
-            std::string fullBody(_body.begin(), _body.end());
-            std::cout << fullBody << std::endl;
-        }
-    }
+    // if (!_body.empty()) {
+    //     if (_body.size() > 500) {
+    //         std::string snippet(_body.begin(), _body.begin() + 500);
+    //         std::cout << snippet << "\n[... Body truncated, total size: " << _body.size() << " bytes ...]" << std::endl;
+    //     } else {
+    //         std::string fullBody(_body.begin(), _body.end());
+    //         std::cout << fullBody << std::endl;
+    //     }
+
     std::cout << "\033[1;36m----------------------------\033[0m" << std::endl;
 }
