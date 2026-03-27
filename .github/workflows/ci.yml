@@ -17,9 +17,9 @@ jobs:
 
     - name: Setup test environment
       run: |
-        mkdir -p srcs/www/upload
-        touch srcs/www/noperm
-        chmod 000 srcs/www/noperm
+        mkdir -p www/uploads
+        touch www/public_html/noperm
+        chmod 000 www/public_html/noperm
 
     - name: Make scripts executable
       run: chmod +x tests/test_http.sh

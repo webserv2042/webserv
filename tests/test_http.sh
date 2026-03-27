@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./webserv tests/server.conf &
+./webserv tests/ci_test.conf &
 SERVER_PID=$!
 
 trap "kill $SERVER_PID 2>/dev/null" EXIT
