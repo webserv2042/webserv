@@ -15,8 +15,14 @@ void    Response::checkingUri(const Request &req)
 
 	this->fullPathUri(req);
 
+	std::cout << "Tentative d'ouverture de (full path) : [" << _uriFullPath << "]\n";
 	if (stat(_uriFullPath.c_str(), &_dataFile) != 0) // uri introuvable
-		this->fail(NOT_FOUND);
+	{
+		if (req.getMethod() == "POST")
+			return ;
+		else
+			this->fail(NOT_FOUND);
+	}
 	
 	if (S_ISREG(_dataFile.st_mode)) // un fichier ?
 		this->checkingPerm();
@@ -71,7 +77,7 @@ void    Response::searchFile(const Request &req)
 		this->fail(NOT_FOUND);
 }
 
-void    Response::fullPathUri(const Request &req)
+void Response::fullPathUri(const Request &req)
 {
 	std::string root;
 	std::string uri = req.getUri();
@@ -87,12 +93,14 @@ void    Response::fullPathUri(const Request &req)
 	else
 		root = "www";
 
-	if (!root.empty() && root[root.size() - 1] == '/' && !uri.empty() && uri[0] == '/')
-		_uriFullPath = root + uri.substr(1);
-	else
-		_uriFullPath = root + uri;
+    if (!root.empty() && root[root.size() - 1] == '/')
+        root.erase(root.size() - 1);
 
-	this->setExtension();
+    if (!uri.empty() && uri[0] != '/')
+        uri = "/" + uri;
+
+    _uriFullPath = root + uri;
+    this->setExtension();
 }
 
 void    Response::setExtension()

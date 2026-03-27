@@ -22,6 +22,15 @@ Response::~Response() {}
 
 void    Response::setResponseFinal(const Request &reqClient)
 {
+	if (reqClient.getErrorCode() != OK)
+    {
+        _statusCode = reqClient.getErrorCode();
+        this->generateErrorPage(_statusCode);
+        this->setHeaders(reqClient);
+        this->createResponse();
+        return ;
+    }
+
 	if (_statusCode >= 300 && _statusCode < 400)
 	{
         this->setHeaders(reqClient);

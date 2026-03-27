@@ -114,9 +114,11 @@ void	CGI::execCgi(const Request &req) {
 		}
 		int status;
 		waitpid(forkPid, &status, 0);
+		// AJOUT DEBUG
 		std::string debug(_output.begin(), _output.end());
 		std::cerr << "CGI RAW OUTPUT: [" << debug << "]" << std::endl;
 		std::cerr << "CGI OUTPUT SIZE: " << _output.size() << std::endl;
+
 		close(pipeOut[0]);
 
 		// if (_output.empty()) {

@@ -10,6 +10,7 @@ Request::Request() :
 	_body(""),
 	_cookies(""),
 	_contentLength(0),
+	_isContentLength(false),
 	_chunkSize(0),
 	_methodEnum(DEFAULT),
 	_step(START_LINE),
@@ -33,6 +34,7 @@ void Request::reset()
     _body = "";
     _cookies = "";
     _contentLength = 0;
+	_isContentLength = false;
     _chunkSize = 0;
     _methodEnum = DEFAULT;
     _step = START_LINE;
@@ -54,6 +56,7 @@ void		Request::feeding(const char *buffer, size_t sizeOfBytes)
 			try {
 				this->parseRequest();
 			} catch (const std::exception &e) {
+				
 				_step = FINISHED; // On force la fin si erreur détectée
 			}
 		}

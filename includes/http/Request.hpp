@@ -6,6 +6,7 @@
 #include <algorithm>    
 #include <string>
 #include <cstdlib>
+#include <cstdio>
 #include <map>
 #include <sstream>
 
@@ -51,6 +52,7 @@ class Request
 		std::string         						_body;
 		std::string									_cookies;
 		size_t										_contentLength;
+		bool										_isContentLength;
 		size_t										_chunkSize;
 		e_request_method							_methodEnum;
 		e_parsing_steps								_step;
@@ -86,6 +88,8 @@ class Request
 		void										parseLines();
 		void										parseStartLine(const std::string &line);
 		void										checkStartLine();
+		std::string									decodeUri(const std::string &uri);
+		std::string									parseUri(std::string uri);
 		void										parseHeaders(const std::string &line);
 		void										parseBodyContent();
 		void										parseBodyChunked();
@@ -96,6 +100,7 @@ class Request
 
 		//Erreurs parsing
 		bool										errorMaxBytes();
+		void										printRequest() const;
 };
 
 #endif

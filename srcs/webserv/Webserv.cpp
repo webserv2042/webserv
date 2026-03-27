@@ -107,6 +107,8 @@ void	Webserv::treatRequest(int &fd)
 		clients[fd].getRequest().feeding(buffer, (size_t)bytesReceived); // on récup le client du fd nommé, on copie les octets reçus du buffer vers sa requête
 		if (clients[fd].getRequest().isFinished())
 		{
+			std::cout << "\033[38;5;211m-----------request-complete--------\033[0m" << std::endl;
+        	clients[fd].getRequest().printRequest();
 			std::cout << "Requête terminée du fd " << fd << " !" << std::endl;
 			//print request here
 
