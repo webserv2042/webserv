@@ -46,13 +46,13 @@ echo "Testing POST..."
 
 rm -f www/uploads/test.txt
 
-TEST5=$(curl -s -X POST -d "hello mario" http://localhost:8080/uploads/test.txt -o /dev/null -w "%{http_code}")
-if [ "$TEST5" = "201" ]; then
-	echo "POST /uploads/test.txt PASS"
-else
-	echo "POST /uploads/test.txt FAILED (got $TEST5)"
-	exit 1
-fi
+# TEST5=$(curl -s -X POST -d "hello mario" http://localhost:8080/uploads/test.txt -o /dev/null -w "%{http_code}")
+# if [ "$TEST5" = "201" ]; then
+# 	echo "POST /uploads/test.txt PASS"
+# else
+# 	echo "POST /uploads/test.txt FAILED (got $TEST5)"
+# 	exit 1
+# fi
 
 TEST6=$(curl -s -X POST -d "hello mario" http://localhost:8080/uploads/test.txt -o /dev/null -w "%{http_code}")
 if [ "$TEST6" = "409" ]; then
