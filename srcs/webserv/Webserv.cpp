@@ -201,10 +201,10 @@ void	Webserv::treatRequest(int &fd)
 /// @param client le client a qui on veut renvoyer la reponse
 void	Webserv::sendResponse(Client &client)
 {
-	std::cout << "\033[38;5;117m-----------response------------\033[0m" << std::endl;
-	std::string s(client.writeBuff.begin(), client.writeBuff.end());
-	std::cout << s << std::endl;
-	std::cout << "\033[38;5;117m-----------response------------\033[0m" << std::endl;
+	// std::cout << "\033[38;5;117m-----------response------------\033[0m" << std::endl;
+	// std::string s(client.writeBuff.begin(), client.writeBuff.end());
+	// std::cout << s << std::endl;
+	// std::cout << "\033[38;5;117m-----------response------------\033[0m" << std::endl;
 	client.clientState = WRITING_RESPONSE;
 
 	//Calcule le nombre de bytes restants a envoyer

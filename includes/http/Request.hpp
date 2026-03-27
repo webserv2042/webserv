@@ -43,21 +43,21 @@ enum	e_parsing_steps
 class Request
 {
 	private:
-		std::vector<char>   						_bytesData; // tab dynamique des octets que je reçois
+		std::vector<char>   						_bytesData;
 		std::map<std::string, std::string>			_allHeaders;
 		std::string         						_method;
 		std::string         						_uri;
 		std::string									_queryString;
 		std::string         						_httpVersion;
 		std::string         						_body;
-		std::string									_cookies;
+		std::map<std::string, std::string>			_cookies;
 		size_t										_contentLength;
 		bool										_isContentLength;
 		size_t										_chunkSize;
 		e_request_method							_methodEnum;
 		e_parsing_steps								_step;
 		e_chunk_step								_chunkStep;
-		e_status_code								_errorCode; 
+		e_status_code								_errorCode;
 
 	public:
 		Request();
@@ -81,7 +81,8 @@ class Request
 		e_status_code								getErrorCode() const;
 		size_t										getContentLength() const;
 		std::string									getQueryString() const;
-		std::string									getCookies() const;
+		std::string									getCookie(const std::string& name) const;
+		std::string									getCookiesMap() const;
 
 		//******************** PARTIE 2 : Parsing **************************//
 		void										parseRequest();
@@ -91,10 +92,10 @@ class Request
 		std::string									decodeUri(const std::string &uri);
 		std::string									parseUri(std::string uri);
 		void										parseHeaders(const std::string &line);
+		void										parseCookie(const std::string &data);
 		void										parseBodyContent();
 		void										parseBodyChunked();
 		void										parseTrailers();
-		// void										trim(std::string &line);
 		void										reset();
 		void										fail(e_status_code code);
 

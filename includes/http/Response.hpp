@@ -33,6 +33,7 @@ class Response
 		std::string									_locationUri;
 
 		std::map<std::string, std::string>			_headers;
+		std::vector<std::string>					_cookies;
 		static std::map<e_status_code, std::string> _statusMessage;
 		static std::map<std::string, std::string>	_mimeType;
 	
@@ -54,6 +55,7 @@ class Response
 		const std::vector<char>						&getResponseFinal() const;
 		void										setStatusCode(e_status_code code);
 		void										addHeaders(const std::string &key, const std::string &value);
+		void										addCookie(const std::string &cookies);
 		void										setBodySize(const std::string &bodyHttp);
 		void    									setHttpDate();
 		void										setLocationUri(const std::string &path);

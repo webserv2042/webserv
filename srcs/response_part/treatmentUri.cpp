@@ -83,11 +83,7 @@ void Response::fullPathUri(const Request &req)
 	std::string uri = req.getUri();
 
 	if (_structLocation && !_structLocation->root.empty())
-	{
 		root = _structLocation->root;
-		if (!_structLocation->path.empty() && _structLocation->path != "/" && uri.compare(0, _structLocation->path.size(), _structLocation->path) == 0)
-				uri = uri.substr(_structLocation->path.size());
-    }
 	else if (!_config.getRoot().empty())
 		root = _config.getRoot();
 	else

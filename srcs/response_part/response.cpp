@@ -76,6 +76,12 @@ void	Response::createResponse()
 		_responseFinal.insert(_responseFinal.end(), line.begin(), line.end());
 	}
 
+	for (size_t i = 0; i < _cookies.size(); ++i)
+	{
+		std::string	cooked = "Set-Cookie: " + _cookies[i] + "\r\n";
+		_responseFinal.insert(_responseFinal.end(), cooked.begin(), cooked.end());
+	}
+
 	std::string	lineEmpty = "\r\n";
 	_responseFinal.insert(_responseFinal.end(), lineEmpty.begin(), lineEmpty.end());
 
@@ -92,14 +98,13 @@ void	Response::setStartLine()
 	_responseFinal.insert(_responseFinal.end(), startLine.begin(), startLine.end());
 }
 
-//Fonctions pour setup les différentes partie de la réponse + ajouter le code status    
 void    Response::setBodySize(const std::string &bodyHttp)
 {
 	_body.assign(bodyHttp.begin(), bodyHttp.end());
 
 	std::stringstream ss;
 	ss << _body.size();
-	addHeaders("content-length", ss.str());
+	this->addHeaders("content-length", ss.str());
 }
 
 void	Response::setHttpDate()
@@ -132,6 +137,11 @@ void    Response::addHeaders(const std::string &key, const std::string &value)
 	_headers[lowerKey] = value;
 }
 
+void	Response::addCookie(const std::string &cookies)
+{
+	_cookies.push_back(cookies);
+}
+
 std::string Response::getUriFullPath() const
 {
 	return (_uriFullPath);
@@ -147,8 +157,9 @@ std::string Response::getHeader(std::string key)
     std::map<std::string, std::string>::iterator it = _headers.find(toLower(key));
 
     if (it != _headers.end())
-        return it->second;
-    return "";
+        return (it->second);
+
+    return ("");
 }
 
 std::string Response::getRootLocation() const

@@ -32,13 +32,17 @@ void CGI::buildEnvp(const Request &req, const Response &rep) {
 	_envp.push_back("CONTENT_TYPE=" + req.getHeader("Content-Type"));
 	_envp.push_back("QUERY_STRING=" + req.getQueryString());
 	_envp.push_back("PATH_TRANSLATED=" + rep.getUriFullPath());
-	_envp.push_back("SCRIPT_NAME=" + req.getUri());
+	_envp.push_back("SCRIPT_NAME=" + req.getUri());	
 	_envp.push_back("SERVER_PROTOCOL=" + req.getHttpVersion());
 	_envp.push_back("REDIRECT_STATUS=200");
 	_envp.push_back("DOCUMENT_ROOT=" + rep.getRootLocation());
 	_envp.push_back("SCRIPT_FILENAME=" + rep.getUriFullPath());
 	_envp.push_back("HTTP_HOST=" + req.getHeader("Host"));
 
+	std::string	allCookies = req.getCookiesMap();
+	if (!allCookies.empty())
+		_envp.push_back("HTTP_COOKIE=" + allCookies);
+	
 	struct sockaddr_in addr;
 	socklen_t len = sizeof(addr);
 	std::string remoteAddr = "";

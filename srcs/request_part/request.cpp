@@ -8,7 +8,7 @@ Request::Request() :
 	_queryString(""),
 	_httpVersion(""),
 	_body(""),
-	_cookies(""),
+	_cookies(),
 	_contentLength(0),
 	_isContentLength(false),
 	_chunkSize(0),
@@ -27,12 +27,12 @@ void Request::reset()
 {
     _bytesData.clear();
     _allHeaders.clear();
+	_cookies.clear();
     _method = "";
     _uri = "";
     _queryString = "";
     _httpVersion = "";
     _body = "";
-    _cookies = "";
     _contentLength = 0;
 	_isContentLength = false;
     _chunkSize = 0;
@@ -121,6 +121,30 @@ std::string Request::getHeader(const std::string& key) const
         return (it->second) ;
 
     return ("") ;
+}
+
+std::string Request::getCookie(const std::string& name) const
+{
+    std::map<std::string, std::string>::const_iterator it = _cookies.find(name);
+
+    if (it != _cookies.end())
+    {
+		return it->second;
+	}
+
+	return ("");
+}
+
+std::string Request::getCookiesMap() const
+{
+    std::string	cookieMap;
+    for (std::map<std::string, std::string>::const_iterator it = _cookies.begin(); it != _cookies.end(); ++it)
+	{
+        if (it != _cookies.begin())
+			cookieMap += "; ";
+        cookieMap += it->first + "=" + it->second;
+    }
+    return (cookieMap);
 }
 
 std::string	Request::getSupportedMethod() const
