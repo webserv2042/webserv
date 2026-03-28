@@ -60,17 +60,17 @@ void    Webserv::epollLoop()
 				//renvoyer la reponse
 				if (events[i].events & EPOLLOUT)
 					sendResponse(clients[fd]);
-				else
-				{
-					std::cout << "\033[31mLAST ELSE :\033[0m" << std::endl;
-					if (events[i].events & EPOLLIN)  printf("EPOLLIN ");
-					if (events[i].events & EPOLLOUT) printf("EPOLLOUT ");
-					if (events[i].events & EPOLLRDHUP) printf("EPOLLRDHUP "); // Déconnexion client
-					if (events[i].events & EPOLLPRI) printf("EPOLLPRI ");
-					if (events[i].events & EPOLLERR) printf("EPOLLERR ");
-					if (events[i].events & EPOLLHUP) printf("EPOLLHUP ");
-   					printf("(Raw: %u)\n", events[i].events);
-				}
+				// else
+				// {
+				// 	std::cout << "\033[31mLAST ELSE :\033[0m" << std::endl;
+				// 	if (events[i].events & EPOLLIN)  printf("EPOLLIN ");
+				// 	if (events[i].events & EPOLLOUT) printf("EPOLLOUT ");
+				// 	if (events[i].events & EPOLLRDHUP) printf("EPOLLRDHUP "); // Déconnexion client
+				// 	if (events[i].events & EPOLLPRI) printf("EPOLLPRI ");
+				// 	if (events[i].events & EPOLLERR) printf("EPOLLERR ");
+				// 	if (events[i].events & EPOLLHUP) printf("EPOLLHUP ");
+   				// 	printf("(Raw: %u)\n", events[i].events);
+				// }
 			}
 		}
 		// std::cout << "--------------------------" << std::endl;
@@ -107,7 +107,7 @@ void	Webserv::treatRequest(int &fd)
 		clients[fd].getRequest().feeding(buffer, (size_t)bytesReceived); // on récup le client du fd nommé, on copie les octets reçus du buffer vers sa requête
 		if (clients[fd].getRequest().isFinished())
 		{
-			std::cout << "\033[38;5;211m-----------request-complete--------\033[0m" << std::endl;
+			std::cout << "\033[38;5;211mrequest-complete !033[0m" << std::endl;
         	clients[fd].getRequest().printRequest();
 			std::cout << "Requête terminée du fd " << fd << " !" << std::endl;
 			//print request here

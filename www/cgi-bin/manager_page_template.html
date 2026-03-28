@@ -4,32 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Page</title>
-    <link rel="stylesheet" href="../public_html/dashboard_pages.css">
+    <link rel="stylesheet" href="/public_html/dashboard_pages.css">
 </head>
 <body>
     <script>
-        async function confirmDeletion(fileName, elementId) {
+        async function confirmDeletion(fileName) {
 
-        // try {
-        //     const response = await fetch('/uploads/' + fileName, {
-        //         method: 'DELETE' // This sends the literal DELETE method
-        //     });
+        try {
+            const response = await fetch(fileName, {
+                method: 'DELETE' // This sends the literal DELETE method
+            });
 
-        //     if (response.ok) {
-        //         // Successfully deleted! Remove the element from the UI
-        //         document.getElementById(elementId).remove();
-        //         alert("File deleted successfully.");
-        //     } else {
-        //         alert("Error: " + response.status + " - " + response.statusText);
-        //     }
-        // }
-        // catch (error) {
-        //     console.error("Network error:", error);
-        //     }
-        document.getElementById(elementId).remove();
+            // if (response.ok) {
+            // } else {
+            //     alert("Error: " + response.status + " - " + response.statusText);
+            // }
+        }
+        catch (error) {
+            console.error("Network error:", error);
+            }
+
         }
 
-        async function acceptRequest(rowId) {
+        async function acceptRequest(rowId, fileName) {
+
+            // delete the file
+            confirmDeletion(fileName);
+
             // send a POST request to 'update_request.py'
             const response = await fetch("update_request.py", {
                 method: 'POST',
@@ -43,7 +44,11 @@
                 alert("Error updating status");
         }
 
-        async function denyRequest(rowId) {
+        async function denyRequest(rowId, fileName) {
+
+            // delete the file
+            confirmDeletion(fileName);
+
             // send a POST request to 'update_request.py'
             const response = await fetch("update_request.py", {
                 method: 'POST',
@@ -61,7 +66,7 @@
 
      <div class="dashboard-wrapper">
 
-        <h1 class="welcome-title">Welcome back, [manager name]</h1>
+        <h1 class="welcome-title">Welcome back, {{NAME}}</h1>
 
         <div class="dashboard-grid">
 

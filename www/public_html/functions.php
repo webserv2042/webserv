@@ -1,7 +1,7 @@
 <?php
 
 //add a new user with its hashed password and role
-function add_user($username, $password, $role)
+function add_user($username, $password, $role, $name)
 {
     $file_path = '../database/users.csv';
 
@@ -9,7 +9,7 @@ function add_user($username, $password, $role)
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     //user data row
-    $user_data = [$username, $hashed_password, $role];
+    $user_data = [$username, $hashed_password, $role, $name];
 
     //add to csv file in append mode (doesnt delete previous stuff)
     if (($handle = fopen($file_path, "a")) !== FALSE)
@@ -62,6 +62,37 @@ function verify_login($submitted_username, $submitted_password)
                     fclose($file_fd);
                     return $stored_role; // Success!
                 }
+            }
+        }
+        fclose($file_fd);
+    }
+    return false; // User not found or password incorrect
+}
+
+//find username
+function find_username($submitted_email)
+{
+    $file_path = "../database/users.csv";
+
+    // 1. Open the file for reading ('r')
+    if (($file_fd = fopen($file_path, "r")) !== FALSE)
+    {
+        // 2. Loop through each row of the CSV
+        while (($data = fgetcsv($file_fd, 1000, ",")) !== FALSE)
+        {
+            // Check if file has at least 3 columns
+            if (count($data) < 4) continue;
+
+            $stored_email = $data[0];
+            $stored_hash = $data[1];
+            $stored_role = $data[2];
+            $stored_name = $data[3];
+
+            // 3. Compare the username
+            if ($submitted_email === $stored_email) 
+            {
+                fclose($file_fd);
+                return $stored_name; // Success!
             }
         }
         fclose($file_fd);
