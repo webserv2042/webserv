@@ -5,8 +5,8 @@
 	
 	// add users
 	clear_file_content("../database/users.csv");
-	add_user('manager@gmail.com', 'mpw', 'manager');
-	add_user('employee@gmail.com', 'upw', 'employee');
+	add_user('manager@gmail.com', 'mpw', 'manager', 'tung tung tung tung sahur');
+	add_user('employee@gmail.com', 'upw', 'employee', 'brr brrr patabim');
 
 	// set variables to empty
 	$email = $password = "";
@@ -42,14 +42,14 @@
 				{
 					$_SESSION['username'] = $email;
 					$_SESSION['role'] = 'manager';
-					header('Location: ../cgi-bin/manager_page.php');
+					header('Location: ../cgi-bin/manager_page.py');
 					exit();
 				}
 				else if ($role === 'employee')
 				{
 					$_SESSION['username'] = $email;
 					$_SESSION['role'] = 'employee';
-					header('Location: ../cgi-bin/employee_page.php');
+					header('Location: ../cgi-bin/employee_page.py');
 					exit();
 				}
 				else

@@ -1,7 +1,7 @@
 <?php
 
 //add a new user with its hashed password and role
-function add_user($username, $password, $role)
+function add_user($username, $password, $role, $name)
 {
     $file_path = '../database/users.csv';
 
@@ -9,7 +9,7 @@ function add_user($username, $password, $role)
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
     //user data row
-    $user_data = [$username, $hashed_password, $role];
+    $user_data = [$username, $hashed_password, $role, $name];
 
     //add to csv file in append mode (doesnt delete previous stuff)
     if (($handle = fopen($file_path, "a")) !== FALSE)

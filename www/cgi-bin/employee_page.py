@@ -4,7 +4,7 @@ import cgi
 import csv
 
 # open the csv database
-with open("database/leave_requests.csv", mode="r") as db_file:
+with open("../database/leave_requests.csv", mode="r") as db_file:
 	reader = csv.reader(db_file);
 
 	all_rows = list(reader);
@@ -34,7 +34,7 @@ with open("database/leave_requests.csv", mode="r") as db_file:
 		""";
 
 #open the template file safely, closing it automatically after use, and store in in a variable
-with open("cgi-bin/employee_page_template.html", "r") as f:
+with open("employee_page_template.html", "r") as f:
 	template = f.read();
 
 final_output = template.replace("{{REQUESTS}}", requests_html);

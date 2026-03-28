@@ -10,7 +10,7 @@ target_id = post_data.getvalue("id");
 new_status = post_data.getvalue("status");
 
 rows = [];
-csv_path = "database/leave_requests.csv";
+csv_path = "../database/leave_requests.csv";
 
 # read the csv file, copy it and modify the line in the copy
 with open(csv_path, mode="r") as f:
