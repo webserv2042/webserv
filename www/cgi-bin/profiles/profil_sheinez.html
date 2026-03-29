@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil de Sheïnez T. - Webserv</title>
+    <link href="https://fonts.googleapis.com/css2?family=Jacquard+12&family=Jacquard+24&family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=MedievalSharp&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --magic-magenta: #c51162;
+            --dark-plum: #4a148c;
+            --glow: 0 0 25px rgba(197, 17, 98, 0.5);
+            --text-light: #f1f8e9;
+        }
+
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #121019;
+            background-image: url("../../uploads/ciel.jpg");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: 'EB Garamond', serif;
+            overflow: hidden;
+        }
+
+        .profile-card {
+            width: 95vw;
+            max-width: 1200px;
+            height: 85vh;
+            display: flex;
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 40px;
+            border: 2px solid rgba(197, 17, 98, 0.2);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7), var(--glow);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .profile-sidebar {
+            flex: 0.8;
+            background: linear-gradient(to bottom, rgba(18, 16, 25, 0.8), rgba(74, 20, 140, 0.6));
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid rgba(197, 17, 98, 0.1);
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            border: 8px solid rgba(197, 17, 98, 0.4);
+            box-shadow: 0 0 35px rgba(197, 17, 98, 0.7);
+            margin-bottom: 25px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-identity h1 {
+            font-family: 'Jacquard 24', serif;
+            color: white;
+            font-size: 2.2rem;
+            margin: 0;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.5);
+        }
+
+        .profile-role {
+            font-family: 'MedievalSharp', cursive;
+            color: #b388ff;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            margin-top: 15px;
+            line-height: 1.4;
+        }
+
+        .contact-info {
+            margin-top: 45px;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .contact-info a {
+            color: var(--magic-magenta) !important;
+            font-family: 'Jacquard 12', serif;
+            font-size: 1.8rem;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .contact-info a:hover {
+            color: #ffd700 !important;
+            text-shadow: 0 0 10px var(--magic-magenta);
+        }
+
+        .profile-main {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.97);
+            padding: 60px;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        .lang-switch {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            z-index: 10;
+        }
+
+        .lang-switch button {
+            background: none;
+            border: 1px solid var(--magic-magenta);
+            color: var(--magic-magenta);
+            padding: 5px 12px;
+            cursor: pointer;
+            font-family: 'MedievalSharp', cursive;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: 0.3s;
+            margin-left: 5px;
+        }
+
+        .lang-switch button.active {
+            background: var(--magic-magenta);
+            color: white;
+        }
+
+        .profile-section {
+            margin-bottom: 45px;
+        }
+
+        .profile-section h2 {
+            font-size: 1.4rem;
+            color: var(--dark-plum);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid rgba(74, 20, 140, 0.15);
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-section h2::before {
+            margin-right: 15px;
+            text-shadow: 0 0 10px var(--magic-magenta);
+        }
+
+        .profile-section p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #333;
+            margin: 0;
+        }
+
+        /* --- CORRECTION ICI : ÉTAT INITIAL PROPRE --- */
+        .lang-en { display: none !important; }
+        .lang-fr { display: block !important; } 
+    </style>
+</head>
+<body>
+
+    <div class="profile-card">
+        <div class="lang-switch">
+            <button id="btn-fr" class="active" onclick="setLang('fr')">FR</button>
+            <button id="btn-en" onclick="setLang('en')">EN</button>
+        </div>
+
+        <div class="profile-sidebar">
+            <div class="profile-avatar">
+                <img src="../../uploads/Sheinez.jpg" alt="Photo de Profil">
+            </div>
+            <div class="profile-identity">
+                <h1>Sheïnez Tounekti</h1>
+                <p class="profile-role">HTTP/1.1 200 OK<br>Server: Webserv/C++</p>
+                <div style="margin-top:35px;"><span style="background:linear-gradient(to right, var(--dark-plum), var(--magic-magenta)); color:white; padding:5px 15px; border-radius:20px; font-size:0.9rem; font-weight:bold;">42 PARIS</span></div>  
+            </div>
+            <div class="contact-info">
+                shtounek@student.42.fr<br>
+                <a href="https://github.com/Senshy42" target="_blank">Github</a>
+            </div>
+        </div>
+
+        <div class="profile-main">
+            <div class="profile-section">
+                <p class="lang-fr" style="font-style: italic; color: #555; border-left: 3px solid var(--magic-magenta); padding-left: 15px;">
+                    Une littéraire reconvertie à 42 Paris, j'ai changé l'encre de ma plume en octets, établi mon art au milieu des bits et me suis passionnée par les problèmes qui font perdre la tête.
+                </p>
+                <p class="lang-en" style="font-style: italic; color: #555; border-left: 3px solid var(--magic-magenta); padding-left: 15px;">
+                    A literature student turned developer at 42 Paris, I traded ink for bytes, built my craft among bits, and developed a passion for the problems that make your head spin.
+                </p>
+            </div>
+
+            <div class="profile-section">
+                <h2 class="lang-fr">Rôle et missions</h2>
+                <h2 class="lang-en">Role & Mission</h2>
+                
+                <p class="lang-fr">J'ai conçu le moteur de parsing HTTP du projet, de la réception des requêtes à la génération des réponses, en m'appuyant principalement sur les RFC puis toutes documentations utiles. J'ai porté une attention très particulière à la réactivité de mon code face aux erreurs ainsi qu'à créer une architecture robuste et modulable, où le passage des informations s'effectue avec logique et le plus de légèreté possible.<br>Du moins tel était le défi, relevé avec rigueur.</p>
+                
+                <p class="lang-en">I designed the HTTP parsing engine, from request reception to response generation, based on RFC standards and all relevant documentation. I paid special attention to error handling and creating a robust, modular architecture where data flow is logical and efficient.<br>At least, that was the challenge, met with rigor.</p>
+            </div>
+
+            <div class="profile-section">
+                <h2 class="lang-fr">Architecture et flux</h2>
+                <h2 class="lang-en">Architecture & Data Flow</h2>
+                
+                <p class="lang-fr">Transformation des données brutes en réponses structurées, traitement complet des headers, de l'uri et des cookies.<br>
+                Implémentation complète des methodes <strong>GET, POST et DELETE</strong>.<br>
+                Gestion des codes d'erreurs, entre la requête et la réponse puis vers le serveur, indice de déconnexion pour la boucle epoll en cas d'erreur quelconque.<br>
+                Respect des types <strong>MIME</strong> et mise en place de <strong>l'autoindex</strong>.</p>
+
+                <p class="lang-en">Transforming raw data into structured responses, with full handling of headers, uri, and cookies.<br>
+                Complete implementation of <strong>GET, POST, and DELETE</strong> methods.<br>
+				Management of error codes between request, response, and server, including disconnection triggers for the epoll loop in case of any anomalies.<br>
+				Full support for <strong>MIME</strong> types and <strong>autoindex</strong> integration.</p>
+            </div>
+
+            <div class="profile-section">
+                <h2 class="lang-fr">Compétences acquises</h2>
+                <h2 class="lang-en">Acquired Skills</h2>
+                
+                <p class="lang-fr">• Protocole HTTP et conformité RFC<br>• Gestion de la sécurité inspirée du modèle <strong>Nginx</strong><br>
+                    • Architecture C++ robuste, modulaire, scalable et transmission optimisée<br>
+                    • Utilisation de <strong>Telnet</strong> et <strong>Curl</strong> pour la phase de tests</p>
+
+                <p class="lang-en">• HTTP Protocol and RFC compliance<br>
+                    • Security management inspired by the <strong>Nginx</strong> model<br>
+                    • Robust, modular, scalable C++ architecture and optimized transmission<br>
+                    • Usage of <strong>Telnet</strong> and <strong>Curl</strong> for testing phases</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setLang(lang) {
+            // On utilise style.setProperty pour outrepasser le !important du CSS initial
+            document.querySelectorAll('.lang-fr').forEach(el => el.style.setProperty('display', (lang === 'fr' ? 'block' : 'none'), 'important'));
+            document.querySelectorAll('.lang-en').forEach(el => el.style.setProperty('display', (lang === 'en' ? 'block' : 'none'), 'important'));
+            
+            document.getElementById('btn-fr').classList.toggle('active', lang === 'fr');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+        }
+
+        // Force l'état au chargement
+        window.onload = function() {
+            setLang('fr');
+        };
+    </script>
+</body>
+</html>
