@@ -117,7 +117,7 @@ void	Webserv::treatRequest(int &fd)
 			const Config		&config = clients[fd].getConfig();
 			Response			res(config);
 
-			res.setResponseFinal(clients[fd].getRequest());
+			res.setResponseFinal(clients[fd].getRequest(), int fd, clients);
 			clients[fd]._keepAlive = !res.getCloseFd();
 
 			std::vector<char>	responseToSend = res.getResponseFinal();
@@ -236,6 +236,7 @@ void	Webserv::sendResponse(Client &client)
         {
             std::cout << "Closing connection as requested by Response headers." << std::endl;
             closeClient(client.clientFd);
+			return ;
         }
         else // sinon on reste ouvert
         {

@@ -20,7 +20,7 @@ Response::Response(const Config &configServer) :
 
 Response::~Response() {}
 
-void    Response::setResponseFinal(const Request &reqClient)
+int    Response::setResponseFinal(const Request &reqClient, int fd, map<int, std::string> clientCgi)
 {
 	if (reqClient.getErrorCode() != OK)
     {
@@ -28,30 +28,31 @@ void    Response::setResponseFinal(const Request &reqClient)
         this->generateErrorPage(_statusCode);
         this->setHeaders(reqClient);
         this->createResponse();
-        return ;
-    }
-
-	if (_statusCode >= 300 && _statusCode < 400)
-	{
-        this->setHeaders(reqClient);
-        this->createResponse();
-        return ;
+        return (0);
     }
 
     try 
     {
         this->checkingUri(reqClient);
-		if (isCgi())
+		
+		if (_statusCode >= 300 && _statusCode < 400)
 		{
-			CGI 				cgiExec(_uriFullPath, _pathExecCgi);
-			std::vector<char>	cgiOutput = cgiExec.cgi(reqClient, *this);
-			this->parseCgi(cgiOutput);
 			this->setHeaders(reqClient);
 			this->createResponse();
-			return ;
+			return (0);
+		}
+
+		if (isCgi())
+		{
+			CGI cgiExec(_uriFullPath, _pathExecCgi);
+			cgiExec.cgi(reqClient, *this, fd, clientCgi);
+			return (1);
 		}
 		else
+		{
+			if (!_isAutoIndex)
         	this->methodProcess(reqClient);
+		}
         this->setHeaders(reqClient);            
     }
 
@@ -61,6 +62,14 @@ void    Response::setResponseFinal(const Request &reqClient)
 		this->setHeaders(reqClient);
     }
 	
+	this->createResponse();
+	return (0);
+}
+
+void	Response::responseCgi(std::vector<char> cgiOutput, const Request &reqClient)
+{
+	this->parseCgi(cgiOutput);
+	this->setHeaders(reqClient);
 	this->createResponse();
 }
 

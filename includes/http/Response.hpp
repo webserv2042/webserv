@@ -14,6 +14,7 @@
 #include "Errors.hpp"
 
 #define PATH_ERROR_PAGES "errors_pages/"
+#define IS_CGI			1
 
 class	Config;
 struct	Location;
@@ -31,6 +32,8 @@ class Response
 		std::string									_extension;
 		std::string									_dateHttp;
 		std::string									_locationUri;
+		size_t										_contentLength;
+
 
 		std::map<std::string, std::string>			_headers;
 		std::vector<std::string>					_cookies;
@@ -51,7 +54,7 @@ class Response
 		Response(const Config &configServer);
 		~Response();
 
-		void										setResponseFinal(const Request &reqClient);
+		int											setResponseFinal(const Request &reqClient, int fd, map<int fd, std::string> clientCgi);
 		const std::vector<char>						&getResponseFinal() const;
 		void										setStatusCode(e_status_code code);
 		void										addHeaders(const std::string &key, const std::string &value);
@@ -79,7 +82,7 @@ class Response
 		void										checkingPerm();
 		void										searchFile(const Request &req);
 
-		// void										trim(std::string &line);
+		void										responseCgi(std::vector<char> cgiOutput, const Request &req);
 		void    									parseCgi(const std::vector<char> &cgi);
         void    									parseHeadersCgi(const std::string &line);
 

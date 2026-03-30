@@ -172,7 +172,6 @@
             margin: 0;
         }
 
-        /* --- CORRECTION ICI : ÉTAT INITIAL PROPRE --- */
         .lang-en { display: none !important; }
         .lang-fr { display: block !important; } 
     </style>
@@ -196,7 +195,7 @@
             </div>
             <div class="contact-info">
                 shtounek@student.42.fr<br>
-                <a href="https://github.com/Senshy42" target="_blank">Github</a>
+                <a href="https://github.com/Senshy42/webserv-http" target="_blank">Github</a>
             </div>
         </div>
 
@@ -260,7 +259,6 @@
             document.getElementById('btn-en').classList.toggle('active', lang === 'en');
         }
 
-        // Force l'état au chargement
         window.onload = function() {
             setLang('fr');
         };

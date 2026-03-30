@@ -184,7 +184,7 @@ void    Request::checkStartLine()
 {
 	const char* methodNotAllowed[] = {"HEAD", "OPTIONS", "TRACE", "PUT", "PATCH", "CONNECT", NULL};
 	bool		found = false;
-	std::string target = "HTTP/1.1";
+	// std::string target = "HTTP/1.1";
 
 	for (size_t i = 0; i < _method.size(); ++i)
 	{
@@ -202,14 +202,29 @@ void    Request::checkStartLine()
 				break ;
 			}
 		}
-		if (found == true)
-			_errorCode = METHOD_NOT_ALLOWED;
-		else
-			_errorCode = BAD_REQUEST;
 		this->fail(found ? METHOD_NOT_ALLOWED : BAD_REQUEST);
 	}
+	this->parseHttp();
+}
 
-	if (_httpVersion != target)
+void	Request::parseHttp()
+{
+	if (_httpVersion.size() != 8)
+		this->fail(BAD_REQUEST);
+	
+	if (_httpVersion.substr(0, 5) != "HTTP/")
+		this->fail(BAD_REQUEST);
+	
+	if (!isdigit(_httpVersion[5]))
+			this->fail(BAD_REQUEST);
+	
+	if (_httpVersion[6] != '.')
+		this->fail(BAD_REQUEST);
+	
+	if (!isdigit(_httpVersion[7]))
+		this->fail(BAD_REQUEST);
+
+	if (_httpVersion != "HTTP/1.1")
 		this->fail(VERSION_NOT_SUPPORTED);
 }
 
@@ -220,7 +235,7 @@ void    Request::parseHeaders(const std::string &line)
 	if (line.size() > 4096)
         this->fail(REQUEST_HEADER_FIELDS_TOO_LARGE);	
     
-    if (_allHeaders.size() > 100)
+    if (_allHeaders.size() > 1024)
     {
 		this->fail(REQUEST_HEADER_FIELDS_TOO_LARGE);
 	}
@@ -237,7 +252,6 @@ void    Request::parseHeaders(const std::string &line)
 
 	if (key == "host")
 	{
-		std::cout << "DEBUG: ça entre dans le test\n";
 		if (_allHeaders.count("host"))
 			this->fail(BAD_REQUEST);
 	}

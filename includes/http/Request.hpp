@@ -89,6 +89,7 @@ class Request
 		void										parseLines();
 		void										parseStartLine(const std::string &line);
 		void										checkStartLine();
+		void										parseHttp();
 		std::string									decodeUri(const std::string &uri);
 		std::string									parseUri(std::string uri);
 		void										parseHeaders(const std::string &line);
