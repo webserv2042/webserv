@@ -1,0 +1,82 @@
+commande siege:
+siege -c 150 -t 1M http://127.0.0.1:8080/
+-- 150 utilisateurs simultaner pendant 1min
+
+// test GET - POST - DELETE
+
+1- GET:
+GET /index.html HTTP/1.1
+Host: 127.0.0.1:8080
+User-Agent: Tester/1.0
+Accept: */*
+
+2- POST:
+POST /test.txt HTTP/1.1
+Host: 127.0.0.1:8080
+Content-Type: text/plain
+Content-Length: 5
+
+salut
+
+curl -v -X POST http://127.0.0.1:8080/test.txt -H "Content-Type: text/plain" -d "salut"
+
+3- DELETE:
+DELETE /test.txt HTTP/1.1
+Host: 127.0.0.1:8080
+User-Agent: TelnetKiller
+
+curl -v -X DELETE http://127.0.0.1:8080/test.txt -A "TelnetKiller"
+
+
+// test ERREURS
+
+301: telnet -> mettre un chemin vers dossier sans "/"
+
+GET /files HTTP/1.1
+Host: 127.0.0.1:8080
+User-Agent: Tester/1.0
+Accept: */*
+
+ 
+400: ecrire nimporte quoi
+403: chmod 000 -> puis get le fichier
+404: fichier qui n'existe pas
+405: faire une requete avec methode non autorise
+500: utiliser fail.py
+504: timeout du cgi
+
+
+// test CGI
+
+------ script sh:
+GET /cgi-bin/test_cgi.sh?cle=valeur&statut=expert HTTP/1.1
+Host: localhost
+User-Agent: telnet-client
+Accept: */*
+ -- curl -v "http://localhost:8080/cgi-bin/test_cgi.sh?cle=valeur&statut=expert"
+
+
+POST /cgi-bin/test_cgi.sh HTTP/1.1
+Host: localhost
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 21
+
+user=neo&action=matrix
+ -- curl -v -X POST -d "user=neo&action=matrix" http://localhost:8080/cgi-bin/test_cgi.sh
+
+------ test_post.py:
+
+POST /cgi-bin/test_post.py HTTP/1.1
+Host: 127.0.0.1:8080
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 13
+
+code=galactic
+
+curl -v -X POST -d "agent=J&status=active" http://127.0.0.1:8080/cgi-bin/test_post.py
+
+------ test_get.py:
+GET /cgi-bin/test_get.py HTTP/1.1
+Host: 127.0.0.1:8080
+User-Agent: Tester/1.0
+Accept: */*
