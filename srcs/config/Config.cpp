@@ -154,6 +154,7 @@ void Config::printConfig() const
     for (size_t i = 0; i < _locations.size(); i++) {
         std::cout << "  [" << i << "] path: " << _locations[i].path << std::endl;
         std::cout << "      root: " << _locations[i].root << std::endl;
+        std::cout << "      uploadPath: " << _locations[i].uploadPath << std::endl;
 		if (!_locations[i].cgi.empty()) {
             std::cout << "      CGI:" << std::endl;
             for (std::map<std::string, std::string>::const_iterator it = _locations[i].cgi.begin();
