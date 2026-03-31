@@ -51,7 +51,16 @@ void    Webserv::epollLoop()
 			{
 				//deconnexion client
 				if (events[i].events & (EPOLLHUP | EPOLLERR))
+<<<<<<< Updated upstream
 					closeClient(fd);
+=======
+				{
+					std::cout << "\033[31mDISCONNECT ERR !!!!\033[0m" << std::endl;
+					epoll_ctl(ep_fd, EPOLL_CTL_DEL, fd, NULL);
+					clients[fd].~Client();
+					close(fd);
+				}
+>>>>>>> Stashed changes
 
 				//lire la requete, la parser, preparer la reponse,...
 				if (events[i].events & EPOLLIN)
@@ -100,8 +109,28 @@ void	Webserv::treatRequest(int &fd)
         	clients[fd].getRequest().printRequest();
 			// std::cout << "\033[38;5;211m-----------request-end--------\033[0m" << std::endl;
 
+<<<<<<< Updated upstream
 			// RESPONSE //
 			writeResponse(fd);
+=======
+			std::cout << "\033[38;5;211m-----------request-end--------\033[0m" << std::endl;
+
+			const Config		&config = clients[fd].getConfig();
+			Response			res(config);
+
+			res.setResponseFinal(clients[fd].getRequest());
+			clients[fd]._keepAlive = !res.getCloseFd();
+
+			std::vector<char>	responseToSend = res.getResponseFinal();
+
+			clients[fd].writeBuff.assign(responseToSend.begin(), responseToSend.end());
+            clients[fd].buffSize = clients[fd].writeBuff.size();
+            clients[fd].bytesSent = 0;
+
+			clients[fd].clientState = WRITING_RESPONSE;
+            modifyEpollout(fd, ADD_EPOLLOUT);
+			// std::cout << "\033[38;5;211m-----------sortie de treat request--------\033[0m" << std::endl;
+>>>>>>> Stashed changes
 		}
 	}
 	else

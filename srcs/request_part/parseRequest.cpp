@@ -1,4 +1,5 @@
 #include "../../includes/http/Request.hpp"
+#include "../../includes/config/Config.hpp"
 
 void    Request::parseRequest()
 {
@@ -68,7 +69,7 @@ void    Request::parseLines()
 			if (line.find(':') != std::string::npos) // réglage d'un bug, pas de qst ça marche c tout
 				this->parseHeaders(line);
 			else
-				std::cout << "DEBUG: Ligne ignorée car pas de ':' -> [" << line << "]" << std::endl;
+				this->fail(BAD_REQUEST);
 		}
 	}
 }
@@ -159,7 +160,7 @@ std::string	Request::parseUri(std::string uri)
 			if (!allPath.empty())
 				allPath.pop_back(); // on supprime le dernier élement
 			else
-				return ("/");
+				this->fail(BAD_REQUEST);
 		}
 		else
 			allPath.push_back(onePath);

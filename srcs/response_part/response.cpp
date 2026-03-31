@@ -21,7 +21,11 @@ Response::Response(const Config &configServer) :
 
 Response::~Response() {}
 
+<<<<<<< Updated upstream
 int    Response::setResponseFinal(const Request &reqClient, int fd, std::map<int, Client> &clients)
+=======
+void    Response::setResponseFinal(const Request &reqClient)
+>>>>>>> Stashed changes
 {
 	if (reqClient.getErrorCode() != OK)
     {
@@ -29,7 +33,7 @@ int    Response::setResponseFinal(const Request &reqClient, int fd, std::map<int
         this->generateErrorPage(_statusCode);
         this->setHeaders(reqClient);
         this->createResponse();
-        return (0);
+        return ;
     }
 
     try 
@@ -39,21 +43,30 @@ int    Response::setResponseFinal(const Request &reqClient, int fd, std::map<int
 		{
 			this->setHeaders(reqClient);
 			this->createResponse();
-			return (0);
+			return ;
 		}
 
 		if (isCgi())
 		{
+<<<<<<< Updated upstream
 			CGI cgiExec(_uriFullPath, _pathExecCgi);
 			cgiExec.cgi(reqClient, *this, fd, clients);
 			return (IS_CGI);
+=======
+			CGI 				cgiExec(_uriFullPath, _pathExecCgi);
+			std::vector<char>	cgiOutput = cgiExec.cgi(reqClient, *this);
+			this->parseCgi(cgiOutput);
+			this->setHeaders(reqClient);
+			this->createResponse();
+			return ;
+>>>>>>> Stashed changes
 		}
 		else
 		{
 			if (!_isAutoIndex)
-        	this->methodProcess(reqClient);
+        		this->methodProcess(reqClient);
 		}
-        this->setHeaders(reqClient);            
+        this->setHeaders(reqClient);
     }
 
     catch (const std::exception &e)
@@ -61,9 +74,8 @@ int    Response::setResponseFinal(const Request &reqClient, int fd, std::map<int
         this->generateErrorPage(_statusCode);
 		this->setHeaders(reqClient);
     }
-	
 	this->createResponse();
-	return (0);
+	// return ;
 }
 
 /// @brief cree la reponse a partir du retour de la CGI
@@ -110,14 +122,15 @@ void	Response::setStartLine()
 	_responseFinal.insert(_responseFinal.end(), startLine.begin(), startLine.end());
 }
 
-void    Response::setBodySize(const std::string &bodyHttp)
-{
-	_body.assign(bodyHttp.begin(), bodyHttp.end());
 
-	std::stringstream ss;
-	ss << _body.size();
-	this->addHeaders("content-length", ss.str());
-}
+// void    Response::setBodySize(const std::string &bodyHttp)
+// {
+// 	_body.assign(bodyHttp.begin(), bodyHttp.end());
+
+// 	std::stringstream ss;
+// 	ss << _body.size();
+// 	this->addHeaders("content-length", ss.str());
+// }
 
 void	Response::setHttpDate()
 {

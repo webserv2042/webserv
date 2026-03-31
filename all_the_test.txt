@@ -1,0 +1,32 @@
+Trouver le pid du serveur : pgrep webserv
+Voir qui écoute sur le port *** (ici, 8080) : lsof -i 8080 (lsof = liste les fd ouverts par les processus, 
+-i pour afficher les fichiers de type réseau, -p + PID pour voir les fichiers ouverts par le processus)
+Surveiller l'état des ressources et des performances pendant l'execution du serveur : top -p + PID
+
+sudo systemctl start nginx, port 80, si besoin de tester le comportement en comparaison
+
+Stress test : siege -c 150 -t 40s http://127.0.0.1:8080 
+
+Rapport :
+
+{       "transactions":                       // Nb total de requêtes
+        "availability":                       // requêtes réussies
+        "elapsed_time":                       // Durée réelle du test
+        "data_transferred":                   // Quantité de données envoyées au serveur
+        "response_time":                      // Temps de réponse du serveur
+        "transaction_rate":                   // Puissance du serveur par sec
+        "throughput":                         // Moyenne du débit binaire par sec (les données poussées par le serveur)
+        "concurrency":                        // Nb moyen de clients simultanés sur le serveur
+        "successful_transactions":            // Nb de requêtes succès
+        "failed_transactions":                // Nb de requêtes échec
+        "longest_transaction":                // Requête la plus lente
+        "shortest_transaction":               // Requête la plus longue
+}
+
+//// : curl -v http://localhost:8080///////index.html
+-> Résultat attendu : 200 OK
+
+Sortie du root : 400 BAD REQUEST 
+Curl et le navigateur renvoient l'index, normalisation indépendante du serveur, faire le test avec NGINX
+Telnet pour tester en brute ou "curl -v --path-as-is + "uri"" pour empêcher la normalisation
+

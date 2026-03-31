@@ -16,7 +16,7 @@ void    Response::setHeaders(const Request &req)
         this->contentType();
 
 	if (_statusCode == METHOD_NOT_ALLOWED)
-		this->addHeaders("Allow", req.getSupportedMethod());
+		this->addHeaders("Allow", this->allowedMethods());
 
 	if (_statusCode >= 300 && _statusCode < 400)
 		this->addHeaders("Location", _locationUri);
@@ -47,4 +47,21 @@ void    Response::contentType()
 		this->addHeaders("Content-Type", it->second);
 	else
 		this->addHeaders("Content-Type", "application/octet-stream");
+}
+
+std::string Response::allowedMethods() const
+{
+    std::string	allowed;
+
+    if (!_structLocation || _structLocation->allowedMethods.empty())
+        return ("GET");
+
+    for (size_t i = 0; i < _structLocation->allowedMethods.size(); ++i)
+    {
+        allowed += _structLocation->allowedMethods[i];
+        if (i < _structLocation->allowedMethods.size() - 1)
+            allowed += ", ";
+    }
+
+    return (allowed);
 }

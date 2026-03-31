@@ -1,9 +1,27 @@
 #include "../../includes/http/Response.hpp"
 #include "../../includes/http/Request.hpp"
+#include "../../includes/config/Config.hpp"
 
 void    Response::methodProcess(const Request &req)
 {
     std::string method = req.getMethod();
+
+    if (_structLocation && !_structLocation->allowedMethods.empty())
+    {
+        bool found = false;
+        std::vector<std::string>::const_iterator it;
+        
+        for (it = _structLocation->allowedMethods.begin(); it < _structLocation->allowedMethods.end(); ++it)
+        {
+            if (*it == method)
+            {
+                found = true;
+                break ;
+            }
+        }
+        if (!found)
+            this->fail(METHOD_NOT_ALLOWED);
+    }
 
     if (method == "GET")
         this->doGet();
@@ -37,7 +55,10 @@ void    Response::doGet()
 void    Response::doPost(const Request &req)
 {
     struct stat checkFile;
-    
+
+    if (_uriFullPath[_uriFullPath.size() - 1] == '/')
+        this->fail(BAD_REQUEST); 
+
     if (stat(_uriFullPath.c_str(), &checkFile) == 0)
     {
         _statusCode = CONFLICT;
@@ -62,6 +83,7 @@ void    Response::doPost(const Request &req)
 
     file.close();
     _statusCode = CREATED;
+    this->addHeaders("content-type", "text/html");
 
     std::string msg = "<html><body><h1>Fichier crée avec succès !</h1></body></html>";
     _body.assign(msg.begin(), msg.end()); // assign nettoie puis écrit

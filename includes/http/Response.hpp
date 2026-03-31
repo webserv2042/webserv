@@ -55,15 +55,18 @@ class Response
 		Response(const Config &configServer);
 		~Response();
 
+<<<<<<< Updated upstream
 		int											setResponseFinal(const Request &reqClient, int fd, std::map<int, Client> &clients);
+=======
+		void										setResponseFinal(const Request &reqClient);
+>>>>>>> Stashed changes
 		const std::vector<char>						&getResponseFinal() const;
 		void										setStatusCode(e_status_code code);
 		void										addHeaders(const std::string &key, const std::string &value);
 		void										addCookie(const std::string &cookies);
-		void										setBodySize(const std::string &bodyHttp);
+		// void										setBodySize(const std::string &bodyHttp);
 		void    									setHttpDate();
 		void										setLocationUri(const std::string &path);
-
 		std::string 								getUriFullPath() const;
 		std::string 								getExtension() const;
 		std::string 								getHeader(std::string key);
@@ -89,6 +92,8 @@ class Response
 
 		// method
 
+		void    									methodProcess(const Request &req);
+		std::string 								allowedMethods() const;
 		void										doGet();
 		void										doPost(const Request &req);
 		void										doDelete();
@@ -97,7 +102,6 @@ class Response
         void    									createResponse();
         void    									setStartLine();
         void    									setHeaders(const Request &req);
-        void    									methodProcess(const Request &req);
         void   	 									doAutoIndex(const Request &req);
 		static std::map<e_status_code, std::string>	initMessageStatus();
 		void										generateErrorPage(e_status_code code);

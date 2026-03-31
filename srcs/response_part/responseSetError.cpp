@@ -11,6 +11,8 @@ const char* repException::what() const throw()
 void Response::fail(e_status_code code)
 {
     _statusCode = code;
+    if (code == BAD_REQUEST || code == CONTENT_TOO_LARGE)
+        _closeFd = true; 
     throw repException();
 }
 
@@ -63,7 +65,7 @@ void Response::generateErrorPage(e_status_code code)
         ss << "<body style='text-align:center; font-family:sans-serif; padding-top:100px;'>";
         ss << "<h1 style='font-size: 50px;'>" << code << "</h1>";
         ss << "<h2>" << message << "</h2>";
-        ss << "<hr><p>Webserv/1.0 (Senshy Edition - Fallback Mode)</p></body></html>";
+        ss << "<hr><p>Webserv/1.0 (Fallback Mode)</p></body></html>";
         
         std::string html = ss.str();
         _body.assign(html.begin(), html.end());

@@ -17,7 +17,7 @@
 
 const int IPV4 = AF_INET;
 
-#define PENDING_QUEUE_MAXLENGTH 1
+// #define PENDING_QUEUE_MAXLENGTH 1
 
 struct Location {
 	std::string						path; // identifiant --> "/admin" "/images"

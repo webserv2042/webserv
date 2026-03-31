@@ -18,7 +18,12 @@ void    Response::checkingUri(const Request &req)
 	if (stat(_uriFullPath.c_str(), &_dataFile) != 0) // uri introuvable
 	{
 		if (req.getMethod() == "POST")
-			return ;
+		{
+			if (!_structLocation->uploadPath.empty())
+				return ;
+			else
+				this->fail(METHOD_NOT_ALLOWED);
+		}
 		else
 			this->fail(NOT_FOUND);
 	}
@@ -26,7 +31,15 @@ void    Response::checkingUri(const Request &req)
 	if (S_ISREG(_dataFile.st_mode)) // un fichier ?
 		this->checkingPerm();
 	else if(S_ISDIR(_dataFile.st_mode)) // un dossier ?
+	{
+		if (req.getUri()[req.getUri().size() - 1] != '/')
+		{
+			_statusCode = MOVED_PERMANENTLY;
+			_locationUri = req.getUri() + "/";
+			return ;
+		}
 		this->searchFile(req);
+	}
 }
 
 const Location* Config::findLocation(std::string uri) const
@@ -70,10 +83,10 @@ void    Response::searchFile(const Request &req)
 		this->checkingPerm();
 		this->setExtension();
 	}
-	else if (_structLocation && _structLocation->autoIndex == true)
+	else if (req.getMethod() == "GET" && _structLocation && _structLocation->autoIndex == true)
 		this->doAutoIndex(req);
 	else
-		this->fail(NOT_FOUND);
+		this->fail(FORBIDDEN);
 }
 
 void Response::fullPathUri(const Request &req)
