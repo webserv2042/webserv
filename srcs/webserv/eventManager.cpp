@@ -58,8 +58,10 @@ void    Webserv::acceptClient(int &newConnexionFd)
         }
 	}
 
-	Client newClient(client_fd,foundConfig);
+	// CREATE NEW CLIENT //
+	Client newClient(client_fd,foundConfig, ep_fd);
     clients[client_fd] = newClient; //do a proper copy!!!!
+	std::cout << "accepted : " << client_fd << std::endl;
 }
 
 
@@ -69,7 +71,7 @@ void    Webserv::acceptClient(int &newConnexionFd)
 /// @param clientFD fd du client a supprimer
 void    Webserv::closeClient(int clientFD)
 {
-	std::cout << "\033[31mDISCONNECT !!!!\033[0m" << std::endl;
+	std::cout << "\033[31mDISCONNECT\033[0m" << std::endl;
     epoll_ctl(ep_fd, EPOLL_CTL_DEL, clientFD, NULL);
     close(clientFD);
 	clients.erase(clientFD);

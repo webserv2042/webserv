@@ -3,7 +3,7 @@
 
 	session_start();
 	
-	// add users
+	// create users
 	clear_file_content("../database/users.csv");
 	add_user('manager@gmail.com', 'mpw', 'manager', 'tung tung tung tung sahur');
 	add_user('employee@gmail.com', 'upw', 'employee', 'brr brrr patabim');
@@ -42,6 +42,10 @@
 				{
 					$_SESSION['username'] = $email;
 					$_SESSION['role'] = 'manager';
+					// create cookies for python
+					// $cookie_username = find_username($email);
+					// setcookie("cookie_username", $cookie_username, time() + 3600, "/cgi-bin/manager_page.py");
+					// 
 					header('Location: ../cgi-bin/manager_page.py');
 					exit();
 				}
@@ -49,6 +53,10 @@
 				{
 					$_SESSION['username'] = $email;
 					$_SESSION['role'] = 'employee';
+					// create cookies for python
+					$cookie_username = find_username($email);
+					setcookie("cookie_username", $cookie_username, time() + 3600, "/");
+					// 
 					header('Location: ../cgi-bin/employee_page.py');
 					exit();
 				}

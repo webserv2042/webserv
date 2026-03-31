@@ -184,7 +184,7 @@ void    Request::checkStartLine()
 {
 	const char* methodNotAllowed[] = {"HEAD", "OPTIONS", "TRACE", "PUT", "PATCH", "CONNECT", NULL};
 	bool		found = false;
-	std::string target = "HTTP/1.1";
+	// std::string target = "HTTP/1.1";
 
 	for (size_t i = 0; i < _method.size(); ++i)
 	{
@@ -202,14 +202,29 @@ void    Request::checkStartLine()
 				break ;
 			}
 		}
-		if (found == true)
-			_errorCode = METHOD_NOT_ALLOWED;
-		else
-			_errorCode = BAD_REQUEST;
 		this->fail(found ? METHOD_NOT_ALLOWED : BAD_REQUEST);
 	}
+	this->parseHttp();
+}
 
-	if (_httpVersion != target)
+void	Request::parseHttp()
+{
+	if (_httpVersion.size() != 8)
+		this->fail(BAD_REQUEST);
+	
+	if (_httpVersion.substr(0, 5) != "HTTP/")
+		this->fail(BAD_REQUEST);
+	
+	if (!isdigit(_httpVersion[5]))
+			this->fail(BAD_REQUEST);
+	
+	if (_httpVersion[6] != '.')
+		this->fail(BAD_REQUEST);
+	
+	if (!isdigit(_httpVersion[7]))
+		this->fail(BAD_REQUEST);
+
+	if (_httpVersion != "HTTP/1.1")
 		this->fail(VERSION_NOT_SUPPORTED);
 }
 
@@ -220,7 +235,7 @@ void    Request::parseHeaders(const std::string &line)
 	if (line.size() > 4096)
         this->fail(REQUEST_HEADER_FIELDS_TOO_LARGE);	
     
-    if (_allHeaders.size() > 100)
+    if (_allHeaders.size() > 1024)
     {
 		this->fail(REQUEST_HEADER_FIELDS_TOO_LARGE);
 	}
@@ -234,9 +249,18 @@ void    Request::parseHeaders(const std::string &line)
 	trim(value);
 
 	key = toLower(key);  // normalisation pr respecter norme rfc (headers sensibles à la casse)
+
+	if (key == "host")
+	{
+		if (_allHeaders.count("host"))
+			this->fail(BAD_REQUEST);
+	}
 	
-	// if (key == "cookie")
-	// 	this->parseCookie(value);
+	if (key == "cookie")
+	{
+		this->parseCookie(value);
+		return ;
+	}
 	
 	if (key == "content-length")
 	{
@@ -244,7 +268,13 @@ void    Request::parseHeaders(const std::string &line)
 		long valueKey = std::strtol(value.c_str(), &endPtr, 10);
 		if (*endPtr != '\0' || valueKey < 0)
 			this->fail(BAD_REQUEST);
-
+		
+		if (_allHeaders.count("content-length"))
+		{
+			if (std::atol(_allHeaders["content-length"].c_str()) != valueKey)
+            	this->fail(BAD_REQUEST);
+			return ;
+		}
 		if (valueKey > LIMIT_BODY)
 			this->fail(CONTENT_TOO_LARGE);
 
@@ -260,11 +290,26 @@ void    Request::parseHeaders(const std::string &line)
 	_allHeaders[key] = value;
 }
 
-// void	Request::parseCookie(const std::string &value)
-// {
-// 	std::string target = "id=";
-// 	size_t		
-// }
+void	Request::parseCookie(const std::string &data)
+{
+	std::stringstream	ss(data);
+	std::string			dataCookie;
+
+	while(std::getline(ss, dataCookie, ';'))
+	{
+		size_t	equal = dataCookie.find('=');
+		if (equal != std::string::npos)
+		{
+			std::string	key = dataCookie.substr(0, equal);
+			std::string value = dataCookie.substr(equal + 1);
+
+			trim(key);
+			trim(value);
+
+			_cookies[key] = value;
+		}
+	}
+}
 
 void    Request::parseBodyContent()
 {

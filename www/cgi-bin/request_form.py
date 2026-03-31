@@ -4,6 +4,21 @@ import cgi
 import csv
 import time
 from datetime import datetime
+from urllib.parse import unquote
+
+# get cookies'name
+cookie_data = os.environ.get("HTTP_COOKIE", "")
+
+# parser manuellement
+cookies = {}
+if cookie_data:
+	parts = cookie_data.split("; ")
+	for p in parts:
+		key, value = p.split("=")
+		cookies[key] = unquote(value)
+	cookie_name = cookies.get("cookie_username", "employee")
+else :
+	cookie_name = "employee"
 
 if os.environ.get("REQUEST_METHOD") == "POST" :
 	form = cgi.FieldStorage(); #get form input
@@ -32,7 +47,7 @@ if os.environ.get("REQUEST_METHOD") == "POST" :
 		end_obj = datetime.strptime(raw_end, "%Y-%m-%d");
 		formatted_end =  end_obj.strftime("%d-%m-%Y");
 
-		writer.writerow(["Test Name", form.getvalue("motive"), formatted_start, formatted_end, str(timestamp), "pending"]);
+		writer.writerow([cookie_name, form.getvalue("motive"), formatted_start, formatted_end, str(timestamp), "pending"]);
 		new_csv.close();
 
 		# Redirect after POST

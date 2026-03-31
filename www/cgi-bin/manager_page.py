@@ -3,6 +3,7 @@ import os  #to import env variables
 import cgi
 import csv
 from datetime import datetime
+from urllib.parse import unquote
 
 def get_total_vacation(csv_path):
 	total_days = 0;
@@ -22,7 +23,20 @@ def get_total_vacation(csv_path):
 				total_days += delta.days + 1
 	return total_days
 
-	
+
+# get cookies'name
+# cookie_data = os.environ.get("HTTP_COOKIE", "")
+
+# # parser manuellement
+# cookies = {}
+# if cookie_data:
+# 	parts = cookie_data.split("; ")
+# 	for p in parts:
+# 		key, value = p.split("=")
+# 		cookies[key] = unquote(value)
+# 	cookie_name = cookies.get("cookie_username", "manager name")
+# else :
+# 	cookie_name = "manager name no cookies"
 
 # open the csv database
 with open("../database/leave_requests.csv", mode="r") as db_file:
@@ -76,7 +90,8 @@ with open("manager_page_template.html", "r") as f:
 	template = f.read();
 
 final_output = template.replace("{{REQUESTS}}", requests_html) \
-						.replace("{{VACATION_TIME}}", total_vacation);
+						.replace("{{VACATION_TIME}}", total_vacation) \
+						.replace("{{NAME}}", "Manager");
 
 print("Content-Type: text/html\r\n\r\n");
 print(final_output);

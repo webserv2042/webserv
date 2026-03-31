@@ -5,7 +5,6 @@
 void    Response::checkingUri(const Request &req)
 {
 	_structLocation = _config.findLocation(req.getUri());
-
 	if (_structLocation && _structLocation->returnRedirect.first != 0)
 	{
 		_statusCode = static_cast<e_status_code>(_structLocation->returnRedirect.first);
@@ -15,7 +14,7 @@ void    Response::checkingUri(const Request &req)
 
 	this->fullPathUri(req);
 
-	std::cout << "Tentative d'ouverture de (full path) : [" << _uriFullPath << "]\n";
+	// std::cout << "Tentative d'ouverture de (full path) : [" << _uriFullPath << "]\n";
 	if (stat(_uriFullPath.c_str(), &_dataFile) != 0) // uri introuvable
 	{
 		if (req.getMethod() == "POST")
@@ -83,11 +82,7 @@ void Response::fullPathUri(const Request &req)
 	std::string uri = req.getUri();
 
 	if (_structLocation && !_structLocation->root.empty())
-	{
 		root = _structLocation->root;
-		if (!_structLocation->path.empty() && _structLocation->path != "/" && uri.compare(0, _structLocation->path.size(), _structLocation->path) == 0)
-				uri = uri.substr(_structLocation->path.size());
-    }
 	else if (!_config.getRoot().empty())
 		root = _config.getRoot();
 	else

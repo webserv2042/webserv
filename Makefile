@@ -10,7 +10,7 @@ SRCS = 	srcs/main.cpp srcs/server/Server.cpp srcs/config/Config.cpp srcs/config/
 		srcs/response_part/treatmentHeaders.cpp srcs/response_part/treatmentMethod.cpp \
 		srcs/response_part/treatmentUri.cpp srcs/response_part/autoIndex.cpp \
 		srcs/response_part/mimeTypes.cpp \
-		srcs/cgi_part/Cgi.cpp srcs/cgi_part/parseCgi.cpp
+		srcs/cgi_part/Cgi.cpp srcs/cgi_part/parseCgi.cpp srcs/webserv/cgiEpoll.cpp
 
 # OBJS = $(SRCS:.cpp=.o)
 NAME = webserv

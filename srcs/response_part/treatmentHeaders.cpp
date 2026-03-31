@@ -9,7 +9,7 @@ void    Response::setHeaders(const Request &req)
 	ss << _body.size();
 
 	this->addHeaders("Date", _dateHttp);
-	this->addHeaders("Server", "werserv/1.1");
+	this->addHeaders("Server", "webserv/1.1");
 	this->addHeaders("Content-Length", ss.str());
 
 	if (_headers.find("content-type") == _headers.end())

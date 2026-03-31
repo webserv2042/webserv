@@ -62,7 +62,7 @@ void    Webserv::modifyEpollout(int &fd, int action)
     
 	//modifier la surveillance du fd avec epoll_ctl
 	if (epoll_ctl(ep_fd, EPOLL_CTL_MOD, fd, &event) == ERROR)
-		throw std::runtime_error("(SERVER) epoll_ctl function failed: ");
+		throw std::runtime_error("MODEPOLL (SERVER) epoll_ctl function failed: ");
 }
 
 std::string readFile(const std::string& filename)

@@ -2,6 +2,25 @@
 import os  #to import env variables
 import cgi
 import csv
+from datetime import datetime
+from urllib.parse import unquote
+import time
+
+# get cookies'name
+cookie_data = os.environ.get("HTTP_COOKIE", "")
+
+# parser manuellement
+cookies = {}
+if cookie_data:
+	parts = cookie_data.split("; ")
+	for p in parts:
+		key, value = p.split("=")
+		cookies[key] = unquote(value)
+	cookie_name = cookies.get("cookie_username", "employee name")
+else :
+	cookie_name = "employee name"
+
+# time.sleep(10)
 
 # open the csv database
 with open("../database/leave_requests.csv", mode="r") as db_file:
@@ -37,7 +56,8 @@ with open("../database/leave_requests.csv", mode="r") as db_file:
 with open("employee_page_template.html", "r") as f:
 	template = f.read();
 
-final_output = template.replace("{{REQUESTS}}", requests_html);
+final_output = template.replace("{{REQUESTS}}", requests_html) \
+						.replace("{{NAME}}", cookie_name);
 
 print("Content-Type: text/html\r\n\r\n");
 print(final_output);
