@@ -55,11 +55,7 @@ class Response
 		Response(const Config &configServer);
 		~Response();
 
-<<<<<<< Updated upstream
 		int											setResponseFinal(const Request &reqClient, int fd, std::map<int, Client> &clients);
-=======
-		void										setResponseFinal(const Request &reqClient);
->>>>>>> Stashed changes
 		const std::vector<char>						&getResponseFinal() const;
 		void										setStatusCode(e_status_code code);
 		void										addHeaders(const std::string &key, const std::string &value);

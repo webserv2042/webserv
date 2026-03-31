@@ -21,11 +21,7 @@ Response::Response(const Config &configServer) :
 
 Response::~Response() {}
 
-<<<<<<< Updated upstream
 int    Response::setResponseFinal(const Request &reqClient, int fd, std::map<int, Client> &clients)
-=======
-void    Response::setResponseFinal(const Request &reqClient)
->>>>>>> Stashed changes
 {
 	if (reqClient.getErrorCode() != OK)
     {
@@ -33,7 +29,7 @@ void    Response::setResponseFinal(const Request &reqClient)
         this->generateErrorPage(_statusCode);
         this->setHeaders(reqClient);
         this->createResponse();
-        return ;
+        return (0);
     }
 
     try 
@@ -43,23 +39,14 @@ void    Response::setResponseFinal(const Request &reqClient)
 		{
 			this->setHeaders(reqClient);
 			this->createResponse();
-			return ;
+			return (0);
 		}
 
 		if (isCgi())
 		{
-<<<<<<< Updated upstream
 			CGI cgiExec(_uriFullPath, _pathExecCgi);
 			cgiExec.cgi(reqClient, *this, fd, clients);
 			return (IS_CGI);
-=======
-			CGI 				cgiExec(_uriFullPath, _pathExecCgi);
-			std::vector<char>	cgiOutput = cgiExec.cgi(reqClient, *this);
-			this->parseCgi(cgiOutput);
-			this->setHeaders(reqClient);
-			this->createResponse();
-			return ;
->>>>>>> Stashed changes
 		}
 		else
 		{
@@ -75,7 +62,7 @@ void    Response::setResponseFinal(const Request &reqClient)
 		this->setHeaders(reqClient);
     }
 	this->createResponse();
-	// return ;
+	return (0);
 }
 
 /// @brief cree la reponse a partir du retour de la CGI
