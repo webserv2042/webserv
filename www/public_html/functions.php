@@ -99,6 +99,3 @@ function find_username($submitted_email)
     }
     return false; // User not found or password incorrect
 }
-
-?>
-

@@ -53,10 +53,12 @@ void		Request::feeding(const char *buffer, size_t sizeOfBytes)
 
 	if (_step != FINISHED)
 		{
-			try {
+			try
+			{
 				this->parseRequest();
-			} catch (const std::exception &e) {
-				
+			}
+			catch (const std::exception &e)
+			{
 				_step = FINISHED; // On force la fin si erreur détectée
 			}
 		}

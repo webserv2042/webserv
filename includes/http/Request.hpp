@@ -17,7 +17,7 @@
 class Config;
 
 #define MAX_BYTES	8000 // recommandé dans la RFC 9112 d'imposer cette limite
-#define LIMIT_BODY	20971520 // 20 Mo pour le body
+#define LIMIT_BODY	10485760 // 20 Mo pour le body
 
 enum    e_request_method    
 {

@@ -12,7 +12,7 @@ void Response::fail(e_status_code code)
 {
     _statusCode = code;
     if (code == BAD_REQUEST || code == CONTENT_TOO_LARGE)
-        _closeFd = true; 
+        _closeFd = true;
     throw repException();
 }
 

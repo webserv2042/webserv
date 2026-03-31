@@ -22,7 +22,7 @@ Response::Response(const Config &configServer) :
 Response::~Response() {}
 
 int    Response::setResponseFinal(const Request &reqClient, int fd, std::map<int, Client> &clients)
-{
+{	
 	if (reqClient.getErrorCode() != OK)
     {
         _statusCode = reqClient.getErrorCode();
@@ -31,9 +31,12 @@ int    Response::setResponseFinal(const Request &reqClient, int fd, std::map<int
         this->createResponse();
         return (0);
     }
-
     try 
     {
+		size_t limit = _config.getClientMaxBodySize();
+
+		if (reqClient.getContentLength() > limit)
+			this->fail(CONTENT_TOO_LARGE);
         this->checkingUri(reqClient);
 		if (_statusCode >= 300 && _statusCode < 400)
 		{

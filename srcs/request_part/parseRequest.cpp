@@ -313,7 +313,7 @@ void	Request::parseCookie(const std::string &data)
 }
 
 void    Request::parseBodyContent()
-{
+{	
 	if (_allHeaders.count("transfer-encoding") && _allHeaders["transfer-encoding"] == "chunked")
 	{
 		this->parseBodyChunked();
@@ -373,10 +373,14 @@ void    Request::parseBodyChunked()
 			}
 			
 			long valueForChunk = std::strtol(hexa.c_str(), &endPtr, 16);
-			if (*endPtr != '\0' || valueForChunk < 0 || (_body.size() + static_cast<size_t>(valueForChunk)) > LIMIT_BODY)
+			
+			if (*endPtr != '\0' || valueForChunk < 0)
+				this->fail(BAD_REQUEST);
+			if (static_cast<size_t>(valueForChunk) > LIMIT_BODY ||
+			(_body.size() + static_cast<size_t>(valueForChunk)) > LIMIT_BODY)
 				this->fail(CONTENT_TOO_LARGE);
 
-			_chunkSize = static_cast<size_t>(valueForChunk);
+			_chunkSize = static_cast<long>(valueForChunk);
 			_bytesData.erase(_bytesData.begin(), it + 2);
 
 			if (_chunkSize == 0)

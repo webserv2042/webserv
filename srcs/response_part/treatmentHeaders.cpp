@@ -20,17 +20,16 @@ void    Response::setHeaders(const Request &req)
 
 	if (_statusCode >= 300 && _statusCode < 400)
 		this->addHeaders("Location", _locationUri);
-		
+
 	if (req.getHeader("connection") == "close")
-	{
-		this->addHeaders("Connection", "close");
 		_closeFd = true;
-	}
-	else
-	{
-		this->addHeaders("Connection", "keep-alive");
-		_closeFd = false;
-	}
+	if (_statusCode >= 400)
+		_closeFd = true;
+	
+	if (_closeFd)
+        this->addHeaders("Connection", "close");
+    else
+        this->addHeaders("Connection", "keep-alive");
 }
 
 void    Response::contentType()

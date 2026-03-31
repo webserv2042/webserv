@@ -30,3 +30,9 @@ Sortie du root : 400 BAD REQUEST
 Curl et le navigateur renvoient l'index, normalisation indépendante du serveur, faire le test avec NGINX
 Telnet pour tester en brute ou "curl -v --path-as-is + "uri"" pour empêcher la normalisation
 
+Test de la CGI : POST /login.php HTTP/1.1
+                Host: localhost
+                Content-length: 36      
+                Content-Type: application/x-www-form-urlencoded
+
+                email=manager@gmail.com&password=mpw

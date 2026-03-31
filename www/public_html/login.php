@@ -8,6 +8,11 @@
 	add_user('manager@gmail.com', 'mpw', 'manager', 'tung tung tung tung sahur');
 	add_user('employee@gmail.com', 'upw', 'employee', 'brr brrr patabim');
 
+	// DEBUG
+	$debug = file_get_contents("../database/users.csv");
+	error_log("CSV CONTENT: " . $debug);
+	error_log("POST DATA: " . print_r($_POST, true));
+
 	// set variables to empty
 	$email = $password = "";
 	$emailErr = "";
