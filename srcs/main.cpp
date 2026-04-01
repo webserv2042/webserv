@@ -10,11 +10,9 @@ int main(int argc, char **argv)
 {
 	Webserv webserv;
 
-	if (argc < 2)
-	{
-		std::cerr << "Usage: " << argv[0] << " <config_file>" << std::endl;
-		return (1);
-	}
+	std::string configPath = "./default.conf";
+	if (argc > 2)
+		configPath = argv[1];
 
 	try
 	{
@@ -22,7 +20,8 @@ int main(int argc, char **argv)
 		//PARSING
 		Parser parser;
 		std::vector<Server> servers;
-		std::vector<Config> configs = parser.parseFile(argv[1]);
+		std::cout << "Parsing config file: " << configPath << std::endl;
+		std::vector<Config> configs = parser.parseFile(configPath);
 		for (size_t i = 0; i < configs.size(); i++) {
 			Server server(configs[i]);
 			configs[i].printConfig();
