@@ -3,7 +3,7 @@
 Config::Config()
 {
 	_port = -1;
-	_clientMaxBodySize = 0;
+	_clientMaxBodySize = 1048576;
 	_autoIndex = false;
 	_host = "0.0.0.0";
 }
