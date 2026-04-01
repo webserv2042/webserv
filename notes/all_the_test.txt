@@ -36,3 +36,4 @@ Test de la CGI : POST /login.php HTTP/1.1
                 Content-Type: application/x-www-form-urlencoded
 
                 email=manager@gmail.com&password=mpw
+                email=employee@gmail.com&password=upw
