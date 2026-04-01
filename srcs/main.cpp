@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 	Webserv webserv;
 
 	std::string configPath = "./default.conf";
-	if (argc > 2)
+	if (argc > 1)
 		configPath = argv[1];
 
 	try
