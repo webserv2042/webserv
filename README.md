@@ -85,6 +85,9 @@ For this project, the following documentation has been used:
 - for the standard functions of C++98: https://www.geeksforgeeks.org
 - for the standard functions of PHP: https://www.php.net/manual, https://www.w3schools.com/php
 - for CGI: https://www.php.net/manual
+- for guide HTTP: https://developer.mozilla.org/fr/docs/Web/HTTP/Guide
+- for NGINX: https://nginx.org/en/docs/http/ngx_http_core_module.html
+- for status code: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
 
 AI has also been used in this project, in order to get specific help on:
 - Understanding the internal behavior of `epoll_create`, `epoll_ctl` and `epoll_wait`
