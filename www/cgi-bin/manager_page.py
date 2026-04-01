@@ -75,7 +75,7 @@ with open("../database/leave_requests.csv", mode="r") as db_file:
 	total_vacation = (f"""
 	<div class="vacation-row">
 		<div class="profile-avatar-list">
-			<img src="../../uploads/Norminette.jpg" alt="Profile photo">
+			<img src="../../uploads/alexis.jpg" alt="Profile photo">
 		</div>
 		<span class="vacation-count">{taken_days}/{total_days}</span>
 		<div class="vacation-bar-track">
