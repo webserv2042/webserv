@@ -20,7 +20,9 @@ if cookie_data:
 else :
 	cookie_name = "employee name"
 
-# time.sleep(70)
+i = 9
+while(1):
+	 i = 5
 
 # open the csv database
 with open("../database/leave_requests.csv", mode="r") as db_file:

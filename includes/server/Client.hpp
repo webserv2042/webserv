@@ -6,7 +6,7 @@
 #include <vector>
 #include <ctime>
 
-#define IDLE_TIMEOUT 60 //timeout d'un client sans aucune activité
+#define IDLE_TIMEOUT 10 //timeout d'un client sans aucune activité
 #define NO_TIMEOUT 0
 #define TIMEOUT 1
 
@@ -17,6 +17,8 @@ typedef enum e_client_state
     WRITING_RESPONSE,
     READING_CGI,
     DONE_READING_CGI,
+    SENDING_RESPONSE,
+    WAITING_FOR_CGI,
     DONE
 }	t_client_state;
 

@@ -47,6 +47,7 @@ int    Response::setResponseFinal(const Request &reqClient, int fd, std::map<int
 
 		if (isCgi())
 		{
+			std::cout << "--IS CGI--" << std::endl;
 			CGI cgiExec(_uriFullPath, _pathExecCgi);
 			cgiExec.cgi(reqClient, *this, fd, clients);
 			return (IS_CGI);

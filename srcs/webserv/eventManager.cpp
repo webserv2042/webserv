@@ -1,6 +1,7 @@
 #include "../../includes/Webserv.hpp"
 #include "../../includes/server/Client.hpp"
 #include "../../includes/Signals.hpp"
+#include "../../includes/http/Response.hpp"
 
 //* FICHIER POUR LES FONCTIONS UTILISEES DANS LA BOUCLE EPOLL
 
@@ -81,7 +82,7 @@ void    Webserv::acceptClient(int &newConnexionFd)
 /// @param clientFD fd du client a supprimer
 void    Webserv::closeClient(int clientFD)
 {
-	std::cout << "\033[31mDISCONNECT\033[0m" << std::endl;
+	std::cout << "\033[31mDISCONNECTING \033[0m" << clientFD << std::endl;
     epoll_ctl(ep_fd, EPOLL_CTL_DEL, clientFD, NULL);
     close(clientFD);
 	clients.erase(clientFD);
@@ -93,7 +94,7 @@ void    Webserv::closeClient(int clientFD)
 /// @return la position suivante de l'iterateur
 std::map<int, Client>::iterator    Webserv::closeClient(std::map<int, Client>::iterator it)
 {
-	std::cout << "\033[31mDISCONNECT !!!!\033[0m" << std::endl;
+	std::cout << "\033[31mDISCONNECT -it- ON \033[0m" << it->first << std::endl;
     epoll_ctl(ep_fd, EPOLL_CTL_DEL, it->first, NULL);
     close(it->first);
 
@@ -108,13 +109,158 @@ std::map<int, Client>::iterator    Webserv::closeClient(std::map<int, Client>::i
 /// en consequence
 void    Webserv::checkIdleTimeout()
 {
-    std::map<int, Client>::iterator it = clients.begin();
+	std::cout << "----------IN TIMEOUT-----------" << std::endl;
 
-	while (it != clients.end())
+	// -- PHASE 1 : collecter les fd en timeout -- //
+	std::vector<int> cgiTimeouts;     // fd des pipes CGI en timeout
+	std::vector<int> clientTimeouts;  // fd des clients normaux en timeout
+
+	for (std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); ++it)
 	{
 		if (it->second.timeout() == TIMEOUT)
-			it = closeClient(it);
-		else
-			++it;
+		{
+			if (it->second.isCGI == IS_CGI)
+				cgiTimeouts.push_back(it->first);
+			else
+				clientTimeouts.push_back(it->first);
+		}
 	}
+
+	// -- PHASE 2a : traiter les pipes CGI en timeout -- //
+	for (size_t i = 0; i < cgiTimeouts.size(); i++)
+	{
+		std::cout << "\033[31m TIMEOUT ON CGI \033[0m" << cgiTimeouts[i] << std::endl;
+		int cgiFd = cgiTimeouts[i];
+
+		// le pipe a pu etre ferme entre temps par un autre traitement
+		if (clients.find(cgiFd) == clients.end())
+			continue;
+
+		int targetFd = clients[cgiFd].ogFd;
+
+		// kill le child process
+		if (clients[cgiFd].forkPid > 0)
+		{
+			kill(clients[cgiFd].forkPid, SIGKILL);
+			waitpid(clients[cgiFd].forkPid, NULL, WNOHANG);
+		}
+
+		// fermer le pipe CGI
+		closeClient(cgiFd);
+
+		// envoyer 504 au client original
+		if (clients.find(targetFd) != clients.end())
+		{
+			clients[targetFd].clientState = WAITING_FOR_CGI;
+			// try
+			// {
+			//     clients[targetFd].getRequest().fail(GATEWAY_TIMEOUT);
+			// }
+			// catch (const std::exception &e)
+			// {
+			//     writeResponse(targetFd);
+			// }
+		}
+
+		// // fermer le pipe CGI
+		// closeClient(cgiFd);
+	}
+
+	// -- PHASE 2b : traiter les clients normaux en timeout -- //
+	for (size_t i = 0; i < clientTimeouts.size(); i++)
+	{
+		int fd = clientTimeouts[i];
+
+		// le client a pu etre ferme entre temps (ex: etait le targetFd d'un CGI ci-dessus)
+		if (clients.find(fd) == clients.end())
+			continue;
+
+		try
+		{
+			// FIX: si le client attend un CGI -> 504 Gateway Timeout
+			//      sinon -> 408 Request Timeout
+			if (clients[fd].clientState == WAITING_FOR_CGI)
+			{
+				std::cout << "WAITING CGI" << std::endl;
+				clients[fd].getRequest().fail(GATEWAY_TIMEOUT);
+				clients[fd].updateActivity();
+			}
+			else if (clients[fd].clientState == WRITING_RESPONSE)
+			{
+				std::cout << "NOT WAITING" << std::endl;
+				clients[fd].getRequest().fail(REQUEST_TIMEOUT);
+				clients[fd].updateActivity();
+			}
+			else
+			{
+				std::cout << "NEITHER" << std::endl;
+				closeClient(fd);
+			}
+		}
+		catch (const std::exception &e)
+		{
+			writeResponse(fd);
+		}
+	}
+
+	std::cout << "----------OUT OF TIMEOUT-----------" << std::endl;
+
+    // std::map<int, Client>::iterator it = clients.begin();
+
+	// int i = 0;
+
+	// while (it != clients.end() && i < 15)
+	// {
+	// 	if (it->second.timeout() == TIMEOUT) 	// TIMEOUT //
+	// 	{
+	// 		if (it->second.isCGI == IS_CGI) 	// CGI //
+	// 		{
+	// 			std::cout << "\033[31m TIMEOUT ON CGI \033[0m" << std::endl;
+	// 			if (clients[it->second.ogFd].clientState == WRITING_RESPONSE) // og client not already sending
+	// 			{
+	// 				if (it->second.forkPid != -1)	// kill child process
+	// 				{
+	// 						kill(it->second.forkPid, SIGKILL);
+	// 						waitpid(it->second.forkPid, NULL, WNOHANG);
+	// 						it->second.forkPid = -1;
+	// 				}
+
+	// 				try //trigger the writing of the error response
+	// 				{
+	// 					clients[it->second.ogFd].getRequest().fail(GATEWAY_TIMEOUT);
+	// 				}
+	// 				catch(const std::exception& e)
+	// 				{
+	// 					writeResponse(it->second.ogFd);
+	// 				}
+	// 				it = closeClient(it); // close only CGI fd
+	// 			}
+	// 			else
+	// 			{
+	// 				it = closeClient(it); // close only CGI fd
+	// 			}
+	// 		}
+	// 		else							// REGULAR CLIENT //
+	// 		{
+	// 			std::cout << "\033[31m TIMEOUT ON REG CLIENT \033[0m" << std::endl;
+	// 			if (it->second.clientState == READING_REQUEST || it->second.clientState == WRITING_RESPONSE)
+	// 			{
+	// 				try{
+	// 					clients[it->first].getRequest().fail(REQUEST_TIMEOUT);
+	// 				}
+	// 				catch (const std::exception &e){
+	// 					writeResponse(it->first);
+	// 				}
+	// 			}
+	// 			else
+	// 				it = closeClient(it);
+	// 		}
+			
+	// 	}
+			
+	// 	else			// NO TIMEOUT //
+	// 		++it;
+	// 	i++;
+	// }
+	// std::cout << "----------OUT OF TIMEOUT-----------" << std::endl;
 }

@@ -105,6 +105,6 @@ void    Webserv::CGIprepareResponse(int fd, std::vector<char> cgiOutput)
 	clients[fd].buffSize = clients[fd].writeBuff.size();
 	clients[fd].bytesSent = 0;
 
-	clients[fd].clientState = WRITING_RESPONSE;
 	modifyEpollout(fd, ADD_EPOLLOUT);
+	clients[fd].clientState = SENDING_RESPONSE;
 }
