@@ -101,7 +101,7 @@ int Client::timeout()
     double lastActSec = difftime(current_time, _lastActivity);
     
     if (lastActSec >= IDLE_TIMEOUT)
-        return TIMEOUT;
+        return (TIMEOUT);
 
 	// double totalSec = difftime(current_time, totalConnection);
     // if (totalSec >= TOTAL_TIMEOUT)

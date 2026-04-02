@@ -29,12 +29,15 @@ std::map<e_status_code, std::string> Response::initMessageStatus()
     code[static_cast<e_status_code>(403)] = "Forbidden";
     code[static_cast<e_status_code>(404)] = "Not Found";
     code[static_cast<e_status_code>(405)] = "Method Not Allowed";
+    code[static_cast<e_status_code>(408)] = "Request Timeout";
     code[static_cast<e_status_code>(409)] = "Conflict";
     code[static_cast<e_status_code>(413)] = "Content Too Large";
     code[static_cast<e_status_code>(414)] = "URI Too Long";
     code[static_cast<e_status_code>(431)] = "Request Headers Fields Too Large";
     code[static_cast<e_status_code>(500)] = "Internal Server Error";
     code[static_cast<e_status_code>(501)] = "Not Implemented";
+    code[static_cast<e_status_code>(502)] = "Bad Gateway";
+    code[static_cast<e_status_code>(504)] = "Gateway Timeout";
     code[static_cast<e_status_code>(505)] = "HTTP Version Not Supported";
 
     return (code);
