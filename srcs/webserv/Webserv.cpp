@@ -22,7 +22,7 @@ void    Webserv::epollLoop()
 	while (server_running)
 	{
 		//epoll_wait attend de recevoir des connections
-		std::cout << "\033[90mWAITING...\033[0m" << std::endl;
+		// std::cout << "\033[90mWAITING...\033[0m" << std::endl;
         if (waitForEvents() == SIGNAL_RECEIVED)
             break;
 		
@@ -33,37 +33,51 @@ void    Webserv::epollLoop()
 		{
 			int fd = events[i].data.fd;
 			// std::cout << "connexion on fd n°" << fd << std::endl;
-
-			if (isSocketFd(fd) == true) //nouvelle connexion sur une socket -> accepter
-				acceptClient(fd);
-
-			else if (clients[fd].isCGI == IS_CGI) // traitement CGI
+	
+			try
 			{
-				if (events[i].events & EPOLLHUP && clients[fd].clientState == READING_CGI)
-					CGIreadFromChild(fd);
-				if (events[i].events & EPOLLIN)
-					CGIreadFromChild(fd);
-				if (events[i].events & EPOLLOUT)
-					CGIwriteToChild(fd);
+				if (isSocketFd(fd) == true) //nouvelle connexion sur une socket -> accepter
+					acceptClient(fd); //! check that
+
+				else if (clients[fd].isCGI == IS_CGI) // traitement CGI
+				{
+					if (events[i].events & EPOLLHUP && clients[fd].clientState == READING_CGI)
+						CGIreadFromChild(fd);
+					if (events[i].events & EPOLLIN)
+						CGIreadFromChild(fd);
+					if (events[i].events & EPOLLOUT)
+						CGIwriteToChild(fd);
+				}
+
+				else //requete/reponse client -> lire/ecrire
+				{
+					//deconnexion client
+					if (events[i].events & (EPOLLHUP | EPOLLERR))
+						closeClient(fd);
+
+					//lire la requete, la parser, preparer la reponse,...
+					if (events[i].events & EPOLLIN)
+						treatRequest(fd);
+
+					//envoyer la reponse
+					if (events[i].events & EPOLLOUT)
+						sendResponse(clients[fd]);
+				}
 			}
-
-			else //requete/reponse client -> lire/ecrire
+			catch(const std::exception& e)
 			{
-				//deconnexion client
-				if (events[i].events & (EPOLLHUP | EPOLLERR))
+				if (clients[fd].isCGI == IS_CGI)
+				{
+					closeClient(clients[fd].ogFd);
 					closeClient(fd);
-
-				//lire la requete, la parser, preparer la reponse,...
-				if (events[i].events & EPOLLIN)
-					treatRequest(fd);
-
-				//envoyer la reponse
-				if (events[i].events & EPOLLOUT)
-					sendResponse(clients[fd]);
+				}
+				else
+					closeClient(fd);
+				std::cerr << e.what();
+				std::cerr << strerror(errno) << std::endl;
 			}
 		}
 	}
-
 	std::cout << "Server stopped." << std::endl;
     finalClean();
 }
@@ -96,9 +110,7 @@ void	Webserv::treatRequest(int &fd)
 		if (clients[fd].getRequest().isFinished())
 		{
 			// PRINT REQUEST //
-			// std::cout << "\033[38;5;211mrequest-complete !\033[0m" << std::endl;
         	clients[fd].getRequest().printRequest();
-			// std::cout << "\033[38;5;211m-----------request-end--------\033[0m" << std::endl;
 
 			// RESPONSE //
 			writeResponse(fd);
@@ -153,8 +165,6 @@ void	Webserv::sendResponse(Client &client)
 		currentBytes = send(client.clientFd, &client.writeBuff[client.bytesSent], bytesLeft, MSG_DONTWAIT);
 		if (currentBytes <= 0)
 		{
-			// if (errno == EAGAIN || errno == EWOULDBLOCK) //mode non bloquant active, le renvoi sera reessaye
-			// 	return;
 			//erreur d'envoi -> client supprime
 			std::cerr << "(SERVER) couldn't send response" << std::endl;
 			closeClient(client.clientFd);
@@ -163,7 +173,8 @@ void	Webserv::sendResponse(Client &client)
 		else //ajout des bytes envoyés au compte
 			client.bytesSent += currentBytes;
 	}
-
+	
+	client._lastActivity = time(NULL);
 	if (client.bytesSent == client.buffSize) // tous les bytes envoyes? ->client retourne en EPOLLIN, sinon retourne ds la boucle d'envoi
     {
         if (client._keepAlive == false) // si ma réponse a dit de fermer selon header Connection
@@ -179,12 +190,11 @@ void	Webserv::sendResponse(Client &client)
             client.clientState = READING_REQUEST;
         }
     }
-    client._lastActivity = time(NULL);
 }
 
 
 /// @brief ferme et supprime les donnees necessaires a la fin de la boucle ->
-/// clients, server sockets, epoll instance
+/// liste clients, server sockets, epoll instance
 void    Webserv::finalClean()
 {
     //close clients fd + whole client list

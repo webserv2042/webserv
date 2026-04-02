@@ -7,7 +7,8 @@ Client::Client() :
     buffSize(0), 
     _lastActivity(time(NULL)), 
     _serverConfig(NULL), 
-    _keepAlive(true) 
+    _keepAlive(true),
+    cgiBytesWritten(0) 
 {}
 
 Client::Client(int fd, const Config *config, int ep_fd) : 
@@ -22,7 +23,8 @@ Client::Client(int fd, const Config *config, int ep_fd) :
     isCGI(0),
     pipeType(0),
     ogFd(-1),
-    forkPid(-1)
+    forkPid(-1),
+    cgiBytesWritten(0)
 {}
 
 Client::Client(const Client& to_copy)
@@ -52,6 +54,7 @@ Client& Client::operator=(const Client& to_copy)
         this->ogFd = to_copy.ogFd;
         this->forkPid = to_copy.forkPid;
         this->cgiResponseBuff = to_copy.cgiResponseBuff;
+        this->cgiBytesWritten = to_copy.cgiBytesWritten;
     }
     return (*this);
 }
@@ -102,18 +105,6 @@ int Client::timeout()
     
     if (lastActSec >= IDLE_TIMEOUT)
         return TIMEOUT;
-
-	// double totalSec = difftime(current_time, totalConnection);
-    // if (totalSec >= TOTAL_TIMEOUT)
-    //     return TIMEOUT;
-        
-    // if (clientState == READING_REQUEST)
-    // {
-    //     std::cout << "AAAAAAAAAAAA" << std::endl;
-    //     double readSec = difftime(current_time, readTime);
-    //     if (readSec >= READ_TIMEOUT)
-    //         return TIMEOUT;
-    // }
 
     return NO_TIMEOUT;
 }

@@ -52,6 +52,7 @@ class Client
         int                 ogFd; // fd du client original
         int                 forkPid;
         std::vector<char>   cgiResponseBuff;
+        size_t              cgiBytesWritten;
 
         int                 timeout();
         void                updateActivity();

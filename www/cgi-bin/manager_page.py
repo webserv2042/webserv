@@ -24,20 +24,6 @@ def get_total_vacation(csv_path):
 	return total_days
 
 
-# get cookies'name
-# cookie_data = os.environ.get("HTTP_COOKIE", "")
-
-# # parser manuellement
-# cookies = {}
-# if cookie_data:
-# 	parts = cookie_data.split("; ")
-# 	for p in parts:
-# 		key, value = p.split("=")
-# 		cookies[key] = unquote(value)
-# 	cookie_name = cookies.get("cookie_username", "manager name")
-# else :
-# 	cookie_name = "manager name no cookies"
-
 # open the csv database
 with open("../database/leave_requests.csv", mode="r") as db_file:
 	reader = csv.reader(db_file)

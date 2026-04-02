@@ -6,7 +6,7 @@
 	// create users
 	clear_file_content("../database/users.csv");
 	add_user('manager@gmail.com', 'mpw', 'manager', 'tung tung tung tung sahur');
-	add_user('employee@gmail.com', 'upw', 'employee', 'brr brrr patabim');
+	add_user('employee@gmail.com', 'upw', 'employee', 'Alexis');
 
 	// DEBUG
 	$debug = file_get_contents("../database/users.csv");
@@ -26,7 +26,7 @@
 			header("Location: login.php");
 			exit();
 		}
-		else 
+		else
 		{
 			$email = htmlspecialchars($_POST["email"]);
 

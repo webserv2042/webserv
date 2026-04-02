@@ -9,13 +9,29 @@
 /// @param fd the fd of the pipe that communicates with the child
 void    Webserv::CGIwriteToChild(int fd)
 {
-	std::cout << "CGI WRITING...." << std::endl;
+	// std::cout << "CGI WRITING...." << std::endl;
 	Request req = clients[fd].getRequest();
 
 	if (req.getMethod() == "POST")
-		write(fd, req.getBody().c_str(), req.getBody().size());
+	{
+		if (clients[fd].cgiBytesWritten < req.getBody().size()) 
+		{
+			ssize_t writeReturn = write(fd, req.getBody().c_str() + clients[fd].cgiBytesWritten, req.getBody().size() - clients[fd].cgiBytesWritten);
 
-	closeClient(fd);
+			if (writeReturn == -1) 
+			{
+				closeClient(clients[fd].ogFd);
+				closeClient(fd);
+				return;
+			}
+			clients[fd].cgiBytesWritten += writeReturn;
+		}
+
+		if (clients[fd].cgiBytesWritten >= req.getBody().size())
+			closeClient(fd);
+	}
+	else
+		closeClient(fd);
 }
 
 /// @brief read content given back by the CGI child
@@ -28,16 +44,12 @@ void    Webserv::CGIreadFromChild(int fd)
     // READ DATA FROM CHILD //
 	// std::cout << "READING CGI...." << std::endl;
     ssize_t bytesRead = read(fd, buffer, sizeof(buffer));
-	// std::cout << "BTS READ: " << bytesRead << std::endl;
-	// std::cout << "-->" << std::endl;
 
 	// ONLY PART OF THE CGI HAS BEEN READ, WE STOP READING NOW AND RESUME WHEN EPOLL ALLOWS US //
     if (bytesRead > 0) {
 		clients[fd].clientState = READING_CGI;
-		// std::cout << "READ PARTIAL DATA FROM CLIENT" << std::endl;
-        // Store data in the client's specific CGI buffer
         clients[fd].cgiResponseBuff.insert(clients[fd].cgiResponseBuff.end(), buffer, buffer + bytesRead);
-        return; // Exit and wait for the next EPOLLIN event
+        return; 
     } 
 
 	// READ ERROR //
@@ -45,23 +57,22 @@ void    Webserv::CGIreadFromChild(int fd)
 	{
 		clients[fd].clientState = READING_CGI;
 		// std::cout << "COULDNT READ BYTES FROM CLIENT YET, TRYING AGAIN" << std::endl;
-		return; // No data yet, totally normal — epoll will notify us
+		return;
 	}
 
 	// EVERYTHING HAS BEEN READ //
 	else if ( bytesRead == 0)
 	{
 		clients[fd].clientState = DONE_READING_CGI;
-		// std::cout << "READ THE WHOLE DATA FROM CLIENT, JOB DONE" << std::endl;
 
 		// WAITPID //
 		int status;
-		waitpid(clients[fd].forkPid, &status, WNOHANG); //WNOHANG
+		waitpid(clients[fd].forkPid, &status, WNOHANG);
 
 		// AJOUT DEBUG
-		std::string debug(clients[fd].cgiResponseBuff.begin(), clients[fd].cgiResponseBuff.end());
-		std::cerr << "CGI RAW OUTPUT: [" << debug << "]" << std::endl;
-		std::cerr << "CGI OUTPUT SIZE: " << clients[fd].cgiResponseBuff.size() << std::endl;
+		// std::string debug(clients[fd].cgiResponseBuff.begin(), clients[fd].cgiResponseBuff.end());
+		// std::cerr << "CGI RAW OUTPUT: [" << debug << "]" << std::endl;
+		// std::cerr << "CGI OUTPUT SIZE: " << clients[fd].cgiResponseBuff.size() << std::endl;
 
 		// CLOSE CLIENT //
 		std::vector<char> responseBuffer = clients[fd].cgiResponseBuff;
@@ -72,7 +83,6 @@ void    Webserv::CGIreadFromChild(int fd)
 		}
 
 		// FINISH THE RESPONSE //
-		std::cout << "PREPARING FINAL CGI RESPONSE" << std::endl;
 		CGIprepareResponse(ogClientFd, responseBuffer);
 	}
 }

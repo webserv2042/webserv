@@ -20,6 +20,8 @@ if cookie_data:
 else :
 	cookie_name = "employee name"
 
+# time.sleep(70)
+
 # open the csv database
 with open("../database/leave_requests.csv", mode="r") as db_file:
 	reader = csv.reader(db_file);

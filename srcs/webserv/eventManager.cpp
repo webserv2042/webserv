@@ -22,7 +22,7 @@ void    Webserv::startEpoll()
 /// @return 1 si un signal interrompt, 0 si tt va bien
 int    Webserv::waitForEvents()
 {
-    ready_fds = epoll_wait(ep_fd, events, MAX_EVENTS, IDLE_TIMEOUT * 1000);
+    ready_fds = epoll_wait(ep_fd, events, MAX_EVENTS, 30 * 1000);
     if (ready_fds == ERROR)
     {
         if (errno == EINTR) //signal interruption -> stop la boucle et libere tout
@@ -40,28 +40,38 @@ void    Webserv::acceptClient(int &newConnexionFd)
 	std::cout << "\033[32mFOUND CONNECTION ->>\033[0m" << std::endl;
 	int client_fd = -1;
 
-	client_fd = accept(newConnexionFd, NULL, NULL);
-	if (client_fd == ERROR)
-		throw std::runtime_error("(SERVER) Failed to accept connection: ");
-	
-	setNonBlockingSocket(client_fd);
-	registerNewFd(client_fd, EPOLLIN);
-
-	// AJOUT DE SHEINEZ POUR AJOUTER LA CONFIG A LA CREATION DE CHAQUE CLIENT
-	const Config* foundConfig = NULL;
-    for (size_t i = 0; i < servers.size(); i++)
+	try
 	{
-        if (servers[i].getSocketFD() == newConnexionFd)
-		{
-            foundConfig = &(servers[i].getConfig());
-            break;
-        }
-	}
+		client_fd = accept(newConnexionFd, NULL, NULL);
+		if (client_fd == ERROR)
+			throw std::runtime_error("(SERVER) Failed to accept connection: ");
+		
+		setNonBlockingSocket(client_fd);
+		registerNewFd(client_fd, EPOLLIN);
 
-	// CREATE NEW CLIENT //
-	Client newClient(client_fd,foundConfig, ep_fd);
-    clients[client_fd] = newClient; //do a proper copy!!!!
-	std::cout << "accepted : " << client_fd << std::endl;
+		// AJOUT DE SHEINEZ POUR AJOUTER LA CONFIG A LA CREATION DE CHAQUE CLIENT
+		const Config* foundConfig = NULL;
+		for (size_t i = 0; i < servers.size(); i++)
+		{
+			if (servers[i].getSocketFD() == newConnexionFd)
+			{
+				foundConfig = &(servers[i].getConfig());
+				break;
+			}
+		}
+
+		// CREATE NEW CLIENT //
+		Client newClient(client_fd,foundConfig, ep_fd);
+		clients[client_fd] = newClient; //do a proper copy!!!!
+		std::cout << "accepted : " << client_fd << std::endl;
+	}
+	catch(const std::exception& e)
+	{
+		if (client_fd > 0)
+			closeClient(client_fd);
+		std::cerr << e.what();
+		std::cerr << strerror(errno) << std::endl;
+	}
 }
 
 
