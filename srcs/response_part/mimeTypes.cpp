@@ -9,7 +9,7 @@ void	Response::initMimeType()
 
 	if (!mimeType.is_open())
 	{
-		std::cout << "Erreur ouverture du fichier\n";
+		// std::cout << "Erreur ouverture du fichier\n";
 		isNotMimeFile();
 		return ;
 	}

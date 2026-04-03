@@ -22,7 +22,7 @@ void    Webserv::epollLoop()
 	while (server_running)
 	{
 		//epoll_wait attend de recevoir des connections
-		std::cout << "\033[90mWAITING...\033[0m" << std::endl;
+		// std::cout << "\033[90mWAITING...\033[0m" << std::endl;
         if (waitForEvents() == SIGNAL_RECEIVED)
             break;
 		
@@ -51,7 +51,10 @@ void    Webserv::epollLoop()
 			{
 				//deconnexion client
 				if (events[i].events & (EPOLLHUP | EPOLLERR))
+				{
 					closeClient(fd);
+					continue ; // AJOUTE ICI A VOIR QUOI EN FAIRE
+				}
 
 				//lire la requete, la parser, preparer la reponse,...
 				if (events[i].events & EPOLLIN)
@@ -64,7 +67,7 @@ void    Webserv::epollLoop()
 		}
 	}
 
-	std::cout << "Server stopped." << std::endl;
+	// std::cout << "Server stopped." << std::endl;
     finalClean();
 }
 
@@ -97,7 +100,7 @@ void	Webserv::treatRequest(int &fd)
 		{
 			// PRINT REQUEST //
 			// std::cout << "\033[38;5;211mrequest-complete !\033[0m" << std::endl;
-        	clients[fd].getRequest().printRequest();
+        	// clients[fd].getRequest().printRequest();
 			// std::cout << "\033[38;5;211m-----------request-end--------\033[0m" << std::endl;
 
 			// RESPONSE //
@@ -113,6 +116,8 @@ void	Webserv::writeResponse(int &fd)
 	const Config		&config = clients[fd].getConfig();
 	Response			res(config);
 
+	if (clients[fd]._requestCount >= MAX_KEEPALIVE_REQUESTS)
+    	clients[fd]._keepAlive = false;
 	// GET RESPONSE OR START CGI //
 	if (res.setResponseFinal(clients[fd].getRequest(), fd, clients) == IS_CGI)
 		return;
@@ -168,7 +173,7 @@ void	Webserv::sendResponse(Client &client)
     {
         if (client._keepAlive == false) // si ma réponse a dit de fermer selon header Connection
         {
-            std::cout << "Closing connection as requested by Response headers." << std::endl;
+            // std::cout << "Closing connection as requested by Response headers." << std::endl;
             closeClient(client.clientFd);
 			return ;
         }
@@ -200,8 +205,10 @@ void    Webserv::finalClean()
     //close server socketFD
     for (long unsigned int i = 0; i < servers.size(); i++)
     {
-        if (servers[i].getSocketFD() != -1)
+        if (servers[i].getSocketFD() != -1) {
+			std::cout << servers[i].getSocketFD() << " is closed." << std::endl;
             close(servers[i].getSocketFD());
+		}
         servers[i].setSocketFD(-1);
     }
 

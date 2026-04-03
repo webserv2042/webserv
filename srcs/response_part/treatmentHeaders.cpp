@@ -25,7 +25,6 @@ void    Response::setHeaders(const Request &req)
 		_closeFd = true;
 	if (_statusCode >= 400)
 		_closeFd = true;
-	
 	if (_closeFd)
         this->addHeaders("Connection", "close");
     else

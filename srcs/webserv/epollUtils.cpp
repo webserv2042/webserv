@@ -70,7 +70,7 @@ std::string readFile(const std::string& filename)
     std::ifstream file(filename.c_str());
     if (!file.is_open())
 	{
-		std::cout << "ERROR FILENAME" << std::endl;
+		// std::cout << "ERROR FILENAME" << std::endl;
 		return ""; // or handle error differently
 	}
 

@@ -78,6 +78,11 @@ void	Response::responseCgi(std::vector<char> cgiOutput, const Request &reqClient
 	this->createResponse();
 }
 
+// void	Response::errorCgi(int code)
+// {
+	
+// }
+
 void	Response::createResponse()
 {
 	_responseFinal.clear();

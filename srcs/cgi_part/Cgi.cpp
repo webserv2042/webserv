@@ -124,7 +124,7 @@ void	CGI::execCgi(int clFd, std::map<int, Client> &clients)
 		Client newClientIn(clients[clFd]); // client qui ecrit
 		clients[pipeIn[1]] = newClientIn;
 		clients[pipeIn[1]].clientFd = pipeIn[1];
-		std::cout << pipeIn[1] << std::endl;
+		// std::cout << pipeIn[1] << std::endl;
 		clients[pipeIn[1]].isCGI = IS_CGI;
 		clients[pipeIn[1]].pipeType = PIPE_IN;
 		clients[pipeIn[1]].ogFd = clFd;
@@ -133,7 +133,7 @@ void	CGI::execCgi(int clFd, std::map<int, Client> &clients)
 		Client newClientOut(clients[clFd]); // client qui lit
 		clients[pipeOut[0]] = newClientOut;
 		clients[pipeOut[0]].clientFd = pipeOut[0];
-		std::cout << pipeOut[0] << std::endl;
+		// std::cout << pipeOut[0] << std::endl;
 		clients[pipeOut[0]].isCGI = IS_CGI;
 		clients[pipeOut[0]].pipeType = PIPE_OUT;
 		clients[pipeOut[0]].ogFd = clFd;

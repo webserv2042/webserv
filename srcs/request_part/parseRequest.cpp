@@ -428,31 +428,31 @@ void    Request::parseTrailers() // headers probables après le body
 	}
 }
 
-void Request::printRequest() const
-{
-    std::cout << "\033[1;36m--- REQUEST RECEIVED ---\033[0m" << std::endl;
+// void Request::printRequest() const
+// {
+//     // std::cout << "\033[1;36m--- REQUEST RECEIVED ---\033[0m" << std::endl;
     
-    // 1. Start-Line
-    std::cout << _method << " " << _uri << " " << _httpVersion << "\r\n";
+//     // 1. Start-Line
+//     std::cout << _method << " " << _uri << " " << _httpVersion << "\r\n";
 
-    // 2. Headers
-    std::map<std::string, std::string>::const_iterator it;
-    for (it = _allHeaders.begin(); it != _allHeaders.end(); ++it) {
-        std::cout << it->first << ": " << it->second << "\r\n";
-    }
+//     // 2. Headers
+//     std::map<std::string, std::string>::const_iterator it;
+//     for (it = _allHeaders.begin(); it != _allHeaders.end(); ++it) {
+//         std::cout << it->first << ": " << it->second << "\r\n";
+//     }
 
-    // 3. Ligne vide séparatrice
-    std::cout << "\r\n";
+//     // 3. Ligne vide séparatrice
+//     std::cout << "\r\n";
 
-    // 4. Body (on affiche un aperçu si c'est du texte)
-    // if (!_body.empty()) {
-    //     if (_body.size() > 500) {
-    //         std::string snippet(_body.begin(), _body.begin() + 500);
-    //         std::cout << snippet << "\n[... Body truncated, total size: " << _body.size() << " bytes ...]" << std::endl;
-    //     } else {
-    //         std::string fullBody(_body.begin(), _body.end());
-    //         std::cout << fullBody << std::endl;
-    //     }
+//     // 4. Body (on affiche un aperçu si c'est du texte)
+//     // if (!_body.empty()) {
+//     //     if (_body.size() > 500) {
+//     //         std::string snippet(_body.begin(), _body.begin() + 500);
+//     //         std::cout << snippet << "\n[... Body truncated, total size: " << _body.size() << " bytes ...]" << std::endl;
+//     //     } else {
+//     //         std::string fullBody(_body.begin(), _body.end());
+//     //         std::cout << fullBody << std::endl;
+//     //     }
 
-    std::cout << "\033[1;36m----------------------------\033[0m" << std::endl;
-}
+//     std::cout << "\033[1;36m----------------------------\033[0m" << std::endl;
+// }
