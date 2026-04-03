@@ -443,7 +443,7 @@ bool	Parser::isDirectiveAllowedInContext(const std::string& name, Context ctx)
 	else
 	{
 		return (name == "root" || name == "allow_methods" || name == "autoindex" || name == "return" ||
-				name == "index" || name == "upload_path" || name == "cgi");
+				name == "index" || name == "upload_path" || name == "cgi" || name == "error_page");
 	}
 }
 
@@ -586,6 +586,9 @@ std::vector<Config> Parser::fillConfig(std::vector<ServerNode> servers)
 						servers[i].locations[k].directives[l].arguments[1]);
 				if (servers[i].locations[k].directives[l].name == "cgi")
 						currentLoc.cgi[servers[i].locations[k].directives[l].arguments[0]] =
+						servers[i].locations[k].directives[l].arguments[1];
+				if (servers[i].locations[k].directives[l].name == "error_page")
+					currentLoc.errorPage[toInt(servers[i].locations[k].directives[l].arguments[0])] =
 						servers[i].locations[k].directives[l].arguments[1];
 			}
 			current.addLocation(currentLoc);

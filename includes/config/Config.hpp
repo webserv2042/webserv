@@ -29,6 +29,7 @@ struct Location {
 	std::pair<int, std::string>		returnRedirect;
 	std::string						uploadPath;
 	std::map<std::string, std::string>	cgi;
+	std::map<int, std::string>			errorPage;
 	Location() : autoIndex(false) {}
 };
 
