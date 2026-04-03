@@ -20,7 +20,7 @@ Response::Response(const Config &configServer) :
 
 Response::~Response() {}
 
-int    Response::setResponseFinal(const Request &reqClient, int fd, map<int, std::string> clientCgi)
+int    Response::setResponseFinal(const Request &reqClient, int fd)
 {
 	if (reqClient.getErrorCode() != OK)
     {
@@ -45,8 +45,10 @@ int    Response::setResponseFinal(const Request &reqClient, int fd, map<int, std
 		if (isCgi())
 		{
 			CGI cgiExec(_uriFullPath, _pathExecCgi);
-			cgiExec.cgi(reqClient, *this, fd, clientCgi);
-			return (1);
+			cgiExec.setClientFd(fd);
+			std::vector<char> cgiOutput = cgiExec.cgi(reqClient, *this);
+			this->responseCgi(cgiOutput, reqClient);
+			return (0);
 		}
 		else
 		{

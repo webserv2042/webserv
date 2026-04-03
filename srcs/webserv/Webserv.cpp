@@ -112,7 +112,7 @@ void	Webserv::treatRequest(int &fd)
 			const Config		&config = clients[fd].getConfig();
 			Response			res(config);
 
-			res.setResponseFinal(clients[fd].getRequest(), int fd, clients);
+			res.setResponseFinal(clients[fd].getRequest(), fd);
 			clients[fd]._keepAlive = !res.getCloseFd();
 
 			std::vector<char>	responseToSend = res.getResponseFinal();

@@ -54,7 +54,7 @@ class Response
 		Response(const Config &configServer);
 		~Response();
 
-		int											setResponseFinal(const Request &reqClient, int fd, map<int fd, std::string> clientCgi);
+		int											setResponseFinal(const Request &reqClient, int fd);
 		const std::vector<char>						&getResponseFinal() const;
 		void										setStatusCode(e_status_code code);
 		void										addHeaders(const std::string &key, const std::string &value);
