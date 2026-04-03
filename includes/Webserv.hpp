@@ -21,7 +21,7 @@
 #include "server/Server.hpp"
 
 
-#define MAX_EVENTS 3 //nombre d'evenements enregistres a la fois par epoll_wait
+#define MAX_EVENTS 1024 //nombre d'evenements enregistres a la fois par epoll_wait
 
 // RETOURS FONCTIONS
 #define ERROR -1

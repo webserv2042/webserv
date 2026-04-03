@@ -15,7 +15,7 @@ void    Response::checkingUri(const Request &req)
 
 	this->fullPathUri(req);
 
-	std::cout << "Tentative d'ouverture de (full path) : [" << _uriFullPath << "]\n";
+	// std::cout << "Tentative d'ouverture de (full path) : [" << _uriFullPath << "]\n";
 	if (stat(_uriFullPath.c_str(), &_dataFile) != 0) // uri introuvable
 	{
 		if (req.getMethod() == "POST")

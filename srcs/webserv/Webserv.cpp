@@ -24,7 +24,7 @@ void    Webserv::epollLoop()
 	while (server_running)
 	{
 		//epoll_wait attend de recevoir des connections
-		std::cout << "\033[90mWAITING...\033[0m" << std::endl;
+		// std::cout << "\033[90mWAITING...\033[0m" << std::endl;
         if (waitForEvents() == SIGNAL_RECEIVED)
             break;
 		
@@ -38,7 +38,7 @@ void    Webserv::epollLoop()
 
 			if (isSocketFd(fd) == true) //nouvelle connexion sur une socket -> accepter
 			{
-				std::cout << "\033[31mINSIDE SOCKET\033[0m" << std::endl;
+				// std::cout << "\033[31mINSIDE SOCKET\033[0m" << std::endl;
 				acceptClient(fd);
 			}
 
@@ -46,19 +46,14 @@ void    Webserv::epollLoop()
 			{
 				//deconnexion client
 				if (events[i].events & (EPOLLHUP | EPOLLERR))
-				{
-					std::cout << "\033[31mDISCONNECT !!!!\033[0m" << std::endl;
-					epoll_ctl(ep_fd, EPOLL_CTL_DEL, fd, NULL);
-					clients[fd].~Client();
-					close(fd);
-				}
+					closeClient(fd);
 
 				//lire la requete, la parser, preparer la reponse etc...
-				if (events[i].events & EPOLLIN)
+				else if (events[i].events & EPOLLIN)
 					treatRequest(fd);
 
 				//renvoyer la reponse
-				if (events[i].events & EPOLLOUT)
+				else if (events[i].events & EPOLLOUT)
 					sendResponse(clients[fd]);
 				// else
 				// {
@@ -76,7 +71,7 @@ void    Webserv::epollLoop()
 		// std::cout << "--------------------------" << std::endl;
 	}
 
-	std::cout << "Server stopped." << std::endl;
+	// std::cout << "Server stopped." << std::endl;
     finalClean();
 }
 
@@ -95,7 +90,7 @@ void    Webserv::setServers(std::vector<Server> &servVec)
 /// @param fd fd du client
 void	Webserv::treatRequest(int &fd)
 {
-	std::cout << "\033[38;5;211m-----------request------------\033[0m" << std::endl;
+	// std::cout << "\033[38;5;211m-----------request------------\033[0m" << std::endl;
 	char    buffer[4096];
 	ssize_t bytesReceived;
 
@@ -107,12 +102,12 @@ void	Webserv::treatRequest(int &fd)
 		clients[fd].getRequest().feeding(buffer, (size_t)bytesReceived); // on récup le client du fd nommé, on copie les octets reçus du buffer vers sa requête
 		if (clients[fd].getRequest().isFinished())
 		{
-			std::cout << "\033[38;5;211mrequest-complete !033[0m" << std::endl;
+			// std::cout << "\033[38;5;211mrequest-complete !033[0m" << std::endl;
         	clients[fd].getRequest().printRequest();
-			std::cout << "Requête terminée du fd " << fd << " !" << std::endl;
+			// std::cout << "Requête terminée du fd " << fd << " !" << std::endl;
 			//print request here
 
-			std::cout << "\033[38;5;211m-----------request-end--------\033[0m" << std::endl;
+			// std::cout << "\033[38;5;211m-----------request-end--------\033[0m" << std::endl;
 
 			const Config		&config = clients[fd].getConfig();
 			Response			res(config);
@@ -131,8 +126,9 @@ void	Webserv::treatRequest(int &fd)
 			// std::cout << "\033[38;5;211m-----------sortie de treat request--------\033[0m" << std::endl;
 		}
 	}
-	else
+	else if (bytesReceived == 0)
 		closeClient(fd);
+	// bytesReceived == -1 avec EAGAIN/EWOULDBLOCK : pas de données encore, epoll re-trigger
 }
 
 // /// @brief fonction pour tester de lire a partir du fd client (a supp + tard)

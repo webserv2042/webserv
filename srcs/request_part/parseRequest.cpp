@@ -425,10 +425,10 @@ void    Request::parseTrailers() // headers probables après le body
 
 void Request::printRequest() const
 {
-    std::cout << "\033[1;36m--- REQUEST RECEIVED ---\033[0m" << std::endl;
+    // std::cout << "\033[1;36m--- REQUEST RECEIVED ---\033[0m" << std::endl;
     
     // 1. Start-Line
-    std::cout << _method << " " << _uri << " " << _httpVersion << "\r\n";
+    // std::cout << _method << " " << _uri << " " << _httpVersion << "\r\n";
 
     // 2. Headers
     std::map<std::string, std::string>::const_iterator it;
@@ -437,7 +437,7 @@ void Request::printRequest() const
     }
 
     // 3. Ligne vide séparatrice
-    std::cout << "\r\n";
+    // std::cout << "\r\n";
 
     // 4. Body (on affiche un aperçu si c'est du texte)
     // if (!_body.empty()) {
@@ -449,5 +449,5 @@ void Request::printRequest() const
     //         std::cout << fullBody << std::endl;
     //     }
 
-    std::cout << "\033[1;36m----------------------------\033[0m" << std::endl;
+    // std::cout << "\033[1;36m----------------------------\033[0m" << std::endl;
 }

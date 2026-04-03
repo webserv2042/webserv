@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 		std::vector<Config> configs = parser.parseFile(configPath);
 		for (size_t i = 0; i < configs.size(); i++) {
 			Server server(configs[i]);
-			configs[i].printConfig();
+			// configs[i].printConfig();
 			servers.push_back(server);
 		}
 	
@@ -31,11 +31,11 @@ int main(int argc, char **argv)
 		handle_signals();
 
 		//INIT SERVER
-		std::cout << std::endl << "Initializing servers..." << std::endl;
+		// std::cout << std::endl << "Initializing servers..." << std::endl;
 		webserv.setServers(servers);
 
 		//PARTIE POLL
-		std::cout << "Starting Epoll..." << std::endl;
+		//  << "Starting Epoll..." << std::endl;
 
 		webserv.epollLoop();
 	}
