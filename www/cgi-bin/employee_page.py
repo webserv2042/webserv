@@ -20,9 +20,11 @@ if cookie_data:
 else :
 	cookie_name = "employee name"
 
-i = 9
-while(1):
-	 i = 5
+# i = 9
+# while(1):
+# 	 i = 5
+
+# hufvride
 
 # open the csv database
 with open("../database/leave_requests.csv", mode="r") as db_file:

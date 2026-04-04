@@ -33,7 +33,18 @@ int main(int argc, char **argv)
 
 		//INIT SERVER
 		std::cout << std::endl << "Initializing servers..." << std::endl;
-		webserv.setServers(servers);
+		try
+		{
+			webserv.setServers(servers);
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << e.what();
+			std::cerr << strerror(errno) << std::endl;
+			return 1;
+		}
+		
+		
 
 		//PARTIE POLL
 		std::cout << "Starting Epoll..." << std::endl;

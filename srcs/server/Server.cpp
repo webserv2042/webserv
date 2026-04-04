@@ -34,10 +34,10 @@ void Server::init()
 {
 	this->_socketFD = socket(IPV4, SOCK_STREAM, 0);
 	if (this->_socketFD == -1)
-		throw std::runtime_error("(SERVER) Failed to initialize socket");
+		throw std::runtime_error("(SERVER) Failed to initialize socket :");
 	int flags = fcntl(this->_socketFD, F_GETFL);
 	if (flags == -1)
-		throw std::runtime_error("(SERVER) Failed to get socket configuration");
+		throw std::runtime_error("(SERVER) Failed to get socket configuration :");
 	flags = flags | O_NONBLOCK;
 
 	//! reuse address necessary
@@ -51,11 +51,11 @@ void Server::init()
 	this->_socketAddressLength = sizeof(this->_socketAddress);
 	int bindReturnCode = bind(_socketFD, reinterpret_cast<struct sockaddr*> (&this->_socketAddress), this->_socketAddressLength);
 	if (bindReturnCode == -1)
-		throw std::runtime_error("(SERVER) Failed to link socket");
+		throw std::runtime_error("(SERVER) Failed to link socket :");
 	int listenReturnCode = listen(_socketFD, PENDING_QUEUE_MAXLENGTH);
 
 	if (listenReturnCode == -1)
-		throw std::runtime_error("(SERVER) Failed to start listening");
+		throw std::runtime_error("(SERVER) Failed to start listening :");
 }
 
 int Server::getSocketAddressLength() const

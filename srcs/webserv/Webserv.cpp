@@ -38,15 +38,16 @@ void    Webserv::epollLoop()
 			try
 			{
 				if (isSocketFd(fd) == true) //nouvelle connexion sur une socket -> accepter
-					acceptClient(fd); //! check that
+					acceptClient(fd);
 
 				else if (clients[fd].isCGI == IS_CGI) // traitement CGI
 				{
-					if (events[i].events & EPOLLHUP && clients[fd].clientState == READING_CGI)
+					// if (events[i].events & EPOLLHUP && clients[fd].clientState == READING_CGI)
+					if (events[i].events & EPOLLHUP)
 						CGIreadFromChild(fd);
-					if (events[i].events & EPOLLIN)
+					else if (events[i].events & EPOLLIN)
 						CGIreadFromChild(fd);
-					if (events[i].events & EPOLLOUT)
+					else if (events[i].events & EPOLLOUT)
 						CGIwriteToChild(fd);
 				}
 
@@ -57,16 +58,17 @@ void    Webserv::epollLoop()
 						closeClient(fd);
 
 					//lire la requete, la parser, preparer la reponse,...
-					if (events[i].events & EPOLLIN)
+					else if (events[i].events & EPOLLIN)
 						treatRequest(fd);
 
 					//envoyer la reponse
-					if (events[i].events & EPOLLOUT)
+					else if (events[i].events & EPOLLOUT)
 						sendResponse(clients[fd]);
 				}
 			}
 			catch(const std::exception& e)
 			{
+				std::cout << "CAUGHT!!!!!!!!" << std::endl;
 				if (clients[fd].isCGI == IS_CGI)
 				{
 					closeClient(clients[fd].ogFd);

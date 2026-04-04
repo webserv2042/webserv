@@ -2,6 +2,7 @@
 #include "../../includes/server/Client.hpp"
 #include "../../includes/Signals.hpp"
 #include "../../includes/http/Response.hpp"
+#include "../../includes/http/Errors.hpp"
 #include <cstdio>
 
 
@@ -9,7 +10,7 @@
 /// @param fd the fd of the pipe that communicates with the child
 void    Webserv::CGIwriteToChild(int fd)
 {
-	// std::cout << "CGI WRITING...." << std::endl;
+	std::cout << "CGI WRITING...." << std::endl;
 	Request req = clients[fd].getRequest();
 
 	if (req.getMethod() == "POST")
@@ -31,7 +32,7 @@ void    Webserv::CGIwriteToChild(int fd)
 			closeClient(fd);
 	}
 	else
-		closeClient(fd);
+		closeClient(fd); 
 }
 
 /// @brief read content given back by the CGI child
@@ -42,7 +43,7 @@ void    Webserv::CGIreadFromChild(int fd)
     int     ogClientFd = clients[fd].ogFd;
     
     // READ DATA FROM CHILD //
-	// std::cout << "READING CGI...." << std::endl;
+	std::cout << "READING CGI...." << std::endl;
     ssize_t bytesRead = read(fd, buffer, sizeof(buffer));
 
 	// ONLY PART OF THE CGI HAS BEEN READ, WE STOP READING NOW AND RESUME WHEN EPOLL ALLOWS US //
@@ -70,32 +71,38 @@ void    Webserv::CGIreadFromChild(int fd)
 		waitpid(clients[fd].forkPid, &status, WNOHANG);
 
 		// AJOUT DEBUG
-		// std::string debug(clients[fd].cgiResponseBuff.begin(), clients[fd].cgiResponseBuff.end());
-		// std::cerr << "CGI RAW OUTPUT: [" << debug << "]" << std::endl;
-		// std::cerr << "CGI OUTPUT SIZE: " << clients[fd].cgiResponseBuff.size() << std::endl;
+		std::string debug(clients[fd].cgiResponseBuff.begin(), clients[fd].cgiResponseBuff.end());
+		std::cerr << "CGI RAW OUTPUT: [" << debug << "]" << std::endl;
+		std::cerr << "CGI OUTPUT SIZE: " << clients[fd].cgiResponseBuff.size() << std::endl;
 
 		// CLOSE CLIENT //
 		std::vector<char> responseBuffer = clients[fd].cgiResponseBuff;
 		closeClient(fd);
 
+		e_status_code errCode = OK;
 		if (responseBuffer.empty()) {
-			throw std::runtime_error("500"); 
+			errCode = BAD_GATEWAY; 
 		}
 
 		// FINISH THE RESPONSE //
-		CGIprepareResponse(ogClientFd, responseBuffer);
+		CGIprepareResponse(ogClientFd, responseBuffer, errCode);
 	}
 }
 
 /// @brief Finish the response from the CGI output
 /// @param fd fd of the original client that made the request
 /// @param cgiOutput the output given by CGI child
-void    Webserv::CGIprepareResponse(int fd, std::vector<char> cgiOutput)
+void    Webserv::CGIprepareResponse(int fd, std::vector<char> cgiOutput, e_status_code errCode)
 {
+	std::cout << "PREPARE CGI RESPONSE..." << std::endl;
+
 	const Config		&config = clients[fd].getConfig();
 	Response			res(config);
 
-	res.responseCgi(cgiOutput, clients[fd].getRequest());
+	if (errCode == OK)
+		res.responseCgi(cgiOutput, clients[fd].getRequest());
+	else
+		res.errorResponseCgi(errCode, clients[fd].getRequest());
 
 	clients[fd]._keepAlive = !res.getCloseFd();
 

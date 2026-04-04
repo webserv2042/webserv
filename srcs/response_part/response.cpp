@@ -79,6 +79,14 @@ void	Response::responseCgi(std::vector<char> cgiOutput, const Request &reqClient
 	this->createResponse();
 }
 
+void	Response::errorResponseCgi(e_status_code errCode, const Request &reqClient)
+{
+	this->generateErrorPage(errCode);
+	this->setHeaders(reqClient);
+	this->createResponse();
+}
+
+
 void	Response::createResponse()
 {
 	_responseFinal.clear();

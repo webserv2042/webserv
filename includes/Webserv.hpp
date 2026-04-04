@@ -91,7 +91,7 @@ class Webserv {
 		void								writeResponse(int fd);
 		void								CGIwriteToChild(int fd);
 		void								CGIreadFromChild(int fd);
-		void								CGIprepareResponse(int fd, std::vector<char> cgiOutput);
+		void								CGIprepareResponse(int fd, std::vector<char> cgiOutput, e_status_code errCode);
 		void								sendResponse(Client &client);
 
 };
