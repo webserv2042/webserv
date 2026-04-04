@@ -3,7 +3,7 @@
 Config::Config()
 {
 	_port = -1;
-	_clientMaxBodySize = 0;
+	_clientMaxBodySize = 1048576;
 	_autoIndex = false;
 	_host = "0.0.0.0";
 }
@@ -137,30 +137,30 @@ void Config::addLocation(const Location& location)
 	_locations.push_back(location);
 }
 
-void Config::printConfig() const
-{
-    std::cout << "=== CONFIG ===" << std::endl;
-    std::cout << "Port: " << _port << std::endl;
-    std::cout << "Host: " << _host << std::endl;
-    std::cout << "Root: " << _root << std::endl;
-    std::cout << "Index: " << _index << std::endl;
+// void Config::printConfig() const
+// {
+//     std::cout << "=== CONFIG ===" << std::endl;
+//     std::cout << "Port: " << _port << std::endl;
+//     std::cout << "Host: " << _host << std::endl;
+//     std::cout << "Root: " << _root << std::endl;
+//     std::cout << "Index: " << _index << std::endl;
 
-    std::cout << "Server names: ";
-    for (size_t i = 0; i < _serverName.size(); i++)
-        std::cout << _serverName[i] << " ";
-    std::cout << std::endl;
+//     std::cout << "Server names: ";
+//     for (size_t i = 0; i < _serverName.size(); i++)
+//         std::cout << _serverName[i] << " ";
+//     std::cout << std::endl;
 
-    std::cout << "Locations: " << _locations.size() << std::endl;
-    for (size_t i = 0; i < _locations.size(); i++) {
-        std::cout << "  [" << i << "] path: " << _locations[i].path << std::endl;
-        std::cout << "      root: " << _locations[i].root << std::endl;
-		if (!_locations[i].cgi.empty()) {
-            std::cout << "      CGI:" << std::endl;
-            for (std::map<std::string, std::string>::const_iterator it = _locations[i].cgi.begin();
-            	it != _locations[i].cgi.end(); ++it) {
-                std::cout << "        " << it->first << " -> " << it->second << std::endl;
-            }
-        }
-    }
-    std::cout << std::endl;
-}
+//     std::cout << "Locations: " << _locations.size() << std::endl;
+//     for (size_t i = 0; i < _locations.size(); i++) {
+//         std::cout << "  [" << i << "] path: " << _locations[i].path << std::endl;
+//         std::cout << "      root: " << _locations[i].root << std::endl;
+// 		if (!_locations[i].cgi.empty()) {
+//             std::cout << "      CGI:" << std::endl;
+//             for (std::map<std::string, std::string>::const_iterator it = _locations[i].cgi.begin();
+//             	it != _locations[i].cgi.end(); ++it) {
+//                 std::cout << "        " << it->first << " -> " << it->second << std::endl;
+//             }
+//         }
+//     }
+//     std::cout << std::endl;
+// }

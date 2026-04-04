@@ -1,4 +1,5 @@
 #include "../../includes/http/Request.hpp"
+#include "../../includes/config/Config.hpp"
 
 void    Request::parseRequest()
 {
@@ -68,7 +69,7 @@ void    Request::parseLines()
 			if (line.find(':') != std::string::npos) // réglage d'un bug, pas de qst ça marche c tout
 				this->parseHeaders(line);
 			else
-				std::cout << "DEBUG: Ligne ignorée car pas de ':' -> [" << line << "]" << std::endl;
+				this->fail(BAD_REQUEST);
 		}
 	}
 }
@@ -159,7 +160,7 @@ std::string	Request::parseUri(std::string uri)
 			if (!allPath.empty())
 				allPath.pop_back(); // on supprime le dernier élement
 			else
-				return ("/");
+				this->fail(BAD_REQUEST);
 		}
 		else
 			allPath.push_back(onePath);
@@ -184,7 +185,7 @@ void    Request::checkStartLine()
 {
 	const char* methodNotAllowed[] = {"HEAD", "OPTIONS", "TRACE", "PUT", "PATCH", "CONNECT", NULL};
 	bool		found = false;
-	std::string target = "HTTP/1.1";
+	// std::string target = "HTTP/1.1";
 
 	for (size_t i = 0; i < _method.size(); ++i)
 	{
@@ -202,14 +203,29 @@ void    Request::checkStartLine()
 				break ;
 			}
 		}
-		if (found == true)
-			_errorCode = METHOD_NOT_ALLOWED;
-		else
-			_errorCode = BAD_REQUEST;
 		this->fail(found ? METHOD_NOT_ALLOWED : BAD_REQUEST);
 	}
+	this->parseHttp();
+}
 
-	if (_httpVersion != target)
+void	Request::parseHttp()
+{
+	if (_httpVersion.size() != 8)
+		this->fail(BAD_REQUEST);
+	
+	if (_httpVersion.substr(0, 5) != "HTTP/")
+		this->fail(BAD_REQUEST);
+	
+	if (!isdigit(_httpVersion[5]))
+			this->fail(BAD_REQUEST);
+	
+	if (_httpVersion[6] != '.')
+		this->fail(BAD_REQUEST);
+	
+	if (!isdigit(_httpVersion[7]))
+		this->fail(BAD_REQUEST);
+
+	if (_httpVersion != "HTTP/1.1")
 		this->fail(VERSION_NOT_SUPPORTED);
 }
 
@@ -220,7 +236,7 @@ void    Request::parseHeaders(const std::string &line)
 	if (line.size() > 4096)
         this->fail(REQUEST_HEADER_FIELDS_TOO_LARGE);	
     
-    if (_allHeaders.size() > 100)
+    if (_allHeaders.size() > 1024)
     {
 		this->fail(REQUEST_HEADER_FIELDS_TOO_LARGE);
 	}
@@ -234,9 +250,18 @@ void    Request::parseHeaders(const std::string &line)
 	trim(value);
 
 	key = toLower(key);  // normalisation pr respecter norme rfc (headers sensibles à la casse)
+
+	if (key == "host")
+	{
+		if (_allHeaders.count("host"))
+			this->fail(BAD_REQUEST);
+	}
 	
-	// if (key == "cookie")
-	// 	this->parseCookie(value);
+	if (key == "cookie")
+	{
+		this->parseCookie(value);
+		return ;
+	}
 	
 	if (key == "content-length")
 	{
@@ -244,7 +269,13 @@ void    Request::parseHeaders(const std::string &line)
 		long valueKey = std::strtol(value.c_str(), &endPtr, 10);
 		if (*endPtr != '\0' || valueKey < 0)
 			this->fail(BAD_REQUEST);
-
+		
+		if (_allHeaders.count("content-length"))
+		{
+			if (std::atol(_allHeaders["content-length"].c_str()) != valueKey)
+            	this->fail(BAD_REQUEST);
+			return ;
+		}
 		if (valueKey > LIMIT_BODY)
 			this->fail(CONTENT_TOO_LARGE);
 
@@ -260,14 +291,29 @@ void    Request::parseHeaders(const std::string &line)
 	_allHeaders[key] = value;
 }
 
-// void	Request::parseCookie(const std::string &value)
-// {
-// 	std::string target = "id=";
-// 	size_t		
-// }
+void	Request::parseCookie(const std::string &data)
+{
+	std::stringstream	ss(data);
+	std::string			dataCookie;
+
+	while(std::getline(ss, dataCookie, ';'))
+	{
+		size_t	equal = dataCookie.find('=');
+		if (equal != std::string::npos)
+		{
+			std::string	key = dataCookie.substr(0, equal);
+			std::string value = dataCookie.substr(equal + 1);
+
+			trim(key);
+			trim(value);
+
+			_cookies[key] = value;
+		}
+	}
+}
 
 void    Request::parseBodyContent()
-{
+{	
 	if (_allHeaders.count("transfer-encoding") && _allHeaders["transfer-encoding"] == "chunked")
 	{
 		this->parseBodyChunked();
@@ -327,10 +373,14 @@ void    Request::parseBodyChunked()
 			}
 			
 			long valueForChunk = std::strtol(hexa.c_str(), &endPtr, 16);
-			if (*endPtr != '\0' || valueForChunk < 0 || (_body.size() + static_cast<size_t>(valueForChunk)) > LIMIT_BODY)
+			
+			if (*endPtr != '\0' || valueForChunk < 0)
+				this->fail(BAD_REQUEST);
+			if (static_cast<size_t>(valueForChunk) > LIMIT_BODY ||
+			(_body.size() + static_cast<size_t>(valueForChunk)) > LIMIT_BODY)
 				this->fail(CONTENT_TOO_LARGE);
 
-			_chunkSize = static_cast<size_t>(valueForChunk);
+			_chunkSize = static_cast<long>(valueForChunk);
 			_bytesData.erase(_bytesData.begin(), it + 2);
 
 			if (_chunkSize == 0)
@@ -378,30 +428,31 @@ void    Request::parseTrailers() // headers probables après le body
 	}
 }
 
-void Request::printRequest() const {
-    std::cout << "\033[1;36m--- REQUEST RECEIVED ---\033[0m" << std::endl;
+// void Request::printRequest() const
+// {
+//     // std::cout << "\033[1;36m--- REQUEST RECEIVED ---\033[0m" << std::endl;
     
-    // 1. Start-Line
-    std::cout << _method << " " << _uri << " " << _httpVersion << "\r\n";
+//     // 1. Start-Line
+//     std::cout << _method << " " << _uri << " " << _httpVersion << "\r\n";
 
-    // 2. Headers
-    std::map<std::string, std::string>::const_iterator it;
-    for (it = _allHeaders.begin(); it != _allHeaders.end(); ++it) {
-        std::cout << it->first << ": " << it->second << "\r\n";
-    }
+//     // 2. Headers
+//     std::map<std::string, std::string>::const_iterator it;
+//     for (it = _allHeaders.begin(); it != _allHeaders.end(); ++it) {
+//         std::cout << it->first << ": " << it->second << "\r\n";
+//     }
 
-    // 3. Ligne vide séparatrice
-    std::cout << "\r\n";
+//     // 3. Ligne vide séparatrice
+//     std::cout << "\r\n";
 
-    // 4. Body (on affiche un aperçu si c'est du texte)
-    if (!_body.empty()) {
-        if (_body.size() > 500) {
-            std::string snippet(_body.begin(), _body.begin() + 500);
-            std::cout << snippet << "\n[... Body truncated, total size: " << _body.size() << " bytes ...]" << std::endl;
-        } else {
-            std::string fullBody(_body.begin(), _body.end());
-            std::cout << fullBody << std::endl;
-        }
-    }
-    std::cout << "\033[1;36m----------------------------\033[0m" << std::endl;
-}
+//     // 4. Body (on affiche un aperçu si c'est du texte)
+//     // if (!_body.empty()) {
+//     //     if (_body.size() > 500) {
+//     //         std::string snippet(_body.begin(), _body.begin() + 500);
+//     //         std::cout << snippet << "\n[... Body truncated, total size: " << _body.size() << " bytes ...]" << std::endl;
+//     //     } else {
+//     //         std::string fullBody(_body.begin(), _body.end());
+//     //         std::cout << fullBody << std::endl;
+//     //     }
+
+//     std::cout << "\033[1;36m----------------------------\033[0m" << std::endl;
+// }

@@ -17,11 +17,16 @@
 #include <sstream>
 #include <ctime>
 
+#include <sys/wait.h>	
+#include <unistd.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #include "server/Client.hpp"
 #include "server/Server.hpp"
 
 
-#define MAX_EVENTS 3 //nombre d'evenements enregistres a la fois par epoll_wait
+#define MAX_EVENTS 1024 //nombre d'evenements enregistres a la fois par epoll_wait
 
 // RETOURS FONCTIONS
 #define ERROR -1
@@ -29,6 +34,10 @@
 #define DISCONNECTION 2
 #define ADD_EPOLLOUT 0
 #define DELETE_EPOLLOUT 1
+
+// PIPE TYPES
+#define PIPE_IN 1
+#define PIPE_OUT 2
 
 //TIMEOUT
 // #define IDLE_TIMEOUT 60 //timeout d'un client sans aucune activité
@@ -79,6 +88,10 @@ class Webserv {
 		//* REQUETE + REPONSE
 
     	void 			                  	treatRequest(int &fd);
+		void								writeResponse(int &fd);
+		void								CGIwriteToChild(int fd);
+		void								CGIreadFromChild(int fd);
+		void								CGIprepareResponse(int fd, std::vector<char> cgiOutput);
 		void								sendResponse(Client &client);
 
 };

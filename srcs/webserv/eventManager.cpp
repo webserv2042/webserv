@@ -37,7 +37,7 @@ int    Webserv::waitForEvents()
 /// @param newConnexionFd le fd sur lequel la nouvelle connexion a ete etablie
 void    Webserv::acceptClient(int &newConnexionFd)
 {
-	std::cout << "\033[32mFOUND CONNECTION ->>\033[0m" << std::endl;
+	// std::cout << "\033[32mFOUND CONNECTION ->>\033[0m" << std::endl;
 	int client_fd = -1;
 
 	client_fd = accept(newConnexionFd, NULL, NULL);
@@ -58,8 +58,10 @@ void    Webserv::acceptClient(int &newConnexionFd)
         }
 	}
 
-	Client newClient(client_fd,foundConfig);
+	// CREATE NEW CLIENT //
+	Client newClient(client_fd,foundConfig, ep_fd);
     clients[client_fd] = newClient; //do a proper copy!!!!
+	// std::cout << "accepted : " << client_fd << std::endl;
 }
 
 
@@ -69,7 +71,7 @@ void    Webserv::acceptClient(int &newConnexionFd)
 /// @param clientFD fd du client a supprimer
 void    Webserv::closeClient(int clientFD)
 {
-	std::cout << "\033[31mDISCONNECT !!!!\033[0m" << std::endl;
+	// std::cout << "\033[31mDISCONNECT\033[0m" << std::endl;
     epoll_ctl(ep_fd, EPOLL_CTL_DEL, clientFD, NULL);
     close(clientFD);
 	clients.erase(clientFD);
@@ -81,7 +83,7 @@ void    Webserv::closeClient(int clientFD)
 /// @return la position suivante de l'iterateur
 std::map<int, Client>::iterator    Webserv::closeClient(std::map<int, Client>::iterator it)
 {
-	std::cout << "\033[31mDISCONNECT !!!!\033[0m" << std::endl;
+	// std::cout << "\033[31mDISCONNECT !!!!\+033[0m" << std::endl;
     epoll_ctl(ep_fd, EPOLL_CTL_DEL, it->first, NULL);
     close(it->first);
 
@@ -98,6 +100,7 @@ void    Webserv::checkIdleTimeout()
 {
     std::map<int, Client>::iterator it = clients.begin();
 
+	// std::cerr << "Nb clients: " << clients.size() << " / checking timeouts" << std::endl;
 	while (it != clients.end())
 	{
 		if (it->second.timeout() == TIMEOUT)

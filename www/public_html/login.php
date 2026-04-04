@@ -3,10 +3,15 @@
 
 	session_start();
 	
-	// add users
+	// create users
 	clear_file_content("../database/users.csv");
-	add_user('manager@gmail.com', 'mpw', 'manager');
-	add_user('employee@gmail.com', 'upw', 'employee');
+	add_user('manager@gmail.com', 'mpw', 'manager', 'tung tung tung tung sahur');
+	add_user('employee@gmail.com', 'upw', 'employee', 'brr brrr patabim');
+
+	// DEBUG
+	$debug = file_get_contents("../database/users.csv");
+	error_log("CSV CONTENT: " . $debug);
+	error_log("POST DATA: " . print_r($_POST, true));
 
 	// set variables to empty
 	$email = $password = "";
@@ -42,14 +47,22 @@
 				{
 					$_SESSION['username'] = $email;
 					$_SESSION['role'] = 'manager';
-					header('Location: ../cgi-bin/manager_page.php');
+					// create cookies for python
+					// $cookie_username = find_username($email);
+					// setcookie("cookie_username", $cookie_username, time() + 3600, "/cgi-bin/manager_page.py");
+					// 
+					header('Location: ../cgi-bin/manager_page.py');
 					exit();
 				}
 				else if ($role === 'employee')
 				{
 					$_SESSION['username'] = $email;
 					$_SESSION['role'] = 'employee';
-					header('Location: ../cgi-bin/employee_page.php');
+					// create cookies for python
+					$cookie_username = find_username($email);
+					setcookie("cookie_username", $cookie_username, time() + 3600, "/");
+					// 
+					header('Location: ../cgi-bin/employee_page.py');
 					exit();
 				}
 				else

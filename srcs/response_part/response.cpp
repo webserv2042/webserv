@@ -2,6 +2,7 @@
 #include "../../includes/http/Request.hpp"
 #include "../../includes/config/Config.hpp"
 #include "../../includes/http/Cgi.hpp"
+#include "../../includes/Webserv.hpp"
 
 Response::Response(const Config &configServer) :
 	_statusCode(OK),
@@ -20,39 +21,42 @@ Response::Response(const Config &configServer) :
 
 Response::~Response() {}
 
-void    Response::setResponseFinal(const Request &reqClient)
-{
+int    Response::setResponseFinal(const Request &reqClient, int fd, std::map<int, Client> &clients)
+{	
 	if (reqClient.getErrorCode() != OK)
     {
         _statusCode = reqClient.getErrorCode();
         this->generateErrorPage(_statusCode);
         this->setHeaders(reqClient);
         this->createResponse();
-        return ;
+        return (0);
     }
-
-	if (_statusCode >= 300 && _statusCode < 400)
-	{
-        this->setHeaders(reqClient);
-        this->createResponse();
-        return ;
-    }
-
     try 
     {
+		size_t limit = _config.getClientMaxBodySize();
+
+		if (reqClient.getContentLength() > limit)
+			this->fail(CONTENT_TOO_LARGE);
         this->checkingUri(reqClient);
-		if (isCgi())
+		if (_statusCode >= 300 && _statusCode < 400)
 		{
-			CGI 				cgiExec(_uriFullPath, _pathExecCgi);
-			std::vector<char>	cgiOutput = cgiExec.cgi(reqClient, *this);
-			this->parseCgi(cgiOutput);
 			this->setHeaders(reqClient);
 			this->createResponse();
-			return ;
+			return (0);
+		}
+
+		if (isCgi())
+		{
+			CGI cgiExec(_uriFullPath, _pathExecCgi);
+			cgiExec.cgi(reqClient, *this, fd, clients);
+			return (IS_CGI);
 		}
 		else
-        	this->methodProcess(reqClient);
-        this->setHeaders(reqClient);            
+		{
+			if (!_isAutoIndex)
+        		this->methodProcess(reqClient);
+		}
+        this->setHeaders(reqClient);
     }
 
     catch (const std::exception &e)
@@ -60,9 +64,24 @@ void    Response::setResponseFinal(const Request &reqClient)
         this->generateErrorPage(_statusCode);
 		this->setHeaders(reqClient);
     }
-	
+	this->createResponse();
+	return (0);
+}
+
+/// @brief cree la reponse a partir du retour de la CGI
+/// @param cgiOutput le retour CGI
+/// @param reqClient la requete client originale
+void	Response::responseCgi(std::vector<char> cgiOutput, const Request &reqClient)
+{
+	this->parseCgi(cgiOutput);
+	this->setHeaders(reqClient);
 	this->createResponse();
 }
+
+// void	Response::errorCgi(int code)
+// {
+	
+// }
 
 void	Response::createResponse()
 {
@@ -74,6 +93,12 @@ void	Response::createResponse()
 	{
 		std::string line = it->first + ": " + it->second + "\r\n";
 		_responseFinal.insert(_responseFinal.end(), line.begin(), line.end());
+	}
+
+	for (size_t i = 0; i < _cookies.size(); ++i)
+	{
+		std::string	cooked = "Set-Cookie: " + _cookies[i] + "\r\n";
+		_responseFinal.insert(_responseFinal.end(), cooked.begin(), cooked.end());
 	}
 
 	std::string	lineEmpty = "\r\n";
@@ -92,15 +117,15 @@ void	Response::setStartLine()
 	_responseFinal.insert(_responseFinal.end(), startLine.begin(), startLine.end());
 }
 
-//Fonctions pour setup les différentes partie de la réponse + ajouter le code status    
-void    Response::setBodySize(const std::string &bodyHttp)
-{
-	_body.assign(bodyHttp.begin(), bodyHttp.end());
 
-	std::stringstream ss;
-	ss << _body.size();
-	addHeaders("content-length", ss.str());
-}
+// void    Response::setBodySize(const std::string &bodyHttp)
+// {
+// 	_body.assign(bodyHttp.begin(), bodyHttp.end());
+
+// 	std::stringstream ss;
+// 	ss << _body.size();
+// 	this->addHeaders("content-length", ss.str());
+// }
 
 void	Response::setHttpDate()
 {
@@ -132,6 +157,11 @@ void    Response::addHeaders(const std::string &key, const std::string &value)
 	_headers[lowerKey] = value;
 }
 
+void	Response::addCookie(const std::string &cookies)
+{
+	_cookies.push_back(cookies);
+}
+
 std::string Response::getUriFullPath() const
 {
 	return (_uriFullPath);
@@ -147,8 +177,9 @@ std::string Response::getHeader(std::string key)
     std::map<std::string, std::string>::iterator it = _headers.find(toLower(key));
 
     if (it != _headers.end())
-        return it->second;
-    return "";
+        return (it->second);
+
+    return ("");
 }
 
 std::string Response::getRootLocation() const

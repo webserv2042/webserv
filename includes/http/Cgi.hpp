@@ -26,9 +26,11 @@ class CGI {
 		~CGI();
 		void						setClientFd(int fd);
 		void						buildEnvp(const Request &req, const Response &rep);
-		void						execCgi(const Request &req);
+		void						execCgi(int clFd, std::map<int, Client> &clients);
 		std::vector<char>			getOutput() const;
-		std::vector<char>			cgi(const Request &req, Response &rep);
+		void						cgi(const Request &req, Response &rep, int clFd, std::map<int, Client> &clients);
+
+		void						addCgiFdToEpoll(int newFd, uint32_t epEvent, int ep_fd);
 };
 
 #endif

@@ -10,11 +10,9 @@ int main(int argc, char **argv)
 {
 	Webserv webserv;
 
-	if (argc < 2)
-	{
-		std::cerr << "Usage: " << argv[0] << " <config_file>" << std::endl;
-		return (1);
-	}
+	std::string configPath = "./default.conf";
+	if (argc > 1)
+		configPath = argv[1];
 
 	try
 	{
@@ -22,10 +20,11 @@ int main(int argc, char **argv)
 		//PARSING
 		Parser parser;
 		std::vector<Server> servers;
-		std::vector<Config> configs = parser.parseFile(argv[1]);
+		// std::cout << "Parsing config file: " << configPath << std::endl;
+		std::vector<Config> configs = parser.parseFile(configPath);
 		for (size_t i = 0; i < configs.size(); i++) {
 			Server server(configs[i]);
-			configs[i].printConfig();
+			// configs[i].printConfig();
 			servers.push_back(server);
 		}
 	
@@ -33,11 +32,11 @@ int main(int argc, char **argv)
 		handle_signals();
 
 		//INIT SERVER
-		std::cout << std::endl << "Initializing servers..." << std::endl;
+		// std::cout << std::endl << "Initializing servers..." << std::endl;
 		webserv.setServers(servers);
 
 		//PARTIE POLL
-		std::cout << "Starting Epoll..." << std::endl;
+		// std::cout << "Starting Epoll..." << std::endl;
 
 		webserv.epollLoop();
 	}
@@ -48,7 +47,6 @@ int main(int argc, char **argv)
 		webserv.finalClean();
 		return (1);
 	}
-
 	return (0);
 }
 

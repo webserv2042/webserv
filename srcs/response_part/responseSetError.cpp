@@ -11,6 +11,8 @@ const char* repException::what() const throw()
 void Response::fail(e_status_code code)
 {
     _statusCode = code;
+    if (code == BAD_REQUEST || code == CONTENT_TOO_LARGE)
+        _closeFd = true;
     throw repException();
 }
 
@@ -27,12 +29,15 @@ std::map<e_status_code, std::string> Response::initMessageStatus()
     code[static_cast<e_status_code>(403)] = "Forbidden";
     code[static_cast<e_status_code>(404)] = "Not Found";
     code[static_cast<e_status_code>(405)] = "Method Not Allowed";
+    code[static_cast<e_status_code>(408)] = "Request Timeout";
     code[static_cast<e_status_code>(409)] = "Conflict";
     code[static_cast<e_status_code>(413)] = "Content Too Large";
     code[static_cast<e_status_code>(414)] = "URI Too Long";
     code[static_cast<e_status_code>(431)] = "Request Headers Fields Too Large";
     code[static_cast<e_status_code>(500)] = "Internal Server Error";
     code[static_cast<e_status_code>(501)] = "Not Implemented";
+    code[static_cast<e_status_code>(502)] = "Bad Gateway";
+    code[static_cast<e_status_code>(504)] = "Gateway Timeout";
     code[static_cast<e_status_code>(505)] = "HTTP Version Not Supported";
 
     return (code);
@@ -63,7 +68,7 @@ void Response::generateErrorPage(e_status_code code)
         ss << "<body style='text-align:center; font-family:sans-serif; padding-top:100px;'>";
         ss << "<h1 style='font-size: 50px;'>" << code << "</h1>";
         ss << "<h2>" << message << "</h2>";
-        ss << "<hr><p>Webserv/1.0 (Senshy Edition - Fallback Mode)</p></body></html>";
+        ss << "<hr><p>Webserv/1.0 (Fallback Mode)</p></body></html>";
         
         std::string html = ss.str();
         _body.assign(html.begin(), html.end());

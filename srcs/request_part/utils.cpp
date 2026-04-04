@@ -18,3 +18,10 @@ std::string toLower(std::string str)
 
     return (str);
 }
+
+std::string	toString(size_t val)
+{
+    std::stringstream ss;
+    ss << val;
+    return ss.str();
+}

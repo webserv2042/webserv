@@ -14,7 +14,7 @@
 #include <fcntl.h>
 
 #define LISTENING_PORT 8080
-#define PENDING_QUEUE_MAXLENGTH 1
+#define PENDING_QUEUE_MAXLENGTH SOMAXCONN
 #define BUFFER_SIZE 1024
 
 class Server {

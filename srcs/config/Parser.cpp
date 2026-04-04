@@ -41,36 +41,36 @@ bool isSingleCharToken(char c)
 
 /// @brief affiche la directive et ses arguments
 /// @param d directive à afficher
-void printDirective(const Directive& d)
-{
-	std::cout << "    Directive: " << d.name << std::endl;
-	for (size_t i = 0; i < d.arguments.size(); ++i)
-		std::cout << "      arg[" << i << "]: " << d.arguments[i] << std::endl;
-}
+// void printDirective(const Directive& d)
+// {
+// 	std::cout << "    Directive: " << d.name << std::endl;
+// 	for (size_t i = 0; i < d.arguments.size(); ++i)
+// 		std::cout << "      arg[" << i << "]: " << d.arguments[i] << std::endl;
+// }
 
 /// @brief affiche le bloc Location et ses directives
 /// @param loc bloc location à afficher
-void printLocation(const LocationNode& loc)
-{
-	std::cout << "  Location: " << loc.path << std::endl;
-	for (size_t i = 0; i < loc.directives.size(); ++i)
-		printDirective(loc.directives[i]);
-}
+// void printLocation(const LocationNode& loc)
+// {
+// 	std::cout << "  Location: " << loc.path << std::endl;
+// 	for (size_t i = 0; i < loc.directives.size(); ++i)x`
+// 		printDirective(loc.directives[i]);
+// }
 
 /// @brief affiche la configuration du serveur, ses blocs location et directives
 /// @param server serveur à afficher
-void printServer(const ServerNode& server)
-{
-	std::cout << "Server {" << std::endl;
+// void printServer(const ServerNode& server)
+// {
+// 	std::cout << "Server {" << std::endl;
 
-	for (size_t i = 0; i < server.directives.size(); ++i)
-		printDirective(server.directives[i]);
+// 	for (size_t i = 0; i < server.directives.size(); ++i)
+// 		printDirective(server.directives[i]);
 
-	for (size_t i = 0; i < server.locations.size(); ++i)
-		printLocation(server.locations[i]);
+// 	for (size_t i = 0; i < server.locations.size(); ++i)
+// 		printLocation(server.locations[i]);
 
-	std::cout << "}" << std::endl;
-}
+// 	std::cout << "}" << std::endl;
+// }
 
 /// @brief Tokenise un fichier de conf en une liste de chaînes
 ///
@@ -443,7 +443,7 @@ bool	Parser::isDirectiveAllowedInContext(const std::string& name, Context ctx)
 	else
 	{
 		return (name == "root" || name == "allow_methods" || name == "autoindex" || name == "return" ||
-				name == "index" || name == "upload_path" || name == "cgi");
+				name == "index" || name == "upload_path" || name == "cgi" || name == "error_page");
 	}
 }
 
@@ -586,6 +586,9 @@ std::vector<Config> Parser::fillConfig(std::vector<ServerNode> servers)
 						servers[i].locations[k].directives[l].arguments[1]);
 				if (servers[i].locations[k].directives[l].name == "cgi")
 						currentLoc.cgi[servers[i].locations[k].directives[l].arguments[0]] =
+						servers[i].locations[k].directives[l].arguments[1];
+				if (servers[i].locations[k].directives[l].name == "error_page")
+					currentLoc.errorPage[toInt(servers[i].locations[k].directives[l].arguments[0])] =
 						servers[i].locations[k].directives[l].arguments[1];
 			}
 			current.addLocation(currentLoc);

@@ -5,7 +5,6 @@
 void    Response::checkingUri(const Request &req)
 {
 	_structLocation = _config.findLocation(req.getUri());
-
 	if (_structLocation && _structLocation->returnRedirect.first != 0)
 	{
 		_statusCode = static_cast<e_status_code>(_structLocation->returnRedirect.first);
@@ -15,11 +14,16 @@ void    Response::checkingUri(const Request &req)
 
 	this->fullPathUri(req);
 
-	std::cout << "Tentative d'ouverture de (full path) : [" << _uriFullPath << "]\n";
+	// std::cout << "Tentative d'ouverture de (full path) : [" << _uriFullPath << "]\n";
 	if (stat(_uriFullPath.c_str(), &_dataFile) != 0) // uri introuvable
 	{
 		if (req.getMethod() == "POST")
-			return ;
+		{
+			if (!_structLocation->uploadPath.empty())
+				return ;
+			else
+				this->fail(METHOD_NOT_ALLOWED);
+		}
 		else
 			this->fail(NOT_FOUND);
 	}
@@ -27,7 +31,15 @@ void    Response::checkingUri(const Request &req)
 	if (S_ISREG(_dataFile.st_mode)) // un fichier ?
 		this->checkingPerm();
 	else if(S_ISDIR(_dataFile.st_mode)) // un dossier ?
+	{
+		if (req.getUri()[req.getUri().size() - 1] != '/')
+		{
+			_statusCode = MOVED_PERMANENTLY;
+			_locationUri = req.getUri() + "/";
+			return ;
+		}
 		this->searchFile(req);
+	}
 }
 
 const Location* Config::findLocation(std::string uri) const
@@ -71,10 +83,10 @@ void    Response::searchFile(const Request &req)
 		this->checkingPerm();
 		this->setExtension();
 	}
-	else if (_structLocation && _structLocation->autoIndex == true)
+	else if (req.getMethod() == "GET" && _structLocation && _structLocation->autoIndex == true)
 		this->doAutoIndex(req);
 	else
-		this->fail(NOT_FOUND);
+		this->fail(FORBIDDEN);
 }
 
 void Response::fullPathUri(const Request &req)
@@ -83,11 +95,7 @@ void Response::fullPathUri(const Request &req)
 	std::string uri = req.getUri();
 
 	if (_structLocation && !_structLocation->root.empty())
-	{
 		root = _structLocation->root;
-		if (!_structLocation->path.empty() && _structLocation->path != "/" && uri.compare(0, _structLocation->path.size(), _structLocation->path) == 0)
-				uri = uri.substr(_structLocation->path.size());
-    }
 	else if (!_config.getRoot().empty())
 		root = _config.getRoot();
 	else

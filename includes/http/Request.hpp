@@ -12,9 +12,13 @@
 
 #include "Utils.hpp"
 #include "Errors.hpp"
+// #include "Config.hpp"
+
+class Config;
 
 #define MAX_BYTES	8000 // recommandé dans la RFC 9112 d'imposer cette limite
-#define LIMIT_BODY	20971520 // 20 Mo pour le body
+#define LIMIT_BODY	10485760 // 10 Mo pour le body
+#define MAX_KEEPALIVE_REQUESTS 1000
 
 enum    e_request_method    
 {
@@ -43,21 +47,21 @@ enum	e_parsing_steps
 class Request
 {
 	private:
-		std::vector<char>   						_bytesData; // tab dynamique des octets que je reçois
+		std::vector<char>   						_bytesData;
 		std::map<std::string, std::string>			_allHeaders;
 		std::string         						_method;
 		std::string         						_uri;
 		std::string									_queryString;
 		std::string         						_httpVersion;
 		std::string         						_body;
-		std::string									_cookies;
+		std::map<std::string, std::string>			_cookies;
 		size_t										_contentLength;
 		bool										_isContentLength;
 		size_t										_chunkSize;
 		e_request_method							_methodEnum;
 		e_parsing_steps								_step;
 		e_chunk_step								_chunkStep;
-		e_status_code								_errorCode; 
+		e_status_code								_errorCode;
 
 	public:
 		Request();
@@ -81,20 +85,22 @@ class Request
 		e_status_code								getErrorCode() const;
 		size_t										getContentLength() const;
 		std::string									getQueryString() const;
-		std::string									getCookies() const;
+		std::string									getCookie(const std::string& name) const;
+		std::string									getCookiesMap() const;
 
 		//******************** PARTIE 2 : Parsing **************************//
 		void										parseRequest();
 		void										parseLines();
 		void										parseStartLine(const std::string &line);
 		void										checkStartLine();
+		void										parseHttp();
 		std::string									decodeUri(const std::string &uri);
 		std::string									parseUri(std::string uri);
 		void										parseHeaders(const std::string &line);
+		void										parseCookie(const std::string &data);
 		void										parseBodyContent();
 		void										parseBodyChunked();
 		void										parseTrailers();
-		// void										trim(std::string &line);
 		void										reset();
 		void										fail(e_status_code code);
 
