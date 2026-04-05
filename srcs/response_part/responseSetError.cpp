@@ -52,16 +52,74 @@ void Response::generateErrorPage(e_status_code code)
     if (message.empty())
         message = "UNKNOWN ERROR";
 
+    std::vector<std::string> pathConfig;
+
+    if (_structLocation)
+    {
+        std::map<int, std::string>::const_iterator it = _structLocation->errorPage.find(static_cast<int>(code));
+        if (it != _structLocation->errorPage.end())
+        {
+            std::string pathErrorInLoc = it->second;
+            std::string root = _config.getRoot();
+
+            if (!pathErrorInLoc.empty())
+            {
+                if (pathErrorInLoc[0] == '/')
+                    pathErrorInLoc.erase(0, 1);
+
+                if (!root.empty() && root[root.size() - 1] != '/')
+                    root += "/";
+
+                pathErrorInLoc = root + pathErrorInLoc;
+            }
+            pathConfig.push_back(pathErrorInLoc);
+        }
+    }
+    {
+        std::map<int, std::string>::const_iterator it = _config.getErrorPage().find(static_cast<int>(code));
+        if (it != _config.getErrorPage().end())
+        {
+            std::string pathErrorInGlobal = it->second;
+            std::string root = _config.getRoot();
+            if (!pathErrorInGlobal.empty()) 
+            {
+                if (pathErrorInGlobal[0] == '/')
+                    pathErrorInGlobal.erase(0, 1);
+
+                if (!root.empty() && root[root.size() - 1] != '/')
+                    root += "/";
+
+                pathErrorInGlobal = root + pathErrorInGlobal;
+            }
+            pathConfig.push_back(pathErrorInGlobal);
+        }
+    }
+
     std::stringstream ssPath;
     ssPath << PATH_ERROR_PAGES << code << ".html";
-    std::string path = ssPath.str();
+    pathConfig.push_back(ssPath.str());
 
-    if (checkFile(path))
+    bool success = false;
+   for (size_t i = 0; i < pathConfig.size(); ++i)
     {
-        std::string content = readFile(path);
-        _body.assign(content.begin(), content.end());
+        bool exists = checkFile(pathConfig[i]);
+        std::cout << "[TRY " << i << "] Path: " << pathConfig[i] 
+                << (exists ? " -> \033[32mFOUND\033[0m" : " -> \033[31mNOT FOUND\033[0m") 
+                << std::endl;
+
+        if (exists)
+        {
+            std::string content = readFile(pathConfig[i]);
+            if (!content.empty())
+            {
+                _body.assign(content.begin(), content.end());
+                success = true;
+                break;
+            }
+        }
     }
-    else
+
+    if (!success)
     {
         std::stringstream ss;
         ss << "<html><head><title>" << code << " " << message << "</title></head>";
@@ -69,7 +127,7 @@ void Response::generateErrorPage(e_status_code code)
         ss << "<h1 style='font-size: 50px;'>" << code << "</h1>";
         ss << "<h2>" << message << "</h2>";
         ss << "<hr><p>Webserv/1.0 (Fallback Mode)</p></body></html>";
-        
+
         std::string html = ss.str();
         _body.assign(html.begin(), html.end());
     }
@@ -81,10 +139,16 @@ bool    Response::checkFile(const std::string &path)
 {
     struct stat data;
     
-    if (stat(path.c_str(), &data) == 0)
-        return S_ISREG(data.st_mode);
+    if (stat(path.c_str(), &data) != 0) // erreur 
+        return (false);
 
-    return false;
+    if (!S_ISREG(data.st_mode)) // dossier
+        return (false);
+
+    if (access(path.c_str(), R_OK) != 0) // lecture interdite
+        return (false);
+
+    return (true);
 }
 
 std::string Response::readFile(const std::string &path)

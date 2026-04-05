@@ -14,7 +14,7 @@
 #include "Errors.hpp"
 #include "../server/Client.hpp"
 
-#define PATH_ERROR_PAGES "errors_pages/"
+#define PATH_ERROR_PAGES "www/errors_pages/"
 #define IS_CGI			1
 
 class	Config;
