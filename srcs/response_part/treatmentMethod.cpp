@@ -23,6 +23,8 @@ void    Response::methodProcess(const Request &req)
             this->fail(METHOD_NOT_ALLOWED);
     }
 
+    std::cerr << "DEBUG uriFullPath: " << _uriFullPath << std::endl;
+
     if (method == "GET")
         this->doGet();
     else if (method == "POST")

@@ -276,7 +276,7 @@ void    Request::parseHeaders(const std::string &line)
             	this->fail(BAD_REQUEST);
 			return ;
 		}
-		if (valueKey > LIMIT_BODY)
+		if (static_cast<size_t>(valueKey) > _clientMaxBodySize)
 			this->fail(CONTENT_TOO_LARGE);
 
 		if (_allHeaders.count("transfer-encoding") && _allHeaders["transfer-encoding"] == "chunked")
@@ -376,8 +376,8 @@ void    Request::parseBodyChunked()
 			
 			if (*endPtr != '\0' || valueForChunk < 0)
 				this->fail(BAD_REQUEST);
-			if (static_cast<size_t>(valueForChunk) > LIMIT_BODY ||
-			(_body.size() + static_cast<size_t>(valueForChunk)) > LIMIT_BODY)
+			if (static_cast<size_t>(valueForChunk) > _clientMaxBodySize ||
+			(_body.size() + static_cast<size_t>(valueForChunk)) > _clientMaxBodySize)
 				this->fail(CONTENT_TOO_LARGE);
 
 			_chunkSize = static_cast<long>(valueForChunk);

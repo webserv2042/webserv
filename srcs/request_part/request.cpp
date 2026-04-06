@@ -9,6 +9,7 @@ Request::Request() :
 	_httpVersion(""),
 	_body(""),
 	_cookies(),
+	_clientMaxBodySize(0),
 	_contentLength(0),
 	_isContentLength(false),
 	_chunkSize(0),
@@ -167,4 +168,9 @@ e_status_code	Request::getErrorCode() const
 std::string	Request::getQueryString() const
 {
 	return (_queryString);
+}
+
+void    Request::setClientMaxBodySize(size_t size)
+{
+    _clientMaxBodySize = size;
 }

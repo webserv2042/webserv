@@ -27,7 +27,10 @@ Client::Client(int fd, const Config *config, int ep_fd) :
     ogFd(-1),
     forkPid(-1),
     cgiBytesWritten(0)
-{}
+{
+	if (config)
+    	_request.setClientMaxBodySize(config->getClientMaxBodySize());
+}
 
 Client::Client(const Client& to_copy)
 {
@@ -92,7 +95,11 @@ void Client::updateActivity()
 
 void Client::resetClient()
 {
-	_request.reset(); 
+	_request.reset();
+
+	if (_serverConfig)
+    	_request.setClientMaxBodySize(_serverConfig->getClientMaxBodySize());
+
 	_keepAlive = true;
 	_requestCount++;
 

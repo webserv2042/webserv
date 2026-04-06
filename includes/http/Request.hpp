@@ -55,6 +55,7 @@ class Request
 		std::string         						_httpVersion;
 		std::string         						_body;
 		std::map<std::string, std::string>			_cookies;
+		size_t										_clientMaxBodySize;
 		size_t										_contentLength;
 		bool										_isContentLength;
 		size_t										_chunkSize;
@@ -87,6 +88,7 @@ class Request
 		std::string									getQueryString() const;
 		std::string									getCookie(const std::string& name) const;
 		std::string									getCookiesMap() const;
+		void    									setClientMaxBodySize(size_t size);
 
 		//******************** PARTIE 2 : Parsing **************************//
 		void										parseRequest();
