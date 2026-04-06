@@ -25,7 +25,6 @@
 #include "server/Client.hpp"
 #include "server/Server.hpp"
 
-
 #define MAX_EVENTS 1024 //nombre d'evenements enregistres a la fois par epoll_wait
 
 // RETOURS FONCTIONS
@@ -88,10 +87,10 @@ class Webserv {
 		//* REQUETE + REPONSE
 
     	void 			                  	treatRequest(int &fd);
-		void								writeResponse(int &fd);
+		void								writeResponse(int fd);
 		void								CGIwriteToChild(int fd);
 		void								CGIreadFromChild(int fd);
-		void								CGIprepareResponse(int fd, std::vector<char> cgiOutput);
+		void								CGIprepareResponse(int fd, std::vector<char> cgiOutput, e_status_code errCode);
 		void								sendResponse(Client &client);
 
 };

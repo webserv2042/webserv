@@ -6,19 +6,21 @@
 #include <vector>
 #include <ctime>
 
-#define IDLE_TIMEOUT 10 //timeout d'un client sans aucune 
+#define IDLE_TIMEOUT 10 //timeout d'un client sans aucune activité
 #define KEEPALIVE_TIMEOUT 3
 #define NO_TIMEOUT 0
 #define TIMEOUT 1
 
 typedef enum e_client_state
 {
-	CONNEXION_ACCEPTED,
-	READING_REQUEST,
-	WRITING_RESPONSE,
-	READING_CGI,
-	DONE_READING_CGI,
-	DONE,
+    CONNEXION_ACCEPTED,
+    READING_REQUEST,
+    WRITING_RESPONSE,
+    READING_CGI,
+    DONE_READING_CGI,
+    SENDING_RESPONSE,
+    WAITING_FOR_CGI,
+    DONE
 }	t_client_state;
 
 class Config;
@@ -48,12 +50,13 @@ class Client
 		const Config* 		_serverConfig; // do copy
 		bool                _keepAlive;
 
-		//CGI DATA
-		bool                isCGI;
-		int                 pipeType;
-		int                 ogFd; // fd du client original
-		int                 forkPid;
-		std::vector<char>   cgiResponseBuff;
+        //CGI DATA
+        bool                isCGI;
+        int                 pipeType;
+        int                 ogFd; // fd du client original
+        int                 forkPid;
+        std::vector<char>   cgiResponseBuff;
+        size_t              cgiBytesWritten;
 
 		int                 timeout();
 		void                updateActivity();

@@ -1,28 +1,32 @@
 #include "../../includes/server/Client.hpp"
 
 Client::Client() : 
-	clientFd(-1), 
-	clientState(CONNEXION_ACCEPTED), 
-	bytesSent(0), 
-	buffSize(0), 
-	_lastActivity(time(NULL)), 
-	_serverConfig(NULL), 
-	_keepAlive(true) 
+    clientFd(-1), 
+    clientState(CONNEXION_ACCEPTED), 
+    bytesSent(0), 
+    buffSize(0), 
+    _lastActivity(time(NULL)), 
+	_requestCount(0),
+    _serverConfig(NULL), 
+    _keepAlive(true),
+    cgiBytesWritten(0) 
 {}
 
 Client::Client(int fd, const Config *config, int ep_fd) : 
-	clientFd(fd), 
-	clientState(CONNEXION_ACCEPTED),
-	epFd(ep_fd),
-	bytesSent(0), 
-	buffSize(0), 
-	_lastActivity(time(NULL)), 
-	_serverConfig(config), 
-	_keepAlive(true),
-	isCGI(0),
-	pipeType(0),
-	ogFd(-1),
-	forkPid(-1)
+    clientFd(fd), 
+    clientState(CONNEXION_ACCEPTED),
+    epFd(ep_fd),
+    bytesSent(0), 
+    buffSize(0), 
+    _lastActivity(time(NULL)), 
+	_requestCount(0),
+    _serverConfig(config), 
+    _keepAlive(true),
+    isCGI(0),
+    pipeType(0),
+    ogFd(-1),
+    forkPid(-1),
+    cgiBytesWritten(0)
 {}
 
 Client::Client(const Client& to_copy)
@@ -44,16 +48,18 @@ Client& Client::operator=(const Client& to_copy)
 		this->_lastActivity = to_copy._lastActivity;
 
 		this->_serverConfig = to_copy._serverConfig;
+		this->_requestCount = to_copy._requestCount;
 		this->_request = to_copy._request; // Copie de ta partie Request
 		this->_keepAlive = to_copy._keepAlive;
 
-		this->isCGI = to_copy.isCGI;
-		this->pipeType = to_copy.pipeType;
-		this->ogFd = to_copy.ogFd;
-		this->forkPid = to_copy.forkPid;
-		this->cgiResponseBuff = to_copy.cgiResponseBuff;
-	}
-	return (*this);
+        this->isCGI = to_copy.isCGI;
+        this->pipeType = to_copy.pipeType;
+        this->ogFd = to_copy.ogFd;
+        this->forkPid = to_copy.forkPid;
+        this->cgiResponseBuff = to_copy.cgiResponseBuff;
+        this->cgiBytesWritten = to_copy.cgiBytesWritten;
+    }
+    return (*this);
 }
 
 Client::~Client() {}

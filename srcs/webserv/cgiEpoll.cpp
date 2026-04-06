@@ -2,6 +2,7 @@
 #include "../../includes/server/Client.hpp"
 #include "../../includes/Signals.hpp"
 #include "../../includes/http/Response.hpp"
+#include "../../includes/http/Errors.hpp"
 #include <cstdio>
 
 
@@ -13,9 +14,25 @@ void    Webserv::CGIwriteToChild(int fd)
 	Request req = clients[fd].getRequest();
 
 	if (req.getMethod() == "POST")
-		write(fd, req.getBody().c_str(), req.getBody().size());
+	{
+		if (clients[fd].cgiBytesWritten < req.getBody().size()) 
+		{
+			ssize_t writeReturn = write(fd, req.getBody().c_str() + clients[fd].cgiBytesWritten, req.getBody().size() - clients[fd].cgiBytesWritten);
 
-	closeClient(fd);
+			if (writeReturn == -1) 
+			{
+				closeClient(clients[fd].ogFd);
+				closeClient(fd);
+				return;
+			}
+			clients[fd].cgiBytesWritten += writeReturn;
+		}
+
+		if (clients[fd].cgiBytesWritten >= req.getBody().size())
+			closeClient(fd);
+	}
+	else
+		closeClient(fd); 
 }
 
 /// @brief read content given back by the CGI child
@@ -26,18 +43,14 @@ void    Webserv::CGIreadFromChild(int fd)
     int     ogClientFd = clients[fd].ogFd;
     
     // READ DATA FROM CHILD //
-	// std::cout << "READING CGI...." << std::endl;
+	std::cout << "READING CGI...." << std::endl;
     ssize_t bytesRead = read(fd, buffer, sizeof(buffer));
-	// std::cout << "BTS READ: " << bytesRead << std::endl;
-	// std::cout << "-->" << std::endl;
 
 	// ONLY PART OF THE CGI HAS BEEN READ, WE STOP READING NOW AND RESUME WHEN EPOLL ALLOWS US //
     if (bytesRead > 0) {
 		clients[fd].clientState = READING_CGI;
-		// std::cout << "READ PARTIAL DATA FROM CLIENT" << std::endl;
-        // Store data in the client's specific CGI buffer
         clients[fd].cgiResponseBuff.insert(clients[fd].cgiResponseBuff.end(), buffer, buffer + bytesRead);
-        return; // Exit and wait for the next EPOLLIN event
+        return; 
     } 
 
 	// READ ERROR //
@@ -45,18 +58,17 @@ void    Webserv::CGIreadFromChild(int fd)
 	{
 		clients[fd].clientState = READING_CGI;
 		// std::cout << "COULDNT READ BYTES FROM CLIENT YET, TRYING AGAIN" << std::endl;
-		return; // No data yet, totally normal — epoll will notify us
+		return;
 	}
 
 	// EVERYTHING HAS BEEN READ //
 	else if ( bytesRead == 0)
 	{
 		clients[fd].clientState = DONE_READING_CGI;
-		// std::cout << "READ THE WHOLE DATA FROM CLIENT, JOB DONE" << std::endl;
 
 		// WAITPID //
 		int status;
-		waitpid(clients[fd].forkPid, &status, WNOHANG); //WNOHANG
+		waitpid(clients[fd].forkPid, &status, WNOHANG);
 
 		// AJOUT DEBUG
 		std::string debug(clients[fd].cgiResponseBuff.begin(), clients[fd].cgiResponseBuff.end());
@@ -67,25 +79,30 @@ void    Webserv::CGIreadFromChild(int fd)
 		std::vector<char> responseBuffer = clients[fd].cgiResponseBuff;
 		closeClient(fd);
 
+		e_status_code errCode = OK;
 		if (responseBuffer.empty()) {
-			throw std::runtime_error("500"); 
+			errCode = BAD_GATEWAY; 
 		}
 
 		// FINISH THE RESPONSE //
-		std::cout << "PREPARING FINAL CGI RESPONSE" << std::endl;
-		CGIprepareResponse(ogClientFd, responseBuffer);
+		CGIprepareResponse(ogClientFd, responseBuffer, errCode);
 	}
 }
 
 /// @brief Finish the response from the CGI output
 /// @param fd fd of the original client that made the request
 /// @param cgiOutput the output given by CGI child
-void    Webserv::CGIprepareResponse(int fd, std::vector<char> cgiOutput)
+void    Webserv::CGIprepareResponse(int fd, std::vector<char> cgiOutput, e_status_code errCode)
 {
+	std::cout << "PREPARE CGI RESPONSE..." << std::endl;
+
 	const Config		&config = clients[fd].getConfig();
 	Response			res(config);
 
-	res.responseCgi(cgiOutput, clients[fd].getRequest());
+	if (errCode == OK)
+		res.responseCgi(cgiOutput, clients[fd].getRequest());
+	else
+		res.errorResponseCgi(errCode, clients[fd].getRequest());
 
 	clients[fd]._keepAlive = !res.getCloseFd();
 
@@ -95,6 +112,6 @@ void    Webserv::CGIprepareResponse(int fd, std::vector<char> cgiOutput)
 	clients[fd].buffSize = clients[fd].writeBuff.size();
 	clients[fd].bytesSent = 0;
 
-	clients[fd].clientState = WRITING_RESPONSE;
 	modifyEpollout(fd, ADD_EPOLLOUT);
+	clients[fd].clientState = SENDING_RESPONSE;
 }

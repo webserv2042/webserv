@@ -32,12 +32,22 @@ int main(int argc, char **argv)
 		handle_signals();
 
 		//INIT SERVER
-		// std::cout << std::endl << "Initializing servers..." << std::endl;
-		webserv.setServers(servers);
+		std::cout << std::endl << "Initializing servers..." << std::endl;
+		try
+		{
+			webserv.setServers(servers);
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << e.what();
+			std::cerr << strerror(errno) << std::endl;
+			return 1;
+		}
+		
+		
 
 		//PARTIE POLL
 		// std::cout << "Starting Epoll..." << std::endl;
-
 		webserv.epollLoop();
 	}
 	catch(const std::exception& e)
