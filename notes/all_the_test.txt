@@ -2,6 +2,7 @@ Trouver le pid du serveur : pgrep webserv
 Voir qui écoute sur le port *** (ici, 8080) : lsof -i 8080 (lsof = liste les fd ouverts par les processus, 
 -i pour afficher les fichiers de type réseau, -p + PID pour voir les fichiers ouverts par le processus)
 Surveiller l'état des ressources et des performances pendant l'execution du serveur : top -p + PID
+Surveiller l'état des connexions sur le réseau : watch -n 1 'ss -tnp | grep 8080'
 
 sudo systemctl start nginx, port 80, si besoin de tester le comportement en comparaison
 
