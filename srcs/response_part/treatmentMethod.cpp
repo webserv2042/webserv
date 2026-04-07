@@ -4,24 +4,10 @@
 
 void    Response::methodProcess(const Request &req)
 {
-    std::string method = req.getMethod();
-
-    if (_structLocation && !_structLocation->allowedMethods.empty())
-    {
-        bool found = false;
-        std::vector<std::string>::const_iterator it;
-        
-        for (it = _structLocation->allowedMethods.begin(); it < _structLocation->allowedMethods.end(); ++it)
-        {
-            if (*it == method)
-            {
-                found = true;
-                break ;
-            }
-        }
-        if (!found)
-            this->fail(METHOD_NOT_ALLOWED);
-    }
+    std::string method = req.getMethod(); 
+    
+     if (!this->isMethodAllowed(req))
+        this->fail(METHOD_NOT_ALLOWED);
 
     std::cerr << "DEBUG uriFullPath: " << _uriFullPath << std::endl;
 
@@ -33,6 +19,20 @@ void    Response::methodProcess(const Request &req)
         this->doDelete();
     else
         this->fail(NOT_IMPLEMENTED);
+}
+
+bool    Response::isMethodAllowed(const Request &req)
+{
+    if (!_structLocation || _structLocation->allowedMethods.empty())
+        return (true);
+
+    std::string method = req.getMethod();
+    for (size_t i = 0; i < _structLocation->allowedMethods.size(); ++i)
+    {
+        if (_structLocation->allowedMethods[i] == method)
+            return (true);
+    }
+    return (false);
 }
 
 void    Response::doGet()

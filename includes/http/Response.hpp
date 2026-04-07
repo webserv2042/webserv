@@ -86,6 +86,7 @@ class Response
 		void										errorResponseCgi(e_status_code errCode, const Request &reqClient);
 		void    									parseCgi(const std::vector<char> &cgi);
         void    									parseHeadersCgi(const std::string &line);
+		bool    									isMethodAllowed(const Request &req);
 
 		// method
 

@@ -6,6 +6,8 @@ Surveiller l'état des connexions sur le réseau : watch -n 1 'ss -tnp | grep 80
 
 sudo systemctl start nginx, port 80, si besoin de tester le comportement en comparaison
 
+valgrind --leak-check=full --track-origins=yes --track-fds=yes --show-leak-kinds=all ./webserv config.conf
+
 Stress test : siege -c 150 -t 40s http://127.0.0.1:8080 
 
 Rapport :
@@ -38,3 +40,19 @@ Test de la CGI : POST /login.php HTTP/1.1
 
                 email=manager@gmail.com&password=mpw
                 email=employee@gmail.com&password=upw
+
+uri too long: python3 -c "
+import socket
+s = socket.socket()
+s.connect(('localhost', 8080))
+req = 'GET /' + 'A' * 9000 + ' HTTP/1.1\r\nHost: localhost\r\n\r\n'
+s.send(req.encode())
+print(s.recv(4096).decode())
+s.close()
+"
+
+content too large : 
+
+- python3 -c "print('A' * 10485769)" > /tmp/bigfile.txt
+- curl -v -X POST -H "Content-Type: text/plain" \
+  --data-binary @/tmp/bigfile.txt http://localhost:8080/uploads/big.txt

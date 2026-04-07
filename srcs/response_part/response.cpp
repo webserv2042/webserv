@@ -44,8 +44,17 @@ int    Response::setResponseFinal(const Request &reqClient, int fd, std::map<int
 			this->createResponse();
 			return (0);
 		}
+		
+		if (!this->isMethodAllowed(reqClient))
+		{
+			this->fail(METHOD_NOT_ALLOWED);
+			this->generateErrorPage(_statusCode);
+			this->setHeaders(reqClient);
+			this->createResponse();
+			return (0);
+		}
 
-		if (isCgi())
+		if (isCgi() && _statusCode)
 		{
 			std::cout << "--IS CGI--" << std::endl;
 			CGI cgiExec(_uriFullPath, _pathExecCgi);
