@@ -79,6 +79,21 @@ server
 }
 ```
 
+## Feedback & Notes
+
+### Score
+
+<img width="198" height="168" alt="Screenshot 2026-04-08 at 09 13 00" src="https://github.com/user-attachments/assets/5f8b4f96-4e09-4b50-be6a-19b7996adac5" />
+
+### Reviewer comments
+
+> *"Un serveur super bien pensé et bien réalisé. Le groupe a une dynamique formidable et une admirable attache aux détails. J'ai été particulièrement étonné de par la propreté du code, des explications et des connaissances de chacun sur leur code mais aussi sur le code des autres membres du groupe. Tous les tests ont été réalisés et ont été réussis avec brio. La relecture du code était simple de part une présence mesurée de commentaires. La présence des commandes de tests dans le fichier txt est un détail marquant une réel intérêt pour une correction fluide. En somme, votre travail a tout les trois est incroyable et vous pouvez être fier du résultat fourni ! Il est sublime !"*
+
+> *"Une équipe super complémentaire avec une totale maîtrise du sujet, bravo pour la réalisation du projet et l'énergie émise !"*
+
+> *"Webserv bien fait et bien compris, merci pour toutes les explications ! Vous avez bien géré."*
+
+
 # Resources
 For this project, the following documentation has been used:
 - for all the epoll functions: https://man7.org/linux/man-pages/man7
